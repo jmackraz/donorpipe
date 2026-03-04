@@ -1,8 +1,13 @@
+from __future__ import annotations
+
+from datetime import date
+from typing import Any
+
 from dateutil.parser import parse
-from util import parse_float, currency_symbol
+from donorpipe.models.util import parse_float, currency_symbol
 
 
-def payment_type(service):
+def payment_type(service: str) -> str:
     if service in ('stripe'):
         return "credit card"
     elif service in ('paypal'):
@@ -11,7 +16,8 @@ def payment_type(service):
         return f"other: {service}"
 
 class Transaction:
-    def __init__(self, record, filename, service, tx_id, date, net, currency="USD"):
+    def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
+                 date: str, net: str | float, currency: str = "USD") -> None:
         self.record = record
         self.filename = filename
         self.service = service
@@ -20,19 +26,21 @@ class Transaction:
         self.net = parse_float(net)
         self.currency = currency
 
-    def __str__(self):
+    def __str__(self) -> str:
         date_str = self.date.strftime("%m-%d-%Y %H:%M")
         netstr = f"{currency_symbol(self.currency)}{self.net:.2f}"
         return f"{date_str:<15} {netstr:>10} {self.service:<20}"
 
     @property
-    def id(self):
+    def id(self) -> str:
         return f"{self.service}:{self.tx_id}"
 
 
 class Donation(Transaction):
-    def __init__(self, record, filename, service, tx_id, date, net, name, payment_service, charge_tx_id,
-                 designation, comment, email, currency="USD"):
+    def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
+                 date: str, net: str | float, name: str, payment_service: str,
+                 charge_tx_id: str | None, designation: str, comment: str,
+                 email: str, currency: str = "USD") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency )
         self.name = name
         self.payment_service = payment_service
@@ -42,24 +50,24 @@ class Donation(Transaction):
         self.email = email
 
         # linkage to QBO sales
-        self.receipt = None     # link to QBO sale. May be set later by associate_donation_receipts
-        self.duplicate_receipts = []   # for illuminating dupe entry
+        self.receipt: Receipt | None = None     # link to QBO sale. May be set later by associate_donation_receipts
+        self.duplicate_receipts: list[Receipt] = []   # for illuminating dupe entry
 
     @property
-    def charge_id(self):
+    def charge_id(self) -> str:
         return f"{self.payment_service}:{self.charge_tx_id}"
 
     @property
-    def receipts(self):
+    def receipts(self) -> list[Receipt]:
         receipts = self.duplicate_receipts or []
         if self.receipt:
             receipts.append(self.receipt)
         return receipts
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{'donation:':<10} {super().__str__()} {self.name}"
 
-    def descr(self):
+    def descr(self) -> str:
         r = self.record
         descr = (f"{'donation:':<10} {super().__str__()}\n"
                 f" name: {self.name}\n"
@@ -73,39 +81,45 @@ class Donation(Transaction):
 
 
 class Charge(Transaction):
-    def __init__(self, record, filename, service, tx_id, date, net, name, description, payment_service, payout_tx_id, currency="USD" ):
+    def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
+                 date: str, net: str | float, name: str, description: str,
+                 payment_service: str, payout_tx_id: str | None, currency: str = "USD") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency )
         self.name = name
         self.description = description
         self.payment_service = payment_service
         self.payout_tx_id = payout_tx_id
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{'charge:':<10} {super().__str__()} {self.name}"
 
     @property
-    def payout_id(self):
+    def payout_id(self) -> str:
         return f"{self.payment_service}:{self.payout_tx_id}"
 
 class Payout(Transaction):
-    def __init__(self, record, filename, service, tx_id, date, net, currency="USD"):
+    def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
+                 date: str, net: str | float, currency: str = "USD") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency)
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{'payout:':<10} {super().__str__()} {self.tx_id}"
 
 class Receipt(Transaction):
-    def __init__(self, record, filename, service, tx_id, date, net, name, ref_id, product, currency="USD"):
+    def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
+                 date: str, net: str | float, name: str, ref_id: str,
+                 product: str, currency: str = "USD") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency)
         self.name = name
         self.ref_id = ref_id
         self.product = product
-        self.donation = None    # link to Donation. May be set later by associate_donation_receipts
-        self.discrepancies = None # holds annotations about diffs with donation
+        self.donation: Donation | None = None    # link to Donation. May be set later by associate_donation_receipts
+        self.discrepancies: str | None = None # holds annotations about diffs with donation
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{'receipt:':<10} {super().__str__()}"
 
-    def descr(self):
+    def descr(self) -> str:
         r = self.record
         descr = (f"{'receipt:':<10} {super().__str__()}\n"
                  f" name: {self.name}\n"

@@ -42,28 +42,57 @@ the names could be "Name 123", "Name 124" etc.  I'm open to a better way if it's
 * script is available in a development scripts directory
 * Test suite succeeds
 
-### Milestone 3: Adapt legacy backend
+### Milestone 3.1: Adapt legacy backend
 
 Before implementing this, we should discuss submilestones.
 
-**Precondition:** I will populate the backend src directory with my legacy code and add 
-the CLI script
+**Precondition:**
+* I have copied legacy code into the 'models' directory
+and two files that make up the CLI script into the 'cli' directory.
+* In so doing, I relocated the two cli files, which were originally
+in the same directory as the models.
 
 **Goals:**
-* Modify the legacy code to run standalone in the project structure
-* Improve its quality
+* The legacy code runs successfully in this project structure
+
+The cli command, from the top level project directory is:
+
+```bash
+env OSF_EXPORTS=testdata uv run src/donorpipe/cli/qcsv.py -d Stripe DonorBox QBO
+```
 
 **Behavior:**
-* The legacy code has been analyzed
+* The legacy code has been analyzed and remembered
 * The CLI script executes without exception and ingests the test data
-* The legacy code is thoroughly typed
-
-Note: I do not have a preference of the order of these directives. It may make sense to define
-sub-milestones
 
 **Done when:**
 * The CLI functions
-* The code has been typed
+* User confirms the CSVs are being ingested
+
+### Milestone 3.2: Improve the legacy code
+
+**Goals:the legacy code is improved**
+
+**Behavior:**
+* The legacy code is typed
+* The legacy code has automated tests
+* Suggestions are discussed and implemented, with decisions recorded
+
+**Done when:**
+* The legacy code is typed
+* Test suite succeeds
+* Suggestions are implemented
+* Decisions are documented
+
+**Constraints:**
+* Don't refactor the legacy code
+
+**Decisions:**
+* Type checker: pyright
+* Testing: light unit tests; code is stable and well-exercised
+* Pydantic: deferred to Milestone 5 where FastAPI integration makes it natural
+* Type annotations: inline PEP 484 hints, no structural refactoring
+
 
 ### Milestone 4: Serialize graph
 

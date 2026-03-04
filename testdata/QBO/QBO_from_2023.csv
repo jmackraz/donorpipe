@@ -1,3 +1,7 @@
+[CURRENT] Sales Transaction Export,,,,,,,
+Oliveseed Foundation,,,,,,,
+"January, 2023-December, 2030",,,,,,,
+
 Donor,Transaction date,Num,Product/Service full name,Amount,REF #,Line created by,Line created date
 Donor 1,01/03/2023,Bloom1068,Name 1,200.00,,Jim Mackraz,01/04/2023 12:33:05 AM
 Donor 2,01/03/2023,Bloom1069,Name 2,300.00,,Jim Mackraz,01/04/2023 12:33:06 AM
@@ -673,5 +677,8 @@ Donor 671,02/16/2026,9573,Name 671,143.06,64030602,Jim Mackraz,03/01/2026 07:07:
 Donor 672,02/18/2026,9574,Name 672,143.40,64084791,Jim Mackraz,03/01/2026 07:08:57 PM
 Donor 673,02/22/2026,9575,Name 673,20.00,64259232,Jim Mackraz,03/01/2026 07:09:28 PM
 Donor 674,02/23/2026,9576,Name 674,50.47,64280142,Jim Mackraz,03/01/2026 07:10:03 PM
-Donor 675,,,Name 675,"$886,535.23",,,
-Donor 676,,,Name 676,,,,
+TOTAL,,,,"$886,535.23",,,
+
+
+
+" Tuesday, March 03, 2026 12:05 AM GMT-08:00",,,,,,,

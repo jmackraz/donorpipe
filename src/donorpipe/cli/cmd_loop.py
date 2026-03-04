@@ -1,19 +1,26 @@
+from __future__ import annotations
+
 import cmd
 import datetime
 import io
 import itertools
+from collections.abc import Iterable
 from contextlib import redirect_stdout
+from typing import Any
 
 from consolemenu import SelectionMenu
 from dateutil import parser as dateparser
 
-from datewindow import VALID_INTERVALS
-from util import paged_print
-from transaction_filter import TransactionFilter
+from donorpipe.datewindow import VALID_INTERVALS
+from donorpipe.models.transaction_filter import TransactionFilter
+from donorpipe.models.transaction_store import TransactionStore
+from donorpipe.models.transactions import Donation, Receipt, Transaction
+from donorpipe.models.util import paged_print
 
 
 
-def list_donations(tx_store, donations=None, show_chain=True,long_form=False, all_fields=False):
+def list_donations(tx_store: TransactionStore, donations: Iterable[Donation] | None = None,
+                   show_chain: bool = True, long_form: bool = False, all_fields: bool = False) -> None:
     if donations is None:
         donations = tx_store.donations.values()
     for donation in donations:
@@ -40,7 +47,7 @@ def list_donations(tx_store, donations=None, show_chain=True,long_form=False, al
                     print(rcpt.descr() if long_form else rcpt)
         print()
 
-def list_payouts(tx_store, payouts=None):
+def list_payouts(tx_store: TransactionStore, payouts: Iterable[Any] | None = None) -> None:
     if not payouts:
         payouts = tx_store.payouts.values()
     for payout in payouts:
@@ -53,7 +60,8 @@ def list_payouts(tx_store, payouts=None):
             print(f"charges not found")
         print()
 
-def list_receipts(tx_store, receipts=None, show_chain=True,long_form=False, all_fields=False):
+def list_receipts(tx_store: TransactionStore, receipts: Iterable[Receipt] | None = None,
+                  show_chain: bool = True, long_form: bool = False, all_fields: bool = False) -> None:
     if not receipts:
         receipts = tx_store.receipts.values()
     for receipt in receipts:
@@ -72,26 +80,26 @@ def list_receipts(tx_store, receipts=None, show_chain=True,long_form=False, all_
 class ExpenseReportingCmd(cmd.Cmd):
     prompt = 'qvc>  '
 
-    def __init__(self, tx_loader):
+    def __init__(self, tx_loader: Any) -> None:
         super().__init__()
         self.loader = tx_loader
-        self.services = []
-        self.tx_store = None
+        self.services: list[str] = []
+        self.tx_store: TransactionStore | None = None
         self.prev_listing = ""  # last donations or payouts command, for repeating
         self.filter = TransactionFilter()
 
         self.update_tx_store()   # inits tx_store and services
 
-    def update_tx_store(self):
+    def update_tx_store(self) -> None:
         self.tx_store = self.loader.load()
-        self.services = list({t.service for t in itertools.chain(self.tx_store.donations.values(),
-                                                                 self.tx_store.charges.values(),
-                                                                 self.tx_store.payouts.values(),
-                                                                 self.tx_store.receipts.values(),
-                                                                 self.tx_store.deposits.values())})
+        self.services = list({t.service for t in itertools.chain(self.tx_store.donations.values(),  # type: ignore[union-attr]
+                                                                 self.tx_store.charges.values(),  # type: ignore[union-attr]
+                                                                 self.tx_store.payouts.values(),  # type: ignore[union-attr]
+                                                                 self.tx_store.receipts.values(),  # type: ignore[union-attr]
+                                                                 self.tx_store.deposits.values())})  # type: ignore[union-attr]
 
     # multiple commands on one line
-    def precmd(self, line):
+    def precmd(self, line: str) -> str:
         cmds = line.split(";")
         if len(cmds) > 1:
             self.cmdqueue.extend(cmds)
@@ -99,16 +107,16 @@ class ExpenseReportingCmd(cmd.Cmd):
             return cmds[0]
         return ""
 
-    def show_filters(self):
+    def show_filters(self) -> None:
         """show current filter spec"""
         self.filter.show_filters()
 
-    def do_reload(self, _):
+    def do_reload(self, _: str) -> None:
         """Reload the transaction data from the CSV file"""
         self.update_tx_store()
         self.show_filters()
 
-    def do_filter(self, arg):
+    def do_filter(self, arg: str) -> None:
         """Add or remove filter conditions (abbreviation: "f")
         Options "reset" to clear, service, name (pattern). Without an argument, show current filter.
         Date window filtering is controlled with 'start' and 'interval' commands.
@@ -136,7 +144,7 @@ class ExpenseReportingCmd(cmd.Cmd):
             elif svc not in self.services:
                 print("service must be one of:", self.services)
             else:
-                self.filter.toggle_service(svc)
+                self.filter.toggle_service(svc)  # type: ignore[arg-type]
 
 
         elif method_args[0] == "name":
@@ -154,13 +162,13 @@ class ExpenseReportingCmd(cmd.Cmd):
 
         self.show_filters()
 
-    def do_f(self, arg):
+    def do_f(self, arg: str) -> None:
         """Shortcut for 'filter'"""
         self.do_filter(arg)
 
 
 
-    def do_donations(self, arg):
+    def do_donations(self, arg: str) -> None:
         """Print the filtered list of donations in various ways. (abbreviation: "d")
         Options include 'short', 'associations', 'duplicates', 'missing', 'errors' (abbreviations work)
         Note that appending " /a" will print the full CSV-file record for each donation.
@@ -173,12 +181,12 @@ class ExpenseReportingCmd(cmd.Cmd):
                              'errors - discrepancies between donation and receipts'
                              )
 
-        arg, long_form, show_all = complete_args(arg, list_choices, list_choices_desc)
+        arg, long_form, show_all = complete_args(arg, list_choices, list_choices_desc)  # type: ignore[misc]
 
-        the_list = self.tx_store.donations.values()
+        the_list = self.tx_store.donations.values()  # type: ignore[union-attr]
         if not the_list:
             return
-        the_list = sorted( self.filter.apply(the_list), key=lambda t: t.date)
+        the_list = sorted( self.filter.apply(the_list), key=lambda t: t.date)  # type: ignore[arg-type]
 
         # capture stdout to string, for paging
         str_io = io.StringIO()
@@ -186,31 +194,31 @@ class ExpenseReportingCmd(cmd.Cmd):
             if arg == "short":
                 self.prev_listing = "donations short"
                 for d in the_list:
-                    print(d.descr() if long_form else d)
+                    print(d.descr() if long_form else d)  # type: ignore[attr-defined]
 
             elif arg == "associations":
                 self.prev_listing = "donations associations"
-                list_donations(self.tx_store, the_list, show_chain=True, long_form=long_form, all_fields=show_all)
+                list_donations(self.tx_store, the_list, show_chain=True, long_form=long_form, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "missing":
                 self.prev_listing = "donations missing"
-                the_list = filter(lambda d: not d.receipt and not d.duplicate_receipts, the_list)
-                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)
+                the_list = filter(lambda d: not d.receipt and not d.duplicate_receipts, the_list)  # type: ignore[attr-defined]
+                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "duplicates":
                 self.prev_listing = "donations duplicates"
-                the_list = filter(lambda d: d.duplicate_receipts, the_list)
-                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)
+                the_list = filter(lambda d: d.duplicate_receipts, the_list)  # type: ignore[attr-defined]
+                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "errors":
                 self.prev_listing = "donations errors"
-                def f(d):
+                def f(d: Donation) -> bool:
                     for rcpt in d.receipts:
                         if rcpt.discrepancies:
                             return True
                     return False
-                the_list = filter(f, the_list)
-                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)
+                the_list = filter(f, the_list)  # type: ignore[arg-type]
+                list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
 
             else:
@@ -218,37 +226,37 @@ class ExpenseReportingCmd(cmd.Cmd):
         s = str_io.getvalue()
         paged_print(s)
 
-    def do_d(self, arg):
+    def do_d(self, arg: str) -> None:
         """Shortcut for 'donations', but defaults to 'short' listing"""
         self.do_donations(arg or "short")
 
-    def do_list(self, _):
+    def do_list(self, _: str) -> None:
         """Repeat last donation or payout listing command (abbreviation: "l")"""
         if self.prev_listing:
             self.cmdqueue.append(self.prev_listing)
         else:
             print("no listing history yet.")
 
-    def do_l(self, _):
+    def do_l(self, _: str) -> None:
         """Shortcut for 'list'"""
         self.do_list(_)
 
-    def do_payouts(self,_):
+    def do_payouts(self, _: str) -> None:
         """list payouts and their associated charges (for reconciliation matching)"""
 
         self.prev_listing = "payouts"
-        the_list = self.tx_store.payouts.values()
+        the_list = self.tx_store.payouts.values()  # type: ignore[union-attr]
         if not the_list:
             return
-        the_list = sorted(self.filter.apply(the_list), key=lambda t: t.date)
+        the_list = sorted(self.filter.apply(the_list), key=lambda t: t.date)  # type: ignore[arg-type]
 
         str_io = io.StringIO()
         with redirect_stdout(str_io):
-            list_payouts(self.tx_store, the_list)
+            list_payouts(self.tx_store, the_list)  # type: ignore[arg-type]
         s = str_io.getvalue()
         paged_print(s)
 
-    def do_receipts(self, arg):
+    def do_receipts(self, arg: str) -> None:
         """Print the filtered list of receipts in various ways. (abbreviation: "r")
         Options include 'short', 'missing'
         Note that appending " /a" will print the full CSV-file record for each receipt.
@@ -260,12 +268,12 @@ class ExpenseReportingCmd(cmd.Cmd):
                                      'missing - online receipts with no corresponding donation',
                                      )
 
-        arg, long_form, show_all = complete_args(arg, receipt_list_choices, receipt_list_choices_desc)
+        arg, long_form, show_all = complete_args(arg, receipt_list_choices, receipt_list_choices_desc)  # type: ignore[misc]
 
-        the_list = self.tx_store.receipts.values()
+        the_list = self.tx_store.receipts.values()  # type: ignore[union-attr]
         if not the_list:
             return
-        the_list = sorted( self.filter.apply(the_list), key=lambda t: t.date)
+        the_list = sorted( self.filter.apply(the_list), key=lambda t: t.date)  # type: ignore[arg-type]
 
         # capture stdout to string, for paging
         str_io = io.StringIO()
@@ -273,34 +281,34 @@ class ExpenseReportingCmd(cmd.Cmd):
             if arg == "short":
                 self.prev_listing = "receipts short"
                 for r in the_list:
-                    print(r.descr() if long_form else r)
+                    print(r.descr() if long_form else r)  # type: ignore[attr-defined]
 
             elif arg == "long":
                 self.prev_listing = "receipts short"
                 for r in the_list:
-                    print(r.descr())
+                    print(r.descr())  # type: ignore[attr-defined]
 
             elif arg == "associations":
                 self.prev_listing = "receipts associations"
-                list_receipts(self.tx_store, the_list, show_chain=True, long_form=long_form, all_fields=show_all)
+                list_receipts(self.tx_store, the_list, show_chain=True, long_form=long_form, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "missing":
                 self.prev_listing = "receipts missing"
-                the_list = filter(lambda r: not r.donation and "Online" in r.product, the_list)
-                list_receipts(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)
+                the_list = filter(lambda r: not r.donation and "Online" in r.product, the_list)  # type: ignore[attr-defined]
+                list_receipts(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
             else:
                 print(f"{arg} not implemented yet.")
         s = str_io.getvalue()
         paged_print(s)
 
-    def do_r(self, arg):
+    def do_r(self, arg: str) -> None:
         """Shortcut for 'receipts', but defaults to 'short' listing"""
         self.do_receipts(arg or "short")
 
     # Sliding Date Window #
 
-    def do_start(self, arg):
+    def do_start(self, arg: str) -> None:
         """Set beginning of date range (will be 'rounded down' to the natural week/month/year interval start date)"""
         if arg == "reset":
             self.filter.clear_date_window()
@@ -316,10 +324,10 @@ class ExpenseReportingCmd(cmd.Cmd):
 
         self.show_filters()
 
-    def do_interval(self, arg):
+    def do_interval(self, arg: str) -> None:
         """Set the reporting interval."""
         if not arg:
-            arg = console_menu_select(VALID_INTERVALS, "Choose an interval")
+            arg = console_menu_select(VALID_INTERVALS, "Choose an interval")  # type: ignore[assignment]
             if not arg:
                 return
         try:
@@ -328,36 +336,36 @@ class ExpenseReportingCmd(cmd.Cmd):
             print(f"Invalid interval: {arg}")
         self.show_filters()
 
-    def do_next(self, arg):
+    def do_next(self, arg: str) -> None:
         """Move filter date window to the next interval"""
         self.filter.shift_date_window(1)
-    def do_n(self,arg):
+    def do_n(self, arg: str) -> None:
         """Shortcut for 'next' followed by 'list'"""
         self.do_next(arg)
         self.do_list(arg)
-    def do_prev(self, arg):
+    def do_prev(self, arg: str) -> None:
         """Move filter date window to the previous interval"""
         self.filter.shift_date_window(-1)
-    def do_p(self,arg):
+    def do_p(self, arg: str) -> None:
         """Shortcut for 'prev' followed by 'list'"""
         self.do_prev(arg)
         self.do_list(arg)
 
     @staticmethod
-    def do_q(_):
+    def do_q(_: str) -> bool:
         """quit"""
         return True
     @staticmethod
-    def do_quit(_):
+    def do_quit(_: str) -> bool:
         """quit"""
         return True
     @staticmethod
-    def do_EOF(_):
+    def do_EOF(_: str) -> bool:
         """Exit on Ctrl-D"""
         print("EOF")
         return True
 
-    def do_readcmds(self, arg):
+    def do_readcmds(self, arg: str) -> None:
         """ Read command strings from a specified file (or a default) and append them to the command queue
         Usage: readcmds <filename>
         """
@@ -374,27 +382,27 @@ class ExpenseReportingCmd(cmd.Cmd):
         except Exception as e:
             print(f"An error occurred while reading the file: {e.__class__.__name__}: {e}")
 
-    def do_go(self, _):
+    def do_go(self, _: str) -> None:
         """Shortcut for 'readcmds'"""
         self.do_readcmds("")
 
 
-def console_menu_select(choice_items, prompt, desc_items = None):
-    choice_items = list(choice_items)
-    if desc_items:
-        desc_items = list(desc_items)
-    mlist = desc_items or choice_items
-    item_list = mlist
+def console_menu_select(choice_items: Iterable[Any], prompt: str,
+                        desc_items: Iterable[Any] | None = None) -> Any | None:
+    choices: list[Any] = list(choice_items)
+    desc_list: list[Any] = list(desc_items) if desc_items else []
+    item_list: list[Any] = desc_list or choices
     selection = SelectionMenu.get_selection(item_list, title=prompt )
     #print("selection:", selection)
     if 0 <= selection < len(item_list):
         # print("selected item:", item_list[selection])
-        return choice_items[selection]
+        return choices[selection]
     else:
         # print("no selection")
         return None
 
-def complete_args(arg, choices=None, descriptions=None):
+def complete_args(arg: str, choices: tuple[str, ...] | None = None,
+                  descriptions: tuple[str, ...] | None = None) -> tuple[str, bool, bool] | None:
     if "/l" in arg:
         long_form = True
         arg = arg.replace("/l", "").strip()
@@ -408,9 +416,9 @@ def complete_args(arg, choices=None, descriptions=None):
         show_all = False
 
     if choices and not arg:
-        arg = console_menu_select(choices, "Choose donations to display", desc_items=descriptions)
+        arg = console_menu_select(choices, "Choose donations to display", desc_items=descriptions)  # type: ignore[assignment]
 
-    arg_matches = list(filter(lambda choice: choice.startswith(arg), choices))
+    arg_matches = list(filter(lambda choice: choice.startswith(arg), choices))  # type: ignore[arg-type]
     match_count = len(arg_matches)
     if match_count == 0:
         print(f"{arg} not a valid choice.")
@@ -422,4 +430,3 @@ def complete_args(arg, choices=None, descriptions=None):
         arg = arg_matches[0]
 
     return arg, long_form, show_all
-

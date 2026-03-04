@@ -2,8 +2,8 @@
 # main
 import argparse
 
-from cmd_loop import ExpenseReportingCmd
-from transaction_loader import TransactionLoader
+from donorpipe.cli.cmd_loop import ExpenseReportingCmd
+from donorpipe.models.transaction_loader import TransactionLoader
 
 
 #old_dirs_filepat =  re.compile(r'[^a-zA-Z]*old[^a-zA-Z]*', re.IGNORECASE)

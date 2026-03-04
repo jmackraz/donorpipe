@@ -15,10 +15,12 @@ uv sync                   # Sync dependencies from pyproject.toml
 ## Common Commands
 
 ```bash
-uv run python -m pytest           # Run all tests
+uv run python -m pytest                                    # Run all tests
+uv run python -m pytest tests/models/                     # Run model unit tests
 uv run python -m pytest path/to/test_file.py::test_name  # Run a single test
-uv run python -m ruff check .     # Lint
-uv run python -m ruff format .    # Format
+uv run pyright src/donorpipe/                             # Type-check
+uv run python -m ruff check .                             # Lint
+uv run python -m ruff format .                            # Format
 ```
 
 ## Project

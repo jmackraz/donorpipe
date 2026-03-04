@@ -2,14 +2,14 @@
 import os
 import glob
 import re
-from util import  shorten_gdrive_path
-from transaction_store import TransactionStore
+from donorpipe.models.util import shorten_gdrive_path
+from donorpipe.models.transaction_store import TransactionStore
 import getpass, pathlib, sys
 
 
 old_dirs_filepat = re.compile(r'(?<![a-zA-Z])old(?![a-zA-Z])', re.IGNORECASE)
 
-def associate_donation_receipts(tx_store):
+def associate_donation_receipts(tx_store: TransactionStore) -> None:
     for d in tx_store.donations.values():
         if d.tx_id == "F8E63CT3XZ":
             print("ok, weird one")
@@ -28,7 +28,7 @@ def associate_donation_receipts(tx_store):
             # no receipt found
             pass
 
-def note_discrepancies(tx_store):
+def note_discrepancies(tx_store: TransactionStore) -> None:
     """ annotate receipts with the fields not matching
     the corresponding donation. Must be called after associate_donation_receipts"""
     for d in tx_store.donations.values():
@@ -46,12 +46,12 @@ def note_discrepancies(tx_store):
 
 
 class TransactionLoader:
-    def __init__(self, filepaths, directories):
+    def __init__(self, filepaths: list[str], directories: list[str]) -> None:
         self.filepaths = filepaths
         self.directories = directories
-        self.files = []
+        self.files: list[str] = []
 
-    def _normalize_directories(self, directories):
+    def _normalize_directories(self, directories: list[str]) -> list[str]:
         """If OSF_EXPORTS is set, prefix any *relative* directory with it."""
         base = os.environ.get("OSF_EXPORTS")
         if not base:
@@ -107,7 +107,7 @@ class TransactionLoader:
 
         # Quick preview of contents (non-recursive)
         try:
-            entries = []
+            entries: list[tuple[str, str]] = []
             with os.scandir(d) as it:
                 for entry in it:
                     kind = "dir" if entry.is_dir(follow_symlinks=False) else "file"
@@ -127,7 +127,7 @@ class TransactionLoader:
 
         return True
 
-    def load(self):
+    def load(self) -> TransactionStore:
         """This method determines the list of files to load and creates a TransactionStore
         to load and store the transactions.  It then applies some analysis and rules to the loaded transactions."""
         self.files = []

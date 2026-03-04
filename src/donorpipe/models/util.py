@@ -2,10 +2,12 @@ import csv
 import io
 import pydoc
 import re
+from collections.abc import Generator, Iterator
 from datetime import datetime
+from typing import IO
 
 
-def parse_datetime(dtstring, tmstring):
+def parse_datetime(dtstring: str, tmstring: str) -> tuple[datetime, datetime]:
     try:
         # Try parsing with a 4-digit year
         date = datetime.strptime(dtstring, '%m/%d/%Y')
@@ -16,11 +18,11 @@ def parse_datetime(dtstring, tmstring):
     time = datetime.strptime(tmstring, '%H:%M:%S')
     return date, time
 
-def shorten_gdrive_path(path):
+def shorten_gdrive_path(path: str) -> str:
     """ shorten Google Drive paths to just the file name """
     return re.sub(r'^.*EXPORTED REPORTS', '[gdrive EXPORTED]', path)
 
-def csv_rows(csv_filename, skip=0, take=-1):
+def csv_rows(csv_filename: str, skip: int = 0, take: int = -1) -> Generator[dict[str, str], None, None]:
     """ generator """
     with open(csv_filename, encoding='utf-8-sig') as csvin:
         for _ in range(skip):
@@ -37,19 +39,19 @@ def csv_rows(csv_filename, skip=0, take=-1):
                 break
 
 
-def csv_rows_from_stream(csvin):
+def csv_rows_from_stream(csvin: IO[str]) -> Generator[dict[str, str], None, None]:
     """ generator """
     reader = csv.DictReader(csvin)
     for row in reader:
         yield row
 
-def parse_float(number_str):
+def parse_float(number_str: str | float | int) -> float | None:
     """
     Parse a number string into a float while supporting formats with commas.
     Example: '2,000.22' -> 2000.22
     """
-    if isinstance(number_str, float):   # in case already converted
-        return number_str
+    if isinstance(number_str, (float, int)):   # in case already converted
+        return float(number_str)
 
     try:
         # Remove commas, then parse as float
@@ -58,7 +60,7 @@ def parse_float(number_str):
         print(f"Error parsing number: {number_str} - {e}")
         return None
 
-def paged_print(s, page_if=30):
+def paged_print(s: str, page_if: int = 30) -> None:
     string_buffer = io.StringIO(s)
     lines = string_buffer.readlines()
     line_count = len(lines)
@@ -75,7 +77,7 @@ currency_symbols = {
     "EUR": "€",
     "GBP": "£"
 }
-def currency_symbol(curr_string):
+def currency_symbol(curr_string: str) -> str:
     return currency_symbols.get(curr_string, curr_string)
 
 

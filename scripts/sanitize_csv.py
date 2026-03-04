@@ -13,7 +13,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-SENSITIVE_PATTERN = re.compile(r"name|address|comment", re.IGNORECASE)
+SENSITIVE_PATTERN = re.compile(r"name|donor|address|comment|email|company|description", re.IGNORECASE)
 
 
 def _sensitive_label(header: str) -> str | None:
@@ -59,8 +59,10 @@ def sanitize_file(
 
 def sanitize_dir(input_dir: Path, output_dir: Path) -> None:
     """Recursively sanitize all CSV files in input_dir into output_dir."""
+    print(f"Sanitizing {input_dir} to {output_dir}")
     counters: dict[str, int] = defaultdict(int)
     for input_path in sorted(input_dir.rglob("*.csv")):
+        print(f"  {input_path}")
         relative = input_path.relative_to(input_dir)
         output_path = output_dir / relative
         sanitize_file(input_path, output_path, counters)

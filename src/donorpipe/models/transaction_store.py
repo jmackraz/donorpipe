@@ -2,9 +2,8 @@ import csv
 import os
 import re
 
-from transactions import Donation, Charge, Payout, Receipt
-from util import csv_rows, parse_float, shorten_gdrive_path
-from util import parse_datetime  # Import parse_datetime from util.py
+from donorpipe.models.transactions import Donation, Charge, Payout, Receipt
+from donorpipe.models.util import csv_rows, parse_float, shorten_gdrive_path, parse_datetime
 
 benevity_filepat = re.compile(".*benevity.*", re.IGNORECASE)
 paypal_filepat = re.compile(".*paypal.*", re.IGNORECASE)
@@ -14,56 +13,56 @@ qbo_filepat = re.compile("(qbo|quickbooks)", re.IGNORECASE)
 
 
 class TransactionStore:
-    def __init__(self, files):
+    def __init__(self, files: list[str]) -> None:
         self.files = files
 
-        self.donations = {}
-        self.charges = {}
-        self.payouts = {}
-        self.deposits = {}
-        self.receipts = {}
+        self.donations: dict[str, Donation] = {}
+        self.charges: dict[str, Charge] = {}
+        self.payouts: dict[str, Payout] = {}
+        self.deposits: dict[str, object] = {}
+        self.receipts: dict[str, Receipt] = {}
 
-    def add_donation(self, donation):
+    def add_donation(self, donation: Donation) -> None:
         if donation.id in self.donations:
             print("DUPLICATE:", donation)
         self.donations[donation.id] = donation
 
-    def add_charge(self, charge):
+    def add_charge(self, charge: Charge) -> None:
         if charge.id in self.charges:
             print("DUPLICATE:", charge)
         self.charges[charge.id] = charge
 
-    def add_payout(self, payout):
+    def add_payout(self, payout: Payout) -> None:
         if payout.id in self.payouts:
             print("DUPLICATE:", payout)
         self.payouts[payout.id] = payout
 
-    def add_receipt(self, receipt):
+    def add_receipt(self, receipt: Receipt) -> None:
         if receipt.id in self.receipts:
             print("DUPLICATE:", receipt)
         self.receipts[receipt.id] = receipt
 
-    def add_deposit(self, deposit):
-        if deposit.id in self.deposits:
+    def add_deposit(self, deposit: object) -> None:
+        if deposit.id in self.deposits:  # type: ignore[attr-defined]
             print("DUPLICATE:", deposit)
-        self.deposits[deposit.id] = deposit
+        self.deposits[deposit.id] = deposit  # type: ignore[attr-defined]
 
     # associations
 
-    def donation_charge(self, donation):
+    def donation_charge(self, donation: Donation | None) -> Charge | None:
         charge_id = donation.charge_id if donation else None
-        return self.charges.get(charge_id)
+        return self.charges.get(charge_id)  # type: ignore[arg-type]
 
-    def charge_payout(self, charge):
+    def charge_payout(self, charge: Charge | None) -> Payout | None:
         payout_id = charge.payout_id if charge else None
-        return self.payouts.get(payout_id)
+        return self.payouts.get(payout_id)  # type: ignore[arg-type]
 
-    def payout_charges(self, payout):
+    def payout_charges(self, payout: Payout) -> list[Charge]:
         return [ch  for ch in self.charges.values() if ch.payout_id == payout.id]
-        return None
+        return None  # type: ignore[return]
 
     @staticmethod
-    def parse_filename(filename):
+    def parse_filename(filename: str) -> dict[str, str] | None:
         match = donorbox_filepat.match(filename)
         if match:
             return dict(type="donorbox")
@@ -88,7 +87,7 @@ class TransactionStore:
         return None
 
 
-    def load(self):
+    def load(self) -> None:
         """ read in new transactions from downloaded csv files with account naming conventions
             pass through rules (lazy-loaded from YAML files) to assign categories and tags.
         """
@@ -121,7 +120,7 @@ class TransactionStore:
             else:
                 print("can't handle type:", info['type'])
 
-    def load_qbo_transactions(self, filename):
+    def load_qbo_transactions(self, filename: str) -> None:
 
         # QBO doesn't export clean CSVs. They have junk at the beginning and the end.
         for r in csv_rows(filename, skip=4):
@@ -141,7 +140,7 @@ class TransactionStore:
                 pass
             self.receipts[receipt.id] = receipt
 
-    def load_benevity_transactions(self, filename):
+    def load_benevity_transactions(self, filename: str) -> None:
         """Load donations from benevity CSV file.
         We synthesize charges for each donation, and a payout for each file.
         We assume the "Check fee" will always be 0.00.  (always has been. payout won't match bank deposit.)
@@ -149,6 +148,9 @@ class TransactionStore:
 
         looking_for_header_block_end = False
         looking_for_column_headers = False
+        field_names: list[str] = []
+        payment_id: str = ""
+        period_end: str = ""
         with open(filename, encoding='utf-8-sig') as csvin:
             tuple_reader = csv.reader(csvin)
             for row in tuple_reader:
@@ -175,7 +177,9 @@ class TransactionStore:
 
             #print(f"ready to parse rows.  payment id: {payment_id} period end: {period_end}")
 
-            payment_net = 0     # sum of donation charges
+            payment_net: float = 0     # sum of donation charges
+            r: dict[str, str] = {}
+            currency: str = "USD"
 
             # stream should be positioned on column-headers row
             if not field_names:
@@ -191,7 +195,7 @@ class TransactionStore:
                 donation_id = r['Transaction ID']
                 date = r['Donation Date']
                 currency = r['Currency']
-                net = parse_float(r['Total Donation to be Acknowledged']) + parse_float(r['Match Amount']) - parse_float(r['Cause Support Fee']) - parse_float(r['Merchant Fee'])
+                net = parse_float(r['Total Donation to be Acknowledged']) + parse_float(r['Match Amount']) - parse_float(r['Cause Support Fee']) - parse_float(r['Merchant Fee'])  # type: ignore[operator]
                 payment_net += net
 
                 #print(f"net: {net}, name: {name}, date: {date} transaction_id: {donation_id}")
@@ -221,9 +225,9 @@ class TransactionStore:
                             net = payment_net, currency = currency ))
 
 
-    def load_paypal_transactions(self, filename):
-        charges_needing_payout = []
-        partner_fees = []   # raw records of partner fees
+    def load_paypal_transactions(self, filename: str) -> None:
+        charges_needing_payout: list[Charge] = []
+        partner_fees: list[dict[str, str]] = []   # raw records of partner fees
 
         # Replace `csv_rows()` with the imported function as necessary
         for r in sorted(csv_rows(filename), key=lambda rec: parse_datetime(rec['Date'], rec['Time'])):
@@ -286,7 +290,7 @@ class TransactionStore:
             charge_tx_id = r['Reference Txn ID']
             charge = self.charges.get(f"paypal:{charge_tx_id}")
             if charge:
-                charge.net += parse_float(net)
+                charge.net += parse_float(net)  # type: ignore[operator]
             else:
                 print("no charge found for paypal fee:", charge_tx_id)
 
@@ -301,7 +305,7 @@ class TransactionStore:
 
 
 
-    def load_stripe_transactions(self, filename):
+    def load_stripe_transactions(self, filename: str) -> None:
         for r in csv_rows(filename):
             tx_type = r['Type']
             net = r['Net']
@@ -324,7 +328,7 @@ class TransactionStore:
                 print("Unexpected Stripe transaction tx_type:", tx_type)
                 continue
 
-    def load_donorbox_transactions(self, filename):
+    def load_donorbox_transactions(self, filename: str) -> None:
         for r in csv_rows(filename):
             if r['Donation Type'] in ("stripe", "ach"):
                 payment_service = "stripe"
