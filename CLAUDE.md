@@ -27,3 +27,4 @@ uv run python -m ruff format .                            # Format
 Read PROJECT.md for a high-level definition of the project.
 Read MILESTONES.md for the development plan
 When needed, find Snippets in docs/SCRATCH.md
+When needed, information about entity relationships is in docs/relationships.md
