@@ -11,8 +11,8 @@ old_dirs_filepat = re.compile(r'(?<![a-zA-Z])old(?![a-zA-Z])', re.IGNORECASE)
 
 def associate_donation_receipts(tx_store: TransactionStore) -> None:
     for d in tx_store.donations.values():
-        if d.tx_id == "F8E63CT3XZ":
-            print("ok, weird one")
+        #if d.tx_id == "F8E63CT3XZ":
+        #    print("ok, weird one")
         receipts = [rcpt for rcpt in tx_store.receipts.values() if rcpt.ref_id == d.tx_id]
         if len(receipts) == 1:
             rcpt = receipts[0]
