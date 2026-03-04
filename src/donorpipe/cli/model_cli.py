@@ -15,6 +15,7 @@ from dateutil import parser as dateparser
 
 from donorpipe.datewindow import VALID_INTERVALS
 from donorpipe.models.transaction_filter import TransactionFilter
+from donorpipe.api.api_loader import ApiLoader
 from donorpipe.models.transaction_loader import TransactionLoader
 from donorpipe.models.transaction_store import TransactionStore
 from donorpipe.models.transactions import Donation, Receipt, Transaction
@@ -98,8 +99,7 @@ class ExpenseReportingCmd(cmd.Cmd):
         self.services = list({t.service for t in itertools.chain(self.tx_store.donations.values(),  # type: ignore[union-attr]
                                                                  self.tx_store.charges.values(),  # type: ignore[union-attr]
                                                                  self.tx_store.payouts.values(),  # type: ignore[union-attr]
-                                                                 self.tx_store.receipts.values(),  # type: ignore[union-attr]
-                                                                 self.tx_store.deposits.values())})  # type: ignore[union-attr]
+                                                                 self.tx_store.receipts.values())})  # type: ignore[union-attr]
 
     # multiple commands on one line
     def precmd(self, line: str) -> str:
@@ -432,12 +432,34 @@ def complete_args(arg: str, choices: tuple[str, ...] | None = None,
 
 
 if __name__ == "__main__":
+    import json
+    import sys
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", "-f", dest='files', nargs='+', action='extend', required=False)
     parser.add_argument("--dir", "-d", dest='dirs', nargs='+', action='extend', required=False)
+    parser.add_argument("--api", action='store_true', help="load data from the API instead of CSVs")
+    parser.add_argument("--account", dest='account', help="account ID (required with --api)")
+    parser.add_argument("--base-url", dest='base_url', default='http://localhost:8000',
+                        help="API base URL (default: http://localhost:8000)")
+    parser.add_argument("--serialize", action='store_true',
+                        help="print graph JSON to stdout and exit (for diff testing)")
     args = parser.parse_args()
-    if args.files is None and args.dirs is None:
-        parser.error("At least one of --file/-f or --dir/-d is required")
 
-    loader = TransactionLoader(args.files or [], args.dirs or [])
+    if args.api:
+        if args.account is None:
+            parser.error("--account is required when using --api")
+        if args.files or args.dirs:
+            parser.error("--api and --file/--dir are mutually exclusive")
+        loader: ApiLoader | TransactionLoader = ApiLoader(args.base_url, args.account)
+    else:
+        if args.files is None and args.dirs is None:
+            parser.error("At least one of --file/-f or --dir/-d is required")
+        loader = TransactionLoader(args.files or [], args.dirs or [])
+
+    if args.serialize:
+        store = loader.load()
+        print(json.dumps(store.to_graph(), indent=2, default=str))
+        sys.exit(0)
+
     ExpenseReportingCmd(loader).cmdloop()
