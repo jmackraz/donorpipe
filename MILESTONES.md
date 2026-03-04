@@ -171,10 +171,14 @@ responsive app
     * Deserializes into object graph
 * Displays donations in a simple scrolling view
 * Demonstrates asynchronous refresh of data (e.g. on on_click)
+* Shows timing for fetch and dedode of graph data
 
 **Guidelines:**
 * Prefer simplicity over performance optimization
-* Instrument fetch and deserialization timing
+
+**To Decide:** Although this milestone doesn't focus on styling, I don't want it to be difficult
+to add later.  Is this a good time to add a theme and styling for the UX as we build?    Include your recommendation 
+in your plan.
 
 **Done when:**
 Let's discuss.  I do not know the best practices for testing web apps.  It may

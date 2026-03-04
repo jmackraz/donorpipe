@@ -36,7 +36,9 @@ uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
 ```bash
 cd frontend
 bun test                                                   # Run all TS tests
-bun run typecheck                                          # tsc --noEmit
+bun run typecheck                                          # tsc -b --noEmit
+bun run dev                                                # Start Vite dev server (port 5173)
+bun run build                                              # Production build
 
 # Fetch graph from running API (mirrors the Python script above)
 bun scripts/fetch_graph.ts --account my_org               # Print entity counts
@@ -55,3 +57,5 @@ When needed, information about entity relationships is in docs/relationships.md
 
 ## Guidelines
 * When I ask you to modify a file or files, ask before changing any other files.
+* As we add functionality, update the 'run' instructions to include new tools
+and command-line scripts.  
