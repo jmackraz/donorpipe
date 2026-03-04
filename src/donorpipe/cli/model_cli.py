@@ -1,5 +1,7 @@
+#! /usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import cmd
 import datetime
 import io
@@ -13,10 +15,10 @@ from dateutil import parser as dateparser
 
 from donorpipe.datewindow import VALID_INTERVALS
 from donorpipe.models.transaction_filter import TransactionFilter
+from donorpipe.models.transaction_loader import TransactionLoader
 from donorpipe.models.transaction_store import TransactionStore
 from donorpipe.models.transactions import Donation, Receipt, Transaction
 from donorpipe.models.util import paged_print
-
 
 
 def list_donations(tx_store: TransactionStore, donations: Iterable[Donation] | None = None,
@@ -122,7 +124,6 @@ class ExpenseReportingCmd(cmd.Cmd):
         Date window filtering is controlled with 'start' and 'interval' commands.
         """
         method_args = arg.split()
-        #print("args:", method_args)
         if not method_args:
             self.show_filters()
             return
@@ -393,12 +394,9 @@ def console_menu_select(choice_items: Iterable[Any], prompt: str,
     desc_list: list[Any] = list(desc_items) if desc_items else []
     item_list: list[Any] = desc_list or choices
     selection = SelectionMenu.get_selection(item_list, title=prompt )
-    #print("selection:", selection)
     if 0 <= selection < len(item_list):
-        # print("selected item:", item_list[selection])
         return choices[selection]
     else:
-        # print("no selection")
         return None
 
 def complete_args(arg: str, choices: tuple[str, ...] | None = None,
@@ -430,3 +428,15 @@ def complete_args(arg: str, choices: tuple[str, ...] | None = None,
         arg = arg_matches[0]
 
     return arg, long_form, show_all
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", "-f", dest='files', nargs='+', action='extend', required=False)
+    parser.add_argument("--dir", "-d", dest='dirs', nargs='+', action='extend', required=False)
+    args = parser.parse_args()
+    if args.files is None and args.dirs is None:
+        parser.error("At least one of --file/-f or --dir/-d is required")
+
+    loader = TransactionLoader(args.files or [], args.dirs or [])
+    ExpenseReportingCmd(loader).cmdloop()

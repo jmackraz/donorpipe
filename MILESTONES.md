@@ -58,7 +58,7 @@ in the same directory as the models.
 The cli command, from the top level project directory is:
 
 ```bash
-env OSF_EXPORTS=testdata uv run src/donorpipe/cli/qcsv.py -d Stripe DonorBox QBO
+env OSF_EXPORTS=testdata uv run src/donorpipe/cli/model_cli.py -d Stripe DonorBox QBO
 ```
 
 **Behavior:**
