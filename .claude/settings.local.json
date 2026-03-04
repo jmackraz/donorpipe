@@ -3,7 +3,10 @@
     "allow": [
       "Bash(uv add:*)",
       "Bash(uv run:*)",
-      "Bash(uv sync:*)"
+      "Bash(uv sync:*)",
+      "Bash(~/.bun/bin/bun test:*)",
+      "Bash(~/.bun/bin/bun run:*)",
+      "Bash(~/.bun/bin/bun:*)"
     ]
   }
 }

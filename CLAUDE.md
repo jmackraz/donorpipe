@@ -31,6 +31,19 @@ uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
 uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
 ```
 
+## Frontend (TypeScript / Bun)
+
+```bash
+cd frontend
+bun test                                                   # Run all TS tests
+bun run typecheck                                          # tsc --noEmit
+
+# Fetch graph from running API (mirrors the Python script above)
+bun scripts/fetch_graph.ts --account my_org               # Print entity counts
+bun scripts/fetch_graph.ts --account my_org --json        # Print full JSON
+bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
+```
+
 Config is read from `config.json` by default. Override with `DONORPIPE_CONFIG=/path/to/config.json`.
 
 ## Project
