@@ -28,3 +28,7 @@ Read PROJECT.md for a high-level definition of the project.
 Read MILESTONES.md for the development plan
 When needed, find Snippets in docs/SCRATCH.md
 When needed, information about entity relationships is in docs/relationships.md
+
+
+## Guidelines
+* When I ask you to modify a file or files, ask before changing any other files.
