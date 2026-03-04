@@ -25,4 +25,5 @@ uv run python -m ruff format .                            # Format
 
 ## Project
 Read PROJECT.md for a high-level definition of the project.
-Reade MILESTONES.md for the development plan
+Read MILESTONES.md for the development plan
+When needed, find Snippets in docs/SCRATCH.md
