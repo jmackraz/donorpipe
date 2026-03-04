@@ -96,16 +96,32 @@ env OSF_EXPORTS=testdata uv run src/donorpipe/cli/model_cli.py -d Stripe DonorBo
 
 ### Milestone 4: Serialize graph
 
-**Goal:** Prepare payloads for fetching the transaction graph
+**Goal:** Serialization
 
+**Approach:**
+* Follow the proposals and decisions in docs/relationshps.md to change the implementation of runtime
+relationships and test.  Adapt model_cli.py to suit and test.
+* Use the new model classes to serialize the graph into a JSON payload and save it to a file in a good place
+for later TypeScript consumption during development.
+* Use the new model classes to deserialize the JSON payload into a graph (Python only)
+* Write an alternative initialization method for TransactionStore that uses the JSON payload as a cache, instead of
+reading CSV files.
+* Test.
 
+**Non-goals:**
+* Work on the API
+* Do any TypeScript
+* Make the loading-from-cache consider timestamps or be smart.
 
+**Done when:**
+* Tests pass
+* Serialization of test data is saved to a file
 
 ### Milestone 5: API
 
 **Goal:** Bring up a REST API exposing the backend
 
-**Behavior:**
+**Approach:**
 * One GET method returns the serialized graph
   * It takes a single parameter as a stub for the 'oganization account id'
 * A simple CLI script (python) demonstrates how to fetch and decode the graph
@@ -147,10 +163,12 @@ responsive app
 * App incorporates code from prior milestone
     * Connects to API and fetches serialized graph
     * Deserializes into object graph
-* Displays some selection of data in a simple scrolling viej
+* Displays donations in a simple scrolling view
+* Demonstrates asynchronous refresh of data
 
 **Guidelines:**
 * Prefer simplicity over performance optimization
+* Instrument fetch and deserialization timing
 
 **Done when:**
 Let's discuss.  I do not know the best practices for testing web apps.  It may
