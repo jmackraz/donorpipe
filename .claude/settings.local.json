@@ -6,7 +6,9 @@
       "Bash(uv sync:*)",
       "Bash(~/.bun/bin/bun test:*)",
       "Bash(~/.bun/bin/bun run:*)",
-      "Bash(~/.bun/bin/bun:*)"
+      "Bash(~/.bun/bin/bun:*)",
+      "Bash(bun install:*)",
+      "Bash(/opt/homebrew/bin/bun install:*)"
     ]
   }
 }
