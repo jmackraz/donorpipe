@@ -23,6 +23,16 @@ uv run python -m ruff check .                             # Lint
 uv run python -m ruff format .                            # Format
 ```
 
+## Running the API
+
+```bash
+uv run fastapi dev src/donorpipe/api/app.py               # Start dev server (port 8000)
+uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
+uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
+```
+
+Config is read from `config.json` by default. Override with `DONORPIPE_CONFIG=/path/to/config.json`.
+
 ## Project
 Read PROJECT.md for a high-level definition of the project.
 Read MILESTONES.md for the development plan

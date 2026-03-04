@@ -131,10 +131,12 @@ provided today by the CLI
 
 ### Milestone 6: CLI uses the API
 
-**Goal:** Make a modified version of the legacy CLI that uses the API instead of direct
-import of the backend.
+**Goal:** Make a modified version of the model_cli.py that can use the API instead of direct import of the backend.
 
-**Done when:** model_cli.py performs equivalently using either API or cvs scanning
+**Requirement:** Same cli script can operate in either mode--read CSV or use API.  
+
+**Done when:** model_cli.py performs equivalently using either API or cvs scanning.  Test by diffing serialized 
+graph output for the two modes.
 
 ### Milestone 7: Core TypeScript functionality
 
