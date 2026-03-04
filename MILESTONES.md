@@ -122,10 +122,11 @@ reading CSV files.
 **Goal:** Bring up a REST API exposing the backend
 
 **Approach:**
-* One GET method returns the serialized graph
+* Set up FastAPI for development
+* Models are instantiated by new config scheme
+* Implement a GET method that returns the entire serialized graph
   * It takes a single parameter as a stub for the 'oganization account id'
 * A simple CLI script (python) demonstrates how to fetch and decode the graph
-* The backend will need a configuration file scheme to replace the parameters
 provided today by the CLI
 
 ### Milestone 6: CLI uses the API
@@ -133,17 +134,20 @@ provided today by the CLI
 **Goal:** Make a modified version of the legacy CLI that uses the API instead of direct
 import of the backend.
 
+**Done when:** model_cli.py performs equivalently using either API or cvs scanning
+
 ### Milestone 7: Core TypeScript functionality
 
-**Goal:** Get the deserialization and object model working for JavaScript in a CLI context
+**Goal:** Get the deserialization and object model working for JavaScript in a standalone (non-browser) context
 
 **Behavior:**
-* New javascript CLI script runs under Node or similar (please recommend)
-* script connects to API, retreives serialized graph
-* deserialized the transaction object graph
-* has a suitable amount of transaction class abstractions and helper methods,
-as modeled on the legacy code
-* Organized suitably modular so that the core code can be imported into the web app.
+* Set up project for TypeScript development in the frontend src directory
+* New script set up for cli running and debugging (Node or other, please recommend)
+* It has a transaction class abstractions as laid forth in relationships.md
+* The script connects to API, retreives serialized graph
+* It deserializes the transaction object graph
+* Tested
+* Reusable in a practical sense for running in a browser context
 
 **Done when:**
 * Tests written to validate 
@@ -164,7 +168,7 @@ responsive app
     * Connects to API and fetches serialized graph
     * Deserializes into object graph
 * Displays donations in a simple scrolling view
-* Demonstrates asynchronous refresh of data
+* Demonstrates asynchronous refresh of data (e.g. on on_click)
 
 **Guidelines:**
 * Prefer simplicity over performance optimization
@@ -196,7 +200,16 @@ We should discuss our approach to specifying the UX features and layout I have i
 
 ### Milestone 11: Auth and Account silos
 
-**Goal:** Implement credentials management and security at the data partition level
+**Goal:** Implement first simple version of credentials management and security for user organiations,
+at the data partition level
+
+**Levels of sophistication:**
+We should compare alternative approaches for the sweet spot in terms of complexity-for-function,
+for our first non-complicated level of support, for example, in increasing complexity.
+1. one password per organiation
+2. user account with passwords, membership in organizations
+3. user accounts self-service with password reset, etc.
+4. multi-factor auth
 
 ### Milestone 12: Local Deployment
 
@@ -204,8 +217,22 @@ We should discuss our approach to specifying the UX features and layout I have i
 
 **Behavior:**
 * Modern, simple approach to packaging front and back end
-* Deployment for stable environments
+* Automated deployment
 * Simple hotfix capability
+* Logging in place
+
+**Non-goals:**
+* CI/CD
+* Automatic rollback
+* Fleet support
+* HTTPS
+
+**Done when:**
+
+Automated routines do:
+* build, package and push releases of the API backend and front end.
+* update backend
+* API smoke tested
 
 ### Milestone 13: Public Deployment
 
@@ -217,10 +244,10 @@ We should discuss our approach to specifying the UX features and layout I have i
 * Reproducible instantiation, e.g. CloudFormation
 
 **Discussion:**
-AWS is my general choice. For simplicity, I'd like to deploy with FastAPI at first,
-rather than involving AWS API Gateway.  I have a lightsail instance we could use,
+AWS is my general preference. For simplicity, I'd like to deploy with FastAPI at first,
+rather than involving AWS API Gateway.  I have a AWS Lightsail instance we could use,
 but I don't know about HTTPS with it.  I'd be inclined to do something that can 
-be fully specified in CloudFormation or someothing.  But if the minimal instance configuration 
-is much more expensive than a Lightsail solution, I'd lean toward Lightsail now and
-migrate to serverless API Gateway with lambdas later.
+be fully specified in CloudFormation or similar.  But if the minimal EC2 instance configuration 
+is significantly more expensive than a Lightsail solution, I'd lean toward Lightsail now and
+migrate to serverless API Gateway with python lambdas and S3 or Dynamo DB later.
 
