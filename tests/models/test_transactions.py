@@ -68,7 +68,7 @@ class TestDonation:
         d = self._make()
         r = Receipt(RECORD, "f.csv", "qbo", "R1", "2024-06-01", "50.00",
                     "Alice Smith", ref_id="D1", product="Online")
-        d.receipt = r
+        d.receipts.append(r)
         assert r in d.receipts
 
     def test_str_contains_donation(self):
@@ -124,7 +124,7 @@ class TestReceipt:
 
     def test_no_discrepancies_by_default(self):
         r = self._make()
-        assert r.discrepancies is None
+        assert r.discrepancies == []
 
     def test_descr_contains_id(self):
         r = self._make(tx_id="R99")

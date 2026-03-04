@@ -38,7 +38,7 @@ class TestTransactionLoaderIntegration:
         assert len(tx_store.payouts) > 0
 
     def test_some_donations_linked_to_receipts(self, tx_store):
-        linked = [d for d in tx_store.donations.values() if d.receipt is not None]
+        linked = [d for d in tx_store.donations.values() if d.receipts]
         assert len(linked) > 0
 
     def test_some_receipts_linked_to_donations(self, tx_store):
@@ -61,7 +61,7 @@ class TestAssociateDonationReceipts:
 
         associate_donation_receipts(store)
 
-        assert d.receipt is r
+        assert r in d.receipts
         assert r.donation is d
 
     def test_no_match_leaves_unlinked(self):
@@ -78,7 +78,7 @@ class TestAssociateDonationReceipts:
 
         associate_donation_receipts(store)
 
-        assert d.receipt is None
+        assert not d.receipts
         assert r.donation is None
 
 
@@ -98,7 +98,7 @@ class TestNoteDiscrepancies:
         associate_donation_receipts(store)
         note_discrepancies(store)
 
-        assert r.discrepancies is not None
+        assert r.discrepancies
         assert "name" in r.discrepancies
 
     def test_no_discrepancy_when_matching(self):
@@ -116,4 +116,4 @@ class TestNoteDiscrepancies:
         associate_donation_receipts(store)
         note_discrepancies(store)
 
-        assert r.discrepancies is None
+        assert not r.discrepancies

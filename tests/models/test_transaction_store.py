@@ -56,33 +56,6 @@ class TestTransactionStoreAddRetrieve:
         assert "DUPLICATE" in capsys.readouterr().out
 
 
-class TestTransactionStoreAssociations:
-    def setup_method(self):
-        self.store = TransactionStore([])
-        self.charge = make_charge()
-        self.payout = make_payout()
-        self.store.add_charge(self.charge)
-        self.store.add_payout(self.payout)
-
-    def test_donation_charge(self):
-        d = make_donation(charge_tx_id="CH1")
-        self.store.add_donation(d)
-        result = self.store.donation_charge(d)
-        assert result is self.charge
-
-    def test_charge_payout(self):
-        result = self.store.charge_payout(self.charge)
-        assert result is self.payout
-
-    def test_payout_charges(self):
-        result = self.store.payout_charges(self.payout)
-        assert self.charge in result
-
-    def test_donation_charge_none(self):
-        d = make_donation(charge_tx_id="NONEXISTENT")
-        self.store.add_donation(d)
-        assert self.store.donation_charge(d) is None
-
 
 class TestParseFilename:
     def test_donorbox(self):

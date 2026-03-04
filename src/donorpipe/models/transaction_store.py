@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import csv
 import os
 import re
@@ -47,19 +49,54 @@ class TransactionStore:
             print("DUPLICATE:", deposit)
         self.deposits[deposit.id] = deposit  # type: ignore[attr-defined]
 
-    # associations
+    def to_graph(self) -> dict:
+        return {
+            "donations": {k: v.to_dict() for k, v in self.donations.items()},
+            "charges":   {k: v.to_dict() for k, v in self.charges.items()},
+            "payouts":   {k: v.to_dict() for k, v in self.payouts.items()},
+            "receipts":  {k: v.to_dict() for k, v in self.receipts.items()},
+        }
 
-    def donation_charge(self, donation: Donation | None) -> Charge | None:
-        charge_id = donation.charge_id if donation else None
-        return self.charges.get(charge_id)  # type: ignore[arg-type]
+    @classmethod
+    def from_graph(cls, data: dict) -> TransactionStore:
+        store = cls([])
 
-    def charge_payout(self, charge: Charge | None) -> Payout | None:
-        payout_id = charge.payout_id if charge else None
-        return self.payouts.get(payout_id)  # type: ignore[arg-type]
+        # Phase 1: create all entities
+        for d in data.get("donations", {}).values():
+            store.donations[d["id"]] = Donation.from_dict(d)
+        for c in data.get("charges", {}).values():
+            store.charges[c["id"]] = Charge.from_dict(c)
+        for p in data.get("payouts", {}).values():
+            store.payouts[p["id"]] = Payout.from_dict(p)
+        for r in data.get("receipts", {}).values():
+            store.receipts[r["id"]] = Receipt.from_dict(r)
 
-    def payout_charges(self, payout: Payout) -> list[Charge]:
-        return [ch  for ch in self.charges.values() if ch.payout_id == payout.id]
-        return None  # type: ignore[return]
+        # Phase 2: link object refs
+        for did, d_data in data.get("donations", {}).items():
+            donation = store.donations[did]
+            charge_id = d_data.get("charge_id")
+            if charge_id:
+                donation.charge = store.charges.get(charge_id)
+
+        for cid, c_data in data.get("charges", {}).items():
+            charge = store.charges[cid]
+            payout_id = c_data.get("payout_id")
+            if payout_id:
+                payout = store.payouts.get(payout_id)
+                charge.payout = payout
+                if payout is not None:
+                    payout.charges.append(charge)
+
+        for rid, r_data in data.get("receipts", {}).items():
+            receipt = store.receipts[rid]
+            donation_id = r_data.get("donation_id")
+            if donation_id:
+                donation = store.donations.get(donation_id)
+                receipt.donation = donation
+                if donation is not None:
+                    donation.receipts.append(receipt)
+
+        return store
 
     @staticmethod
     def parse_filename(filename: str) -> dict[str, str] | None:

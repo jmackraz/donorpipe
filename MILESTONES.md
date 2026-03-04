@@ -96,13 +96,13 @@ env OSF_EXPORTS=testdata uv run src/donorpipe/cli/model_cli.py -d Stripe DonorBo
 
 ### Milestone 4: Serialize graph
 
-**Goal:** Serialization
+**Goal:** Serialization and deserialization in python
 
 **Approach:**
 * Follow the proposals and decisions in docs/relationshps.md to change the implementation of runtime
-relationships and test.  Adapt model_cli.py to suit and test.
+relationships and test.  Adapt model_cli.py to suit if needed and test.
 * Use the new model classes to serialize the graph into a JSON payload and save it to a file in a good place
-for later TypeScript consumption during development.
+for later consumption during development.
 * Use the new model classes to deserialize the JSON payload into a graph (Python only)
 * Write an alternative initialization method for TransactionStore that uses the JSON payload as a cache, instead of
 reading CSV files.
@@ -123,7 +123,7 @@ reading CSV files.
 
 **Approach:**
 * Set up FastAPI for development
-* Models are instantiated by new config scheme
+* Models are instantiated subject to new config scheme
 * Implement a GET method that returns the entire serialized graph
   * It takes a single parameter as a stub for the 'oganization account id'
 * A simple CLI script (python) demonstrates how to fetch and decode the graph

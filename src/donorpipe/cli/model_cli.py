@@ -31,21 +31,22 @@ def list_donations(tx_store: TransactionStore, donations: Iterable[Donation] | N
             print(donation.record)
             print(donation.filename)
         if show_chain:
-            charge = tx_store.donation_charge(donation)
+            charge = donation.charge
             if charge:
                 print(charge)
-                payout = tx_store.charge_payout(charge)
+                payout = charge.payout
                 if payout:
                     print(payout)
                 else:
                     print(f"payout {charge.payout_id} not found")
             else:
                 print("{donation.charge_id} not found")
-            if donation.receipt:
-                print(donation.receipt.descr() if long_form else donation.receipt)
-            if donation.duplicate_receipts:
+            if len(donation.receipts) == 1:
+                rcpt = donation.receipts[0]
+                print(rcpt.descr() if long_form else rcpt)
+            elif len(donation.receipts) > 1:
                 print("duplicate receipts:")
-                for rcpt in donation.duplicate_receipts:
+                for rcpt in donation.receipts:
                     print(rcpt.descr() if long_form else rcpt)
         print()
 
@@ -54,7 +55,7 @@ def list_payouts(tx_store: TransactionStore, payouts: Iterable[Any] | None = Non
         payouts = tx_store.payouts.values()
     for payout in payouts:
         print(payout)
-        charges = tx_store.payout_charges(payout)
+        charges = payout.charges
         if charges:
             for charge in charges:
                 print(charge)
@@ -203,12 +204,12 @@ class ExpenseReportingCmd(cmd.Cmd):
 
             elif arg == "missing":
                 self.prev_listing = "donations missing"
-                the_list = filter(lambda d: not d.receipt and not d.duplicate_receipts, the_list)  # type: ignore[attr-defined]
+                the_list = filter(lambda d: not d.receipts, the_list)  # type: ignore[attr-defined]
                 list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "duplicates":
                 self.prev_listing = "donations duplicates"
-                the_list = filter(lambda d: d.duplicate_receipts, the_list)  # type: ignore[attr-defined]
+                the_list = filter(lambda d: len(d.receipts) > 1, the_list)  # type: ignore[attr-defined]
                 list_donations(self.tx_store, the_list, show_chain=True, long_form=True, all_fields=show_all)  # type: ignore[arg-type]
 
             elif arg == "errors":

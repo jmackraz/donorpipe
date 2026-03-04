@@ -10,23 +10,15 @@ import getpass, pathlib, sys
 old_dirs_filepat = re.compile(r'(?<![a-zA-Z])old(?![a-zA-Z])', re.IGNORECASE)
 
 def associate_donation_receipts(tx_store: TransactionStore) -> None:
-    for d in tx_store.donations.values():
-        #if d.tx_id == "F8E63CT3XZ":
-        #    print("ok, weird one")
-        receipts = [rcpt for rcpt in tx_store.receipts.values() if rcpt.ref_id == d.tx_id]
-        if len(receipts) == 1:
-            rcpt = receipts[0]
-            # cross-link
-            d.receipt = rcpt
-            rcpt.donation = d
+    receipts_by_ref_id: dict[str, list] = {}
+    for rcpt in tx_store.receipts.values():
+        receipts_by_ref_id.setdefault(rcpt.ref_id, []).append(rcpt)
 
-        if len(receipts) > 1:
-            d.duplicate_receipts = receipts
-            for rcpt in receipts:
-                rcpt.donation = d
-        else:
-            # no receipt found
-            pass
+    for d in tx_store.donations.values():
+        matched = receipts_by_ref_id.get(d.tx_id, [])
+        d.receipts = matched
+        for rcpt in matched:
+            rcpt.donation = d
 
 def note_discrepancies(tx_store: TransactionStore) -> None:
     """ annotate receipts with the fields not matching
@@ -42,7 +34,18 @@ def note_discrepancies(tx_store: TransactionStore) -> None:
             if d.date!= rcpt.date:
                 discrepancies.append('date')
             if discrepancies:
-                rcpt.discrepancies = " ".join(discrepancies)
+                rcpt.discrepancies = discrepancies
+
+
+def associate_charges_payouts(tx_store: TransactionStore) -> None:
+    for donation in tx_store.donations.values():
+        donation.charge = tx_store.charges.get(donation.charge_id)
+
+    for charge in tx_store.charges.values():
+        payout = tx_store.payouts.get(charge.payout_id)
+        charge.payout = payout
+        if payout is not None:
+            payout.charges.append(charge)
 
 
 class TransactionLoader:
@@ -158,6 +161,7 @@ class TransactionLoader:
         # "analytics"
         associate_donation_receipts(tx_store)
         note_discrepancies(tx_store)
+        associate_charges_payouts(tx_store)
 
         print(
             f"donations: {len(tx_store.donations)}, charges: {len(tx_store.charges)}, payouts: {len(tx_store.payouts)}, deposits: {len(tx_store.deposits)}, receipts: {len(tx_store.receipts)} ")
