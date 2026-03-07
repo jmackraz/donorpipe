@@ -2,7 +2,9 @@ import type { Donation, Charge, Payout, Receipt } from "./graph"
 import type { Filters } from "../hooks/useFilters"
 
 function inDateRange(date: string, from: string, to: string): boolean {
-  return date >= from && date <= to
+  if (from && date < from) return false
+  if (to && date > to) return false
+  return true
 }
 
 function inAmountRange(net: number, min: number | null, max: number | null): boolean {

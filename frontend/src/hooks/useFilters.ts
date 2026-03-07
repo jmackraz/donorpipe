@@ -15,16 +15,6 @@ export interface Filters {
   selected: string | null
 }
 
-function firstOfMonth(): string {
-  const d = new Date()
-  d.setDate(1)
-  return d.toISOString().slice(0, 10)
-}
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
 function isEntityType(v: string | null): v is EntityType {
   return v === "donations" || v === "charges" || v === "payouts" || v === "receipts"
 }
@@ -41,8 +31,8 @@ export function useFilters() {
     const rawMatch = params.get("donationMatch")
     return {
       type: isEntityType(rawType) ? rawType : "donations",
-      dateFrom: params.get("dateFrom") ?? firstOfMonth(),
-      dateTo: params.get("dateTo") ?? today(),
+      dateFrom: params.get("dateFrom") ?? "",
+      dateTo: params.get("dateTo") ?? "",
       text: params.get("text") ?? "",
       amountMin: params.get("amountMin") ? Number(params.get("amountMin")) : null,
       amountMax: params.get("amountMax") ? Number(params.get("amountMax")) : null,
