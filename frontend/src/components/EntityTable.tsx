@@ -64,6 +64,7 @@ function PayoutRow({ p }: { p: Payout }) {
       <span className="w-28 shrink-0 text-right tabular-nums">{fmtAmt(p.net, p.currency)}</span>
       <span className="w-24 shrink-0 text-gray-500 truncate hidden sm:block">{p.service}</span>
       <span className="flex-1 text-gray-900 truncate min-w-0 font-mono text-xs">{p.tx_id}</span>
+      <span className="w-24 shrink-0 text-gray-500 text-center">{p.charges.length} charges</span>
     </>
   )
 }
