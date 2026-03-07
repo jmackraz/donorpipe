@@ -8,9 +8,8 @@ function inDateRange(date: string, from: string, to: string): boolean {
 }
 
 function inAmountRange(net: number, min: number | null, max: number | null): boolean {
-  // Amounts are stored as integers (cents/basis points); filters are in dollars
-  if (min !== null && net < min * 100) return false
-  if (max !== null && net > max * 100) return false
+  if (min !== null && net < min) return false
+  if (max !== null && net > max) return false
   return true
 }
 

@@ -23,7 +23,7 @@ export default function DonationList({ donations }: Props) {
               <div className="flex justify-between">
                 <span className="font-medium text-gray-900">{d.name || "—"}</span>
                 <span className="text-gray-700">
-                  {(d.net / 100).toFixed(2)} {d.currency.toUpperCase()}
+                  {d.net.toFixed(2)} {d.currency.toUpperCase()}
                 </span>
               </div>
               <div className="text-gray-500 flex gap-3 mt-0.5">

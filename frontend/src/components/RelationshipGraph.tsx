@@ -60,15 +60,17 @@ function buildCanonicalForm(entity: AnyEntity): CanonicalForm {
 }
 
 function fmtAmt(net: number, currency: string): string {
-  return `${(net / 100).toFixed(2)} ${currency.toUpperCase()}`
+  return `${net.toFixed(2)} ${currency.toUpperCase()}`
 }
 
-function PayoutNode({ payout }: { payout: Payout | null }) {
+const SELECTED_CLS = "bg-blue-50 rounded px-1 -mx-1 font-medium"
+
+function PayoutNode({ payout, selectedId }: { payout: Payout | null; selectedId: string }) {
   if (!payout) {
     return <div className="text-gray-400 italic text-sm">— No payout —</div>
   }
   return (
-    <div className="text-sm">
+    <div className={`text-sm ${payout.id === selectedId ? SELECTED_CLS : ""}`}>
       <span className="text-xs text-gray-400 mr-2">Payout</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{payout.id}</span>
       <span className="text-gray-900">
@@ -78,12 +80,12 @@ function PayoutNode({ payout }: { payout: Payout | null }) {
   )
 }
 
-function DonationNode({ donation }: { donation: Donation | null }) {
+function DonationNode({ donation, selectedId }: { donation: Donation | null; selectedId: string }) {
   if (!donation) {
     return <div className="text-gray-400 italic text-sm ml-4">— No donation —</div>
   }
   return (
-    <div className="text-sm ml-4">
+    <div className={`text-sm ml-4 ${donation.id === selectedId ? SELECTED_CLS : ""}`}>
       <span className="text-xs text-gray-400 mr-2">Donation</span>
       <span className="text-gray-900">{donation.name || "—"}</span>
       <span className="text-gray-500 mx-1">·</span>
@@ -94,9 +96,9 @@ function DonationNode({ donation }: { donation: Donation | null }) {
   )
 }
 
-function ReceiptNode({ receipt }: { receipt: Receipt }) {
+function ReceiptNode({ receipt, selectedId }: { receipt: Receipt; selectedId: string }) {
   return (
-    <div className="text-sm">
+    <div className={`text-sm ${receipt.id === selectedId ? SELECTED_CLS : ""}`}>
       <span className="text-xs text-gray-400 mr-2">Receipt</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{receipt.id}</span>
       <span className={`mr-2 ${receipt.item_class ? "text-gray-700" : "text-gray-400 italic"}`}>
@@ -105,21 +107,18 @@ function ReceiptNode({ receipt }: { receipt: Receipt }) {
       <span className="text-gray-900">
         {fmtAmt(receipt.net, receipt.currency)} · {receipt.date}
       </span>
-      {receipt.discrepancies.length > 0 && (
-        <span className="text-amber-600 text-xs ml-2">⚠ {receipt.discrepancies.join(" ")}</span>
-      )}
     </div>
   )
 }
 
-function ReceiptSection({ receipts }: { receipts: Receipt[] }) {
+function ReceiptSection({ receipts, selectedId }: { receipts: Receipt[]; selectedId: string }) {
   if (receipts.length === 0) {
     return <div className="text-gray-400 italic text-sm ml-8">— No receipt —</div>
   }
   if (receipts.length === 1) {
     return (
       <div className="ml-8">
-        <ReceiptNode receipt={receipts[0]!} />
+        <ReceiptNode receipt={receipts[0]!} selectedId={selectedId} />
       </div>
     )
   }
@@ -127,7 +126,7 @@ function ReceiptSection({ receipts }: { receipts: Receipt[] }) {
     <div className="ml-8 space-y-1">
       {receipts.map((r) => (
         <div key={r.id} className="border border-amber-200 rounded px-2 py-1 bg-amber-50">
-          <ReceiptNode receipt={r} />
+          <ReceiptNode receipt={r} selectedId={selectedId} />
         </div>
       ))}
     </div>
@@ -140,17 +139,18 @@ interface Props {
 
 export default function RelationshipGraph({ entity }: Props) {
   const form = buildCanonicalForm(entity)
+  const selectedId = entity.id
   return (
     <section className="mb-4">
       <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
         Relationships
       </h3>
       <div className="space-y-2">
-        <PayoutNode payout={form.payout} />
+        <PayoutNode payout={form.payout} selectedId={selectedId} />
         {form.entries.map((entry, i) => (
           <div key={entry.donation?.id ?? `placeholder-${i}`} className="space-y-1">
-            <DonationNode donation={entry.donation} />
-            <ReceiptSection receipts={entry.receipts} />
+            <DonationNode donation={entry.donation} selectedId={selectedId} />
+            <ReceiptSection receipts={entry.receipts} selectedId={selectedId} />
           </div>
         ))}
       </div>

@@ -13,7 +13,7 @@ interface Props {
 }
 
 function fmtAmt(net: number, currency: string): string {
-  return `${(net / 100).toFixed(2)} ${currency.toUpperCase()}`
+  return `${net.toFixed(2)} ${currency.toUpperCase()}`
 }
 
 function DonationRow({ d }: { d: Donation }) {

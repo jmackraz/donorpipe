@@ -145,6 +145,5 @@ and command-line scripts.
 * Don't commit without asking or being explicitly instructed
 
 ## Frontend Notes
-* Amounts are stored as integers (cents). Filter inputs from the user are in dollars
-and must be multiplied by 100 before comparison.
+* Amounts are stored as floats (dollars). Filter inputs from the user are in dollars and can be compared directly.
 * Virtual scroll uses a fixed row height of 48px with overscan 8 (`useVirtualizer`).

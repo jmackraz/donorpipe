@@ -61,6 +61,7 @@ Domain name already owned.
   * ops scripts (dev, stage, prod) from CLAUDE.md
   * include arch overview
   * include dev/stage/prod push processes
+  * include log monitor commands
   * keep updated, occasionally validate
 * baby CI/CD just to make pushes easier for me?
 * Add notice about proprietary data
@@ -71,8 +72,8 @@ Domain name already owned.
   * Separate engine for automated downloading
   * Trigger reload
   * Works well for dev iterations
-* Canonical relationship topology with highlighting
 * Realistic fake data
 * Merge in csvstore
 * test mobile form factor
 * Filter out cash donations when appropriate
+  * More filters.  day/week/month/year.  donor/recipient. service.  missing donations/receipt.  too many receipts.
