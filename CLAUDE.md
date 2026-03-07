@@ -72,6 +72,7 @@ and command-line scripts.
 * When a milestone is committed as done, move its spec from `MILESTONES.md` to
 `docs/COMPLETED_MILESTONES.md`.
 * When a new dev of ops shell command is added, document it in `CLAUDE.md`
+* Don't commit without asking or being explicitly instructed
 
 ## Frontend Notes
 * Amounts are stored as integers (cents). Filter inputs from the user are in dollars
