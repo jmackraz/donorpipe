@@ -360,6 +360,12 @@ export default function DetailPanel({ type, entity, onClose }: Props) {
             </span>
             <span className="text-xs text-gray-500">{entity.date}</span>
           </div>
+          {(type === "donations" || type === "receipts") &&
+            (entity as Donation | Receipt).name && (
+              <div className="text-base font-medium text-gray-800 truncate">
+                {(entity as Donation | Receipt).name}
+              </div>
+            )}
           <div className="text-lg font-semibold text-gray-900">
             {fmtAmt(entity.net, entity.currency)}
           </div>
