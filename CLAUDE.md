@@ -23,10 +23,18 @@ uv run python -m ruff check .                             # Lint
 uv run python -m ruff format .                            # Format
 ```
 
-## Running the API
+## Running the Dev Environment
 
 ```bash
-uv run fastapi dev src/donorpipe/api/app.py               # Start dev server (port 8000)
+./scripts/dev.sh                                           # Start API + frontend; open http://localhost:5173
+```
+
+This starts both servers and prints the URL. Press Ctrl+C to stop both.
+
+### Individual servers
+
+```bash
+uv run fastapi dev src/donorpipe/api/app.py               # API only (port 8000)
 uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
 uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
 ```

@@ -125,8 +125,15 @@ export default function AppLayout() {
             activeType={filters.type}
             store={store}
             onSelect={(t) => {
-              setFilter("type", t)
-              setFilter("selected", null)
+              setSearchParams(
+                (prev) => {
+                  const next = new URLSearchParams(prev)
+                  next.set("type", t)
+                  next.delete("selected")
+                  return next
+                },
+                { replace: true },
+              )
             }}
           />
 
