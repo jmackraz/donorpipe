@@ -31,10 +31,10 @@ function DonationRow({ d }: { d: Donation }) {
         ) : null}
       </span>
       <span className="w-16 shrink-0 text-center">
-        {d.receipts.length > 0 ? (
-          <span className="text-xs text-blue-600 bg-blue-50 rounded px-1">
-            {d.receipts.length}r
-          </span>
+        {d.receipts.length === 1 ? (
+          <span className="text-xs text-green-600 bg-green-50 rounded px-1">receipt</span>
+        ) : d.receipts.length > 1 ? (
+          <span className="text-xs text-red-600 bg-red-50 rounded px-1" title={`${d.receipts.length} receipts`}>duplicate</span>
         ) : null}
       </span>
     </>
