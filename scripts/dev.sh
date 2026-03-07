@@ -17,6 +17,10 @@ trap cleanup EXIT
 
 echo "Starting API (port 8000)..."
 cd "$ROOT"
+# Load .env if present (provides DONORPIPE_JWT_SECRET etc.)
+if [ -f "$ROOT/.env" ]; then
+    set -a; source "$ROOT/.env"; set +a
+fi
 #uv run fastapi dev src/donorpipe/api/app.py &
 USERS_CONFIG="${DONORPIPE_USERS_CONFIG:-users.json}"
 JWT_SECRET="${DONORPIPE_JWT_SECRET:?DONORPIPE_JWT_SECRET must be set}"
