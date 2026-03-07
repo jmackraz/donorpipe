@@ -143,3 +143,9 @@ Domain name already owned.
 - `src/donorpipe/api/app.py` — update CORS allowed origins to include production domain
 - New: CloudFormation template or `scripts/provision.sh`
 
+
+# Backlog
+* extract operations manual from CLAUDE.md, complete and verify. Keep up to date.
+* Add notice about proprietary data
+* Logging, alarms
+* 
