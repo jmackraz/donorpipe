@@ -20,11 +20,9 @@ function DonationRow({ d }: { d: Donation }) {
   return (
     <>
       <span className="w-24 shrink-0 text-gray-500">{d.date}</span>
-      <span className="flex-1 font-medium text-gray-900 truncate min-w-0">{d.name || "—"}</span>
       <span className="w-28 shrink-0 text-right tabular-nums">{fmtAmt(d.net, d.currency)}</span>
-      <span className="w-28 shrink-0 text-gray-500 truncate hidden sm:block">
-        {d.designation || "—"}
-      </span>
+      <span className="w-24 shrink-0 text-gray-500 truncate hidden sm:block">{d.service || "—"}</span>
+      <span className="flex-1 font-medium text-gray-900 truncate min-w-0">{d.name || "—"}</span>
       <span className="w-16 shrink-0 text-center">
         {d.charge ? (
           <span className="text-xs text-green-600 bg-green-50 rounded px-1">charge</span>
