@@ -54,6 +54,10 @@ class Donation(Transaction):
         self.charge: Charge | None = None
 
     @property
+    def payout(self) -> Payout | None:
+        return self.charge.payout if self.charge else None
+
+    @property
     def charge_id(self) -> str:
         return f"{self.payment_service}:{self.charge_tx_id}"
 
@@ -87,6 +91,7 @@ class Donation(Transaction):
             "comment": self.comment,
             "email": self.email,
             "charge_id": self.charge.id if self.charge else None,
+            "payout_id": self.payout.id if self.payout else None,
             "receipt_ids": [r.id for r in self.receipts],
         }
 

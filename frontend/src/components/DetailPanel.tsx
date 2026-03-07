@@ -37,6 +37,7 @@ function toFlatJson(type: EntityType, entity: AnyEntity): Record<string, unknown
       comment: d.comment,
       payment_service: d.payment_service,
       charge_id: d.charge?.id ?? null,
+      payout_id: d.payout?.id ?? null,
       receipt_ids: d.receipts.map((r) => r.id),
     }
   }
@@ -107,23 +108,31 @@ function DonationDetail({ d }: { d: Donation }) {
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
           Relationships
         </h3>
-        {d.charge ? (
+        {d.payout ? (
+          <div className="border border-gray-200 rounded p-2 text-sm mb-2">
+            <div className="text-xs text-gray-400 mb-0.5">Payout</div>
+            <div className="font-mono text-xs text-gray-600">{d.payout.id}</div>
+            <div className="text-gray-900">
+              {fmtAmt(d.payout.net, d.payout.currency)} · {d.payout.date}
+            </div>
+            {d.charge && (
+              <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
+                <div className="text-xs text-gray-400 mb-0.5">Charge</div>
+                <div className="font-mono text-xs text-gray-600">{d.charge.id}</div>
+                <div className="text-gray-900">
+                  {fmtAmt(d.charge.net, d.charge.currency)} · {d.charge.date}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : d.charge ? (
           <div className="border border-gray-200 rounded p-2 text-sm mb-2">
             <div className="text-xs text-gray-400 mb-0.5">Charge</div>
             <div className="font-mono text-xs text-gray-600">{d.charge.id}</div>
             <div className="text-gray-900">
               {fmtAmt(d.charge.net, d.charge.currency)} · {d.charge.date}
             </div>
-            {d.charge.payout && (
-              <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
-                <div className="text-xs text-gray-400 mb-0.5">Payout</div>
-                <div className="font-mono text-xs text-gray-600">{d.charge.payout.id}</div>
-                <div className="text-gray-900">
-                  {fmtAmt(d.charge.payout.net, d.charge.payout.currency)} ·{" "}
-                  {d.charge.payout.date}
-                </div>
-              </div>
-            )}
+            <p className="text-xs text-gray-400 mt-1">Not yet paid out.</p>
           </div>
         ) : (
           <p className="text-sm text-gray-400 mb-2">No charge linked.</p>

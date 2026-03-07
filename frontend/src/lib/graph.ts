@@ -1,8 +1,9 @@
 import type { EntityGraph, RawDonation, RawCharge, RawPayout, RawReceipt } from "./types"
 
 // Resolved types — object references instead of IDs
-export interface Donation extends Omit<RawDonation, "charge_id" | "receipt_ids"> {
+export interface Donation extends Omit<RawDonation, "charge_id" | "payout_id" | "receipt_ids"> {
   charge: Charge | null
+  payout: Payout | null
   receipts: Receipt[]
 }
 
@@ -34,8 +35,8 @@ export function fromGraph(data: EntityGraph): TransactionStore {
   const receipts = new Map<string, Receipt>()
 
   for (const [id, raw] of Object.entries(data.donations)) {
-    const { charge_id: _charge_id, receipt_ids: _receipt_ids, ...rest } = raw
-    donations.set(id, { ...rest, charge: null, receipts: [] })
+    const { charge_id: _charge_id, payout_id: _payout_id, receipt_ids: _receipt_ids, ...rest } = raw
+    donations.set(id, { ...rest, charge: null, payout: null, receipts: [] })
   }
 
   for (const [id, raw] of Object.entries(data.charges)) {
@@ -83,6 +84,11 @@ export function fromGraph(data: EntityGraph): TransactionStore {
         payout.charges.push(charge)
       }
     }
+  }
+
+  // Pass 3: propagate payout from charge to donation
+  for (const donation of donations.values()) {
+    donation.payout = donation.charge?.payout ?? null
   }
 
   return { donations, charges, payouts, receipts }
