@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom"
 import { useGraph } from "../hooks/useGraph"
 import { useFilters } from "../hooks/useFilters"
 import type { EntityType } from "../hooks/useFilters"
-import { filterDonations, filterCharges, filterPayouts, filterReceipts } from "../lib/filters"
+import { filterDonations, filterPayouts, filterReceipts } from "../lib/filters"
 import type { AnyEntity } from "./EntityTable"
 import TypeTabs from "./TypeTabs"
 import FilterBar from "./FilterBar"
@@ -25,11 +25,11 @@ export default function AppLayout() {
 
   // Tab keyboard shortcuts 1–4 and "/" to focus filter text
   useEffect(() => {
-    const types: EntityType[] = ["donations", "charges", "payouts", "receipts"]
+    const types: EntityType[] = ["donations", "payouts", "receipts"]
     function handleKey(e: KeyboardEvent) {
       const target = e.target as Element
       if (target.tagName === "INPUT" || target.tagName === "SELECT") return
-      if (/^[1-4]$/.test(e.key)) {
+      if (/^[1-3]$/.test(e.key)) {
         const t = types[parseInt(e.key) - 1]
         if (t) setFilter("type", t)
       } else if (e.key === "/") {
@@ -46,8 +46,6 @@ export default function AppLayout() {
     switch (filters.type) {
       case "donations":
         return filterDonations(store.donations, filters)
-      case "charges":
-        return filterCharges(store.charges, filters)
       case "payouts":
         return filterPayouts(store.payouts, filters)
       case "receipts":
@@ -59,7 +57,6 @@ export default function AppLayout() {
     if (!store || !filters.selected) return null
     return (
       store.donations.get(filters.selected) ??
-      store.charges.get(filters.selected) ??
       store.payouts.get(filters.selected) ??
       store.receipts.get(filters.selected) ??
       null

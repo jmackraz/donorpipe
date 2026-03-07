@@ -9,7 +9,6 @@ interface Props {
 
 const TABS: { type: EntityType; label: string }[] = [
   { type: "donations", label: "Donations" },
-  { type: "charges", label: "Charges" },
   { type: "payouts", label: "Payouts" },
   { type: "receipts", label: "Receipts" },
 ]

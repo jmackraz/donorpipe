@@ -49,7 +49,7 @@ export default function StatsBar({ store }: Props) {
       >
         <span>{open ? "▲" : "▼"}</span>
         <span>
-          {totals.donations} donations · {totals.charges} charges · {totals.payouts} payouts ·{" "}
+          {totals.donations} donations · {totals.payouts} payouts ·{" "}
           {totals.receipts} receipts
         </span>
       </button>

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 
-export type EntityType = "donations" | "charges" | "payouts" | "receipts"
+export type EntityType = "donations" | "payouts" | "receipts"
 export type DonationMatch = "all" | "has_charge" | "has_receipt" | "unmatched"
 
 export interface Filters {
@@ -16,7 +16,7 @@ export interface Filters {
 }
 
 function isEntityType(v: string | null): v is EntityType {
-  return v === "donations" || v === "charges" || v === "payouts" || v === "receipts"
+  return v === "donations" || v === "payouts" || v === "receipts"
 }
 
 function isDonationMatch(v: string | null): v is DonationMatch {
