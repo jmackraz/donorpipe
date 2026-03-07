@@ -23,6 +23,41 @@ uv run python -m ruff check .                             # Lint
 uv run python -m ruff format .                            # Format
 ```
 
+## New Dev Environment Setup
+
+One-time steps when setting up a fresh clone:
+
+**1. Install system tools** (if not already present):
+```bash
+# Install uv (Python package/env manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install bun (JS runtime/package manager)
+curl -fsSL https://bun.sh/install | bash
+```
+
+**2. Install Python dependencies:**
+```bash
+uv sync
+```
+
+**3. Install frontend dependencies:**
+```bash
+cd frontend && bun install
+```
+
+**4. Create `.env`** in the project root with:
+```
+DONORPIPE_JWT_SECRET=<your-secret>
+```
+Generate a secret with: `python3 -c "import secrets; print(secrets.token_hex(32))"`
+
+**5. Ensure `config.json`** exists in the project root (copy from a template or existing config; must have `"users"` and `"accounts"` keys and `"data_base"` pointing to a local data directory).
+
+After these steps, `./scripts/dev.sh` should work.
+
+---
+
 ## Running the Dev Environment
 
 ```bash
