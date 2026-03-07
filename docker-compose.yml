@@ -1,0 +1,24 @@
+services:
+  api:
+    image: donorpipe-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DONORPIPE_JWT_SECRET=${DONORPIPE_JWT_SECRET}
+      - DONORPIPE_CONFIG=/app/config.json
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ${DONORPIPE_DATA:-./data}:/data:ro
+    restart: unless-stopped
+
+  nginx:
+    image: donorpipe-nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped

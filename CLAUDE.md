@@ -29,6 +29,20 @@ uv run python -m ruff format .                            # Format
 ./scripts/dev.sh                                           # Start API + frontend; open http://localhost:5173
 ```
 
+## Deployment
+
+```bash
+./scripts/deploy.sh                                        # Build images and deploy to Pi (PI_HOST=donorpipe.local)
+PI_HOST=mypi.local ./scripts/deploy.sh                    # Deploy to a different host
+```
+
+**First-time Pi setup** (run once on the Pi before first deploy):
+```bash
+mkdir -p ~/donorpipe/data
+# Copy config.json to ~/donorpipe/config.json; set data_base to "/data"
+# Create ~/donorpipe/.env with: DONORPIPE_JWT_SECRET=<your-secret>
+```
+
 This starts both servers and prints the URL. Press Ctrl+C to stop both.
 
 ### Individual servers

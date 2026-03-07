@@ -10,51 +10,6 @@ Completed milestones (1–11) have been moved to [docs/COMPLETED_MILESTONES.md](
 
 ## Active Milestones
 
-### Milestone 12: Local Deployment (Raspberry Pi)
-
-**Goal:** Host the app on a Raspberry Pi 4 for local network use.
-
-**Platform:** Raspberry Pi 4 (ARM64), Docker already installed.
-
-**Architecture:**
-- Two Docker containers managed by Docker Compose:
-  - `api`: FastAPI backend (Python 3.13, built from `Dockerfile`)
-  - `nginx`: serves built React static files + reverse-proxies `/api/` and `/token` to `api`
-- nginx is the only container with a published port (80)
-- FastAPI is only reachable inside the Docker network
-
-**nginx routing:**
-- `GET /` and `/assets/` → serve `frontend/dist/`
-- `POST /token`, `GET /api/...` → proxy to `api:8000`
-
-**Deployment workflow (`scripts/deploy.sh`):**
-1. `bun run build` in `frontend/` to produce `frontend/dist/`
-2. `docker compose build` to build both images
-3. Copy images to Pi via `docker save | ssh | docker load`
-4. SSH to Pi and run `docker compose up -d`
-
-**Configuration:**
-- `config.json` and `users.json` mounted as volumes; JWT signing key passed as env var
-- `DONORPIPE_CONFIG` env var points to mounted config file
-
-**Non-goals:**
-- HTTPS (added in M13)
-- CI/CD, automatic rollback, fleet management
-
-**Done when:**
-- `docker compose up` on the Pi serves the app at `http://pi-hostname/`
-- Auth (M11) works end-to-end on the Pi
-- `scripts/deploy.sh` completes a full deploy from a developer laptop in one command
-- `GET /health` returns 200
-- `docker compose logs` shows structured log output
-
-**New files:**
-- `Dockerfile` — multi-stage Python build
-- `docker-compose.yml` — defines `api` and `nginx` services
-- `nginx/nginx.conf` — routing rules
-- `scripts/deploy.sh` — full deploy script
-- Health check route in `src/donorpipe/api/app.py`
-
 ### Milestone 13: Public Deployment (AWS Lightsail)
 
 **Goal:** Make the app publicly accessible over HTTPS to a small audience.
@@ -101,14 +56,23 @@ Domain name already owned.
 
 
 # Backlog
-* extract operations manual from CLAUDE.md, complete and verify. Keep up to date.
+* ops manual
+  * include CMS
+  * ops scripts (dev, stage, prod) from CLAUDE.md
+  * include arch overview
+  * include dev/stage/prod push processes
+  * keep updated, occasionally validate
+* baby CI/CD just to make pushes easier for me?
 * Add notice about proprietary data
 * Logging, alarms
 * tune keyboard shortcuts, document
 * CMS system
+  * REST interface for uploading (sanity checks?)
+  * Separate engine for automated downloading
+  * Trigger reload
+  * Works well for dev iterations
 * Canonical relationship topology with highlighting
 * Realistic fake data
 * Merge in csvstore
 * test mobile form factor
 * Filter out cash donations when appropriate
-* Extract operations script docs, create ops manual (dev, stage, prod)

@@ -1,5 +1,59 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 12: Local Deployment (Raspberry Pi)
+
+**Goal:** Host the app on a Raspberry Pi 4 for local network use.
+
+**Platform:** Raspberry Pi 4 (ARM64), Docker already installed.
+
+**Architecture:**
+- Two Docker containers managed by Docker Compose:
+  - `api`: FastAPI backend (Python 3.13, built from `Dockerfile`)
+  - `nginx`: serves built React static files + reverse-proxies `/api/` and `/token` to `api`
+- nginx is the only container with a published port (80)
+- FastAPI is only reachable inside the Docker network
+- `frontend/dist/` and `nginx.conf` are baked into the nginx image at build time
+- Data files are volume-mounted from the Pi's filesystem (`DONORPIPE_DATA` env var, default `./data`)
+
+**nginx routing:**
+- `GET /` and `/assets/` → serve `frontend/dist/`
+- `POST /token`, `GET /api/...`, `GET /health` → proxy to `api:8000`
+
+**Deployment workflow (`scripts/deploy.sh`):**
+1. `bun run build` in `frontend/` to produce `frontend/dist/`
+2. `docker compose build` to build both images
+3. Copy images to Pi via `docker save | ssh | docker load`
+4. `scp docker-compose.yml` to Pi
+5. SSH to Pi and run `docker compose up -d`
+
+**Configuration:**
+- `config.json` mounted as volume; JWT signing key passed via `DONORPIPE_JWT_SECRET` env var
+- `DONORPIPE_CONFIG` env var points to mounted config file
+- Pi's `.env` file holds `DONORPIPE_JWT_SECRET`
+
+**First-time Pi setup:**
+```bash
+mkdir -p ~/donorpipe/data
+# Copy config.json to ~/donorpipe/config.json; set data_base to "/data"
+# Create ~/donorpipe/.env with: DONORPIPE_JWT_SECRET=<your-secret>
+```
+
+**Non-goals:**
+- HTTPS (added in M13)
+- CI/CD, automatic rollback, fleet management
+
+**New files:**
+- `Dockerfile` — multi-stage Python build
+- `nginx/Dockerfile` — nginx image with baked-in static files and config
+- `docker-compose.yml` — defines `api` and `nginx` services
+- `nginx/nginx.conf` — routing rules
+- `scripts/deploy.sh` — full deploy script
+- `.dockerignore`
+
+**Modified files:**
+- `src/donorpipe/api/app.py` — added `GET /health` route
+- `CLAUDE.md` — documented deploy commands and first-time Pi setup
+
 ## Milestone 1: Set up project directory hierarchy
 
 **Goal:** Directory src tree set up for best practices, to include:

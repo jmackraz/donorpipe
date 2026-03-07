@@ -31,6 +31,11 @@ app.add_middleware(
 app.include_router(router)
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/token")
 def login(form: OAuth2PasswordRequestForm = Depends()):
     user = app.state.config.users.get(form.username)
