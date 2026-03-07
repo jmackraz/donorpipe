@@ -104,4 +104,11 @@ Domain name already owned.
 * extract operations manual from CLAUDE.md, complete and verify. Keep up to date.
 * Add notice about proprietary data
 * Logging, alarms
-* 
+* tune keyboard shortcuts, document
+* CMS system
+* Canonical relationship topology with highlighting
+* Realistic fake data
+* Merge in csvstore
+* test mobile form factor
+* Filter out cash donations when appropriate
+* Extract operations script docs, create ops manual (dev, stage, prod)
