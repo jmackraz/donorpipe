@@ -1,0 +1,8 @@
+{
+  "accounts": {
+    "my_org": {
+      "data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
+      "data_dirs": ["Stripe", "DonorBox", "QBO"]
+    }
+  }
+}

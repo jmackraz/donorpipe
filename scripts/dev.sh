@@ -5,6 +5,7 @@
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CONFIG="realfiles_config.json"
 
 # Kill background jobs on exit
 cleanup() {
@@ -16,7 +17,9 @@ trap cleanup EXIT
 
 echo "Starting API (port 8000)..."
 cd "$ROOT"
-uv run fastapi dev src/donorpipe/api/app.py &
+#uv run fastapi dev src/donorpipe/api/app.py &
+env DONORPIPE_CONFIG=$CONFIG uv run fastapi dev src/donorpipe/api/app.py &
+
 
 echo "Starting frontend (port 5173)..."
 cd "$ROOT/frontend"
