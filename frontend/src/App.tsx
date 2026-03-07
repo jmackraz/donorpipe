@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter } from "react-router-dom"
 import AppLayout from "./components/AppLayout"
+import LoginForm from "./components/LoginForm"
+import { AuthProvider, useAuth } from "./contexts/AuthContext"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,12 +13,22 @@ const queryClient = new QueryClient({
   },
 })
 
+function AppContent() {
+  const { isAuthenticated } = useAuth()
+  if (!isAuthenticated) return <LoginForm />
+  return (
+    <BrowserRouter>
+      <AppLayout />
+    </BrowserRouter>
+  )
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppLayout />
-      </BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

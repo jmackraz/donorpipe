@@ -2,15 +2,20 @@
 
 import os
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
+from donorpipe.api.auth import UserRecord, require_account_access
 from donorpipe.models.transaction_loader import TransactionLoader
 
 router = APIRouter()
 
 
 @router.get("/accounts/{account_id}/graph")
-def get_graph(account_id: str, request: Request) -> dict:
+def get_graph(
+    account_id: str,
+    request: Request,
+    _user: UserRecord = Depends(require_account_access),
+) -> dict:
     config = request.app.state.config
     account = config.accounts.get(account_id)
     if account is None:

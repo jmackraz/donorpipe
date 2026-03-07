@@ -37,6 +37,7 @@ This starts both servers and prints the URL. Press Ctrl+C to stop both.
 uv run fastapi dev src/donorpipe/api/app.py               # API only (port 8000)
 uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
 uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
+uv run python scripts/hash_password.py <password>         # Hash a password for users.json
 ```
 
 ## Frontend (TypeScript / Bun)
@@ -70,6 +71,7 @@ When needed, high-level information about the UI is in docs/webui_spec.md
 and command-line scripts.
 * When a milestone is committed as done, move its spec from `MILESTONES.md` to
 `docs/COMPLETED_MILESTONES.md`.
+* When a new dev of ops shell command is added, document it in `CLAUDE.md`
 
 ## Frontend Notes
 * Amounts are stored as integers (cents). Filter inputs from the user are in dollars

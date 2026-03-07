@@ -18,7 +18,10 @@ trap cleanup EXIT
 echo "Starting API (port 8000)..."
 cd "$ROOT"
 #uv run fastapi dev src/donorpipe/api/app.py &
-env DONORPIPE_CONFIG=$CONFIG uv run fastapi dev src/donorpipe/api/app.py &
+USERS_CONFIG="${DONORPIPE_USERS_CONFIG:-users.json}"
+JWT_SECRET="${DONORPIPE_JWT_SECRET:?DONORPIPE_JWT_SECRET must be set}"
+env DONORPIPE_CONFIG=$CONFIG DONORPIPE_USERS_CONFIG=$USERS_CONFIG DONORPIPE_JWT_SECRET=$JWT_SECRET \
+    uv run fastapi dev src/donorpipe/api/app.py &
 
 
 echo "Starting frontend (port 5173)..."

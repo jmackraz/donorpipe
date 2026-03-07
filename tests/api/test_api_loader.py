@@ -6,15 +6,18 @@ import json
 import os
 from unittest.mock import MagicMock, patch
 
+import bcrypt
 import pytest
 from fastapi.testclient import TestClient
 
 from donorpipe.api.api_loader import ApiLoader
 from donorpipe.api.app import app
+from donorpipe.api.auth import create_access_token
 from donorpipe.models.transaction_loader import TransactionLoader
 from donorpipe.models.transaction_store import TransactionStore
 
 TESTDATA = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "testdata"))
+TEST_SECRET = "test-secret-key-for-pytest"
 
 
 @pytest.fixture
@@ -23,14 +26,25 @@ def client(tmp_path):
     config_file.write_text(
         json.dumps({"accounts": {"test_org": {"data_base": TESTDATA, "data_dirs": ["Stripe", "DonorBox", "QBO"]}}})
     )
-    env_backup = os.environ.get("DONORPIPE_CONFIG")
+    hashed = bcrypt.hashpw(b"testpass", bcrypt.gensalt()).decode()
+    users_file = tmp_path / "users.json"
+    users_file.write_text(
+        json.dumps({"users": {"alice": {"hashed_password": hashed, "accounts": ["test_org"]}}})
+    )
+    env_backup = {
+        k: os.environ.get(k)
+        for k in ("DONORPIPE_CONFIG", "DONORPIPE_USERS_CONFIG", "DONORPIPE_JWT_SECRET")
+    }
     os.environ["DONORPIPE_CONFIG"] = str(config_file)
+    os.environ["DONORPIPE_USERS_CONFIG"] = str(users_file)
+    os.environ["DONORPIPE_JWT_SECRET"] = TEST_SECRET
     with TestClient(app) as c:
         yield c
-    if env_backup is None:
-        os.environ.pop("DONORPIPE_CONFIG", None)
-    else:
-        os.environ["DONORPIPE_CONFIG"] = env_backup
+    for k, v in env_backup.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
 
 
 def test_api_loader_unit():
@@ -75,6 +89,10 @@ def test_api_loader_strips_trailing_slash():
 
 def test_api_loader_matches_csv_loader(client):
     """Integration test: ApiLoader and TransactionLoader produce identical graphs."""
+    os.environ["DONORPIPE_JWT_SECRET"] = TEST_SECRET
+    token = create_access_token("alice", ["test_org"])
+    auth_headers = {"Authorization": f"Bearer {token}"}
+
     # CSV loader (same env setup the graph route uses)
     env_backup = os.environ.get("OSF_EXPORTS")
     os.environ["OSF_EXPORTS"] = TESTDATA
@@ -91,7 +109,7 @@ def test_api_loader_matches_csv_loader(client):
     # API loader — intercept httpx.get and forward to TestClient
     def fake_get(url: str):
         path = url.split("localhost:8000", 1)[-1]
-        response = client.get(path)
+        response = client.get(path, headers=auth_headers)
         mock_resp = MagicMock()
         mock_resp.json.return_value = response.json()
         mock_resp.raise_for_status.return_value = None
