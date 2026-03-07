@@ -9,7 +9,11 @@
       "Bash(~/.bun/bin/bun:*)",
       "Bash(bun install:*)",
       "Bash(/opt/homebrew/bin/bun install:*)",
-      "Bash(bun add:*)"
+      "Bash(bun add:*)",
+      "Bash(bun run:*)",
+      "Bash(bun test:*)",
+      "Bash(uv:*)",
+      "Bash(git add:*)"
     ]
   }
 }

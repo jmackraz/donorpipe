@@ -6,53 +6,9 @@ All steps should be implemented in line with the memorized plan.
 The first milestone will help us set up some durable test data files.  All further milestones can
 use these files for their automated tests.
 
-Completed milestones (1–10) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–11) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
-
-### Milestone 11: Auth and Account Silos
-
-**Goal:** Protect per-organization data with individual user accounts.
-
-**Decisions:**
-- Auth protocol: OAuth2 password flow with JWT, using FastAPI's built-in security
-  utilities (`python-jose`, `passlib[bcrypt]`)
-- User store: a `users.json` file (or section in `config.json`) with hashed passwords
-  and org membership — no database required
-- No self-service registration or password reset; admin manages users by editing the
-  config file and generating bcrypt hashes via a helper script
-- Tokens are stateless (verified by signature, no server-side session state)
-- Container-friendly; migrate to Cognito if audience grows to warrant it
-
-**Behavior:**
-- `POST /token` — accepts `username` + `password` (form-encoded), returns a signed JWT
-  on success or 401 on failure
-- `GET /accounts/{account_id}/graph` — requires a valid JWT (`Authorization: Bearer <token>`);
-  returns 401 if missing/invalid, 403 if user is not a member of that account
-- JWT contains: `sub` (username), `accounts` (list of accessible account IDs), `exp` (expiry ~8h)
-- Frontend: login form POSTs to `/token`, stores JWT in React memory (not localStorage);
-  attaches it as `Authorization` header on every graph fetch
-- `scripts/hash_password.py` generates bcrypt hashes for admin use
-
-**Non-goals:**
-- Self-service password reset or registration UI
-- MFA
-- Admin management UI
-
-**Done when:**
-- `POST /token` returns JWT for valid credentials; 401 for invalid
-- Graph endpoint returns 401 without token, 403 if user lacks org membership, 200 if authorized
-- Frontend login form works end-to-end; unauthenticated users cannot reach data
-- Existing tests still pass; new tests cover auth happy path and error cases
-- `scripts/hash_password.py` generates a usable bcrypt hash
-
-**Key files:**
-- `src/donorpipe/api/auth.py` — JWT creation, verification, user lookup
-- `src/donorpipe/api/app.py` — add `/token` route
-- `src/donorpipe/api/graph_route.py` — add auth dependency
-- `src/donorpipe/api/config.py` — add user/membership model
-- `frontend/src/` — login form, auth context, header injection in `useGraph.ts`
-- `scripts/hash_password.py` — new helper
 
 ### Milestone 12: Local Deployment (Raspberry Pi)
 
