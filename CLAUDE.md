@@ -67,4 +67,11 @@ When needed, high-level information about the UI is in docs/webui_spec.md
 ## Guidelines
 * When I ask you to modify a file or files, ask before changing any other files.
 * As we add functionality, update the 'run' instructions to include new tools
-and command-line scripts.  
+and command-line scripts.
+* When a milestone is committed as done, move its spec from `MILESTONES.md` to
+`docs/COMPLETED_MILESTONES.md`.
+
+## Frontend Notes
+* Amounts are stored as integers (cents). Filter inputs from the user are in dollars
+and must be multiplied by 100 before comparison.
+* Virtual scroll uses a fixed row height of 48px with overscan 8 (`useVirtualizer`).
