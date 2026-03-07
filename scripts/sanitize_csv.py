@@ -24,6 +24,15 @@ def _sensitive_label(header: str) -> str | None:
     return match.group(0).capitalize()
 
 
+def find_header_row(rows: list[list[str]]) -> int:
+    """Return the index of the first row with the maximum number of non-empty fields."""
+    if not rows:
+        return 0
+    counts = [sum(1 for cell in row if cell.strip()) for row in rows]
+    max_count = max(counts)
+    return next(i for i, c in enumerate(counts) if c == max_count)
+
+
 def sanitize_file(
     input_path: Path,
     output_path: Path,
@@ -33,27 +42,42 @@ def sanitize_file(
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with input_path.open(newline="") as infile:
-        reader = csv.DictReader(infile)
-        fieldnames = reader.fieldnames
+        rows = list(csv.reader(infile))
 
-        if not fieldnames:
-            output_path.write_text(input_path.read_text())
-            return
+    if not rows:
+        output_path.write_text(input_path.read_text())
+        return
 
-        sensitive = {h: _sensitive_label(h) for h in fieldnames}
+    header_idx = find_header_row(rows)
+    header = rows[header_idx]
 
-        with output_path.open("w", newline="") as outfile:
-            writer = csv.DictWriter(outfile, fieldnames=fieldnames)
-            writer.writeheader()
-            for row in reader:
-                new_row = {}
-                for h in fieldnames:
-                    label = sensitive[h]
-                    if label is not None:
+    if not any(cell.strip() for cell in header):
+        output_path.write_text(input_path.read_text())
+        return
+
+    sensitive = {i: _sensitive_label(h) for i, h in enumerate(header)}
+    half = len(header) / 2
+
+    with output_path.open("w", newline="") as outfile:
+        writer = csv.writer(outfile)
+        # Write pre-header rows verbatim
+        for row in rows[:header_idx]:
+            writer.writerow(row)
+        # Write header verbatim
+        writer.writerow(header)
+        # Write data and trailer rows
+        for row in rows[header_idx + 1 :]:
+            nonempty = sum(1 for cell in row if cell.strip())
+            if nonempty < half:
+                # Sparse row — trailer/summary, pass through verbatim
+                writer.writerow(row)
+            else:
+                # Data row — sanitize sensitive columns
+                new_row = list(row)
+                for i, label in sensitive.items():
+                    if label is not None and i < len(new_row):
                         counters[label] += 1
-                        new_row[h] = f"{label} {counters[label]}"
-                    else:
-                        new_row[h] = row[h]
+                        new_row[i] = f"{label} {counters[label]}"
                 writer.writerow(new_row)
 
 

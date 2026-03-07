@@ -132,6 +132,71 @@ def test_counters_are_global(tmp_path, mod):
     assert len(vals) == 2
 
 
+def write_raw(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+
+
+def test_preamble_rows_pass_through(tmp_path, mod):
+    src = tmp_path / "in" / "a.csv"
+    write_raw(
+        src,
+        "Report Title,,,\n"
+        "Generated: 2024-01-01,,,\n"
+        "donor_name,amount,date,mailing_address\n"
+        "Alice,100,2024-01-01,123 Main St\n",
+    )
+    out = tmp_path / "out" / "a.csv"
+    mod.sanitize_file(src, out, defaultdict(int))
+    lines = out.read_text().splitlines()
+    assert lines[0] == "Report Title,,,"
+    assert lines[1] == "Generated: 2024-01-01,,,"
+    assert lines[2] == "donor_name,amount,date,mailing_address"
+    row = list(csv.DictReader([lines[2], lines[3]]))
+    assert row[0]["donor_name"] != "Alice"
+    assert row[0]["amount"] == "100"
+
+
+def test_trailer_rows_pass_through(tmp_path, mod):
+    src = tmp_path / "in" / "a.csv"
+    write_raw(
+        src,
+        "donor_name,amount,date,mailing_address\n"
+        "Alice,100,2024-01-01,123 Main St\n"
+        "Total: 1 record,,,\n"
+        "End of report,,,\n",
+    )
+    out = tmp_path / "out" / "a.csv"
+    mod.sanitize_file(src, out, defaultdict(int))
+    lines = out.read_text().splitlines()
+    assert lines[0] == "donor_name,amount,date,mailing_address"
+    assert lines[2] == "Total: 1 record,,,"
+    assert lines[3] == "End of report,,,"
+    row = list(csv.DictReader([lines[0], lines[1]]))
+    assert row[0]["donor_name"] != "Alice"
+    assert row[0]["amount"] == "100"
+
+
+def test_preamble_and_trailer(tmp_path, mod):
+    src = tmp_path / "in" / "a.csv"
+    write_raw(
+        src,
+        "Report Title,,,\n"
+        "donor_name,amount,date,mailing_address\n"
+        "Alice,100,2024-01-01,123 Main St\n"
+        "Total: 1 record,,,\n",
+    )
+    out = tmp_path / "out" / "a.csv"
+    mod.sanitize_file(src, out, defaultdict(int))
+    lines = out.read_text().splitlines()
+    assert lines[0] == "Report Title,,,"
+    assert lines[1] == "donor_name,amount,date,mailing_address"
+    assert lines[3] == "Total: 1 record,,,"
+    row = list(csv.DictReader([lines[1], lines[2]]))
+    assert row[0]["donor_name"] != "Alice"
+    assert row[0]["amount"] == "100"
+
+
 def test_empty_rows_no_crash(tmp_path, mod):
     src = tmp_path / "in" / "empty.csv"
     src.parent.mkdir(parents=True, exist_ok=True)
