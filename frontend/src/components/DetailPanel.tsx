@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from "react"
 import type { Donation, Charge, Payout, Receipt } from "../lib/graph"
 import type { EntityType } from "../hooks/useFilters"
+import RelationshipGraph from "./RelationshipGraph"
 
 type AnyEntity = Donation | Charge | Payout | Receipt
 
@@ -105,65 +106,7 @@ function DonationDetail({ d }: { d: Donation }) {
         </dl>
       </section>
 
-      <section className="mb-4">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          Relationships
-        </h3>
-        {d.payout ? (
-          <div className="border border-gray-200 rounded p-2 text-sm mb-2">
-            <div className="text-xs text-gray-400 mb-0.5">Payout</div>
-            <div className="font-mono text-xs text-gray-600">{d.payout.id}</div>
-            <div className="text-gray-900">
-              {fmtAmt(d.payout.net, d.payout.currency)} · {d.payout.date}
-            </div>
-            {d.charge && (
-              <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
-                <div className="text-xs text-gray-400 mb-0.5">Charge</div>
-                <div className="font-mono text-xs text-gray-600">{d.charge.id}</div>
-                <div className="text-gray-900">
-                  {fmtAmt(d.charge.net, d.charge.currency)} · {d.charge.date}
-                </div>
-              </div>
-            )}
-          </div>
-        ) : d.charge ? (
-          <div className="border border-gray-200 rounded p-2 text-sm mb-2">
-            <div className="text-xs text-gray-400 mb-0.5">Charge</div>
-            <div className="font-mono text-xs text-gray-600">{d.charge.id}</div>
-            <div className="text-gray-900">
-              {fmtAmt(d.charge.net, d.charge.currency)} · {d.charge.date}
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Not yet paid out.</p>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-400 mb-2">No charge linked.</p>
-        )}
-
-        {d.receipts.length > 0 && (
-          <div>
-            <div className="text-xs text-gray-400 mb-1">
-              Receipts ({d.receipts.length})
-            </div>
-            {d.receipts.map((r) => (
-              <div
-                key={r.id}
-                className="border border-gray-200 rounded p-2 text-sm mb-1"
-              >
-                <div className="font-mono text-xs text-gray-600">{r.id}</div>
-                <div className="text-gray-900">
-                  {fmtAmt(r.net, r.currency)} · {r.date}
-                  {r.product ? ` · ${r.product}` : ""}
-                </div>
-                {r.discrepancies.length > 0 && (
-                  <div className="text-amber-600 text-xs mt-0.5">
-                    ⚠ {r.discrepancies.join(", ")}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      <RelationshipGraph entity={d} />
     </>
   )
 }
@@ -199,59 +142,13 @@ function ChargeDetail({ c }: { c: Charge }) {
         </dl>
       </section>
 
-      <section className="mb-4">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          Relationships
-        </h3>
-        {c.payout ? (
-          <div className="border border-gray-200 rounded p-2 text-sm">
-            <div className="text-xs text-gray-400 mb-0.5">Payout</div>
-            <div className="font-mono text-xs text-gray-600">{c.payout.id}</div>
-            <div className="text-gray-900">
-              {fmtAmt(c.payout.net, c.payout.currency)} · {c.payout.date}
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-400">Not yet paid out.</p>
-        )}
-        {c.donations.length > 0 && (
-          <div className="mt-2">
-            <div className="text-xs text-gray-400 mb-1">Donations ({c.donations.length})</div>
-            {c.donations.map((d) => (
-              <div key={d.id} className="border border-gray-200 rounded p-2 text-sm mb-1">
-                <div className="font-mono text-xs text-gray-600">{d.id}</div>
-                <div className="text-gray-900">
-                  {d.name || "—"} · {fmtAmt(d.net, d.currency)} · {d.date}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      <RelationshipGraph entity={c} />
     </>
   )
 }
 
 function PayoutDetail({ p }: { p: Payout }) {
-  return (
-    <section className="mb-4">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-        Charges ({p.charges.length})
-      </h3>
-      {p.charges.length === 0 ? (
-        <p className="text-sm text-gray-400">No charges.</p>
-      ) : (
-        p.charges.map((c) => (
-          <div key={c.id} className="border border-gray-200 rounded p-2 text-sm mb-1">
-            <div className="font-mono text-xs text-gray-600">{c.id}</div>
-            <div className="text-gray-900">
-              {c.name || "—"} · {fmtAmt(c.net, c.currency)} · {c.date}
-            </div>
-          </div>
-        ))
-      )}
-    </section>
-  )
+  return <RelationshipGraph entity={p} />
 }
 
 function ReceiptDetail({ r }: { r: Receipt }) {
@@ -304,22 +201,7 @@ function ReceiptDetail({ r }: { r: Receipt }) {
         </section>
       )}
 
-      <section className="mb-4">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          Matched Donation
-        </h3>
-        {r.donation ? (
-          <div className="border border-gray-200 rounded p-2 text-sm">
-            <div className="font-mono text-xs text-gray-600">{r.donation.id}</div>
-            <div className="text-gray-900">
-              {r.donation.name || "—"} · {fmtAmt(r.donation.net, r.donation.currency)} ·{" "}
-              {r.donation.date}
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-400">No donation matched.</p>
-        )}
-      </section>
+      <RelationshipGraph entity={r} />
     </>
   )
 }
