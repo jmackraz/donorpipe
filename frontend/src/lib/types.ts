@@ -31,6 +31,7 @@ export interface RawReceipt extends Transaction {
   name: string
   ref_id: string
   product: string
+  item_class: string
   donation_id: string | null
   discrepancies: string[]
 }

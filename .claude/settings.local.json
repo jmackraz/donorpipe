@@ -13,7 +13,11 @@
       "Bash(bun run:*)",
       "Bash(bun test:*)",
       "Bash(uv:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(bun:*)",
+      "Bash(npm root:*)"
     ]
   }
 }

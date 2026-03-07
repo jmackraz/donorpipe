@@ -56,6 +56,7 @@ function toFlatJson(type: EntityType, entity: AnyEntity): Record<string, unknown
     name: r.name,
     ref_id: r.ref_id,
     product: r.product,
+    item_class: r.item_class,
     donation_id: r.donation?.id ?? null,
     discrepancies: r.discrepancies,
   }
@@ -279,6 +280,12 @@ function ReceiptDetail({ r }: { r: Receipt }) {
             <div className="flex gap-2">
               <dt className="text-gray-500 w-28 shrink-0">Product</dt>
               <dd>{r.product}</dd>
+            </div>
+          )}
+          {r.item_class && (
+            <div className="flex gap-2">
+              <dt className="text-gray-500 w-28 shrink-0">Class</dt>
+              <dd>{r.item_class}</dd>
             </div>
           )}
         </dl>

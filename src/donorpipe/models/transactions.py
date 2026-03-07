@@ -203,11 +203,12 @@ class Payout(Transaction):
 class Receipt(Transaction):
     def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
                  date: str, net: str | float, name: str, ref_id: str,
-                 product: str, currency: str = "USD") -> None:
+                 product: str, item_class: str = "", currency: str = "USD") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency)
         self.name = name
         self.ref_id = ref_id
         self.product = product
+        self.item_class = item_class
         self.donation: Donation | None = None    # link to Donation. May be set later by associate_donation_receipts
         self.discrepancies: list[str] = []
 
@@ -235,6 +236,7 @@ class Receipt(Transaction):
             "name": self.name,
             "ref_id": self.ref_id,
             "product": self.product,
+            "item_class": self.item_class,
             "donation_id": self.donation.id if self.donation else None,
             "discrepancies": self.discrepancies,
         }
@@ -251,6 +253,7 @@ class Receipt(Transaction):
             name=data["name"],
             ref_id=data["ref_id"],
             product=data["product"],
+            item_class=data.get("item_class", ""),
             currency=data.get("currency", "USD"),
         )
         obj.discrepancies = data.get("discrepancies", [])

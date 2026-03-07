@@ -169,7 +169,8 @@ class TransactionStore:
             date = r['Transaction date']
             receipt = Receipt(r, filename=filename, service="qbo", tx_id = r['Num'], date = date, net = net,
                               name = r['Donor'], ref_id = r['REF #'],
-                              product=r['Product/Service full name'])
+                              product=r['Product/Service full name'],
+                              item_class=r.get('Item class', ''))
 
             if receipt.id in self.receipts:
                 # so far, this is always a split.  Can turn this on or breakpoint on it for debugging.

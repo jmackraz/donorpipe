@@ -9,8 +9,8 @@ interface Props {
 
 const TABS: { type: EntityType; label: string }[] = [
   { type: "donations", label: "Donations" },
-  { type: "payouts", label: "Payouts" },
   { type: "receipts", label: "Receipts" },
+  { type: "payouts", label: "Payouts" },
 ]
 
 export default function TypeTabs({ activeType, store, onSelect }: Props) {
