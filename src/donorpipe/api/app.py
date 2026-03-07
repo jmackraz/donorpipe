@@ -3,12 +3,11 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends
 
-from donorpipe.api.auth import create_access_token, load_users, verify_password
+from donorpipe.api.auth import create_access_token, verify_password
 from donorpipe.api.config import load_config
 from donorpipe.api.graph_route import router
 
@@ -19,7 +18,6 @@ async def lifespan(app: FastAPI):
     if not secret:
         raise RuntimeError("DONORPIPE_JWT_SECRET environment variable is required")
     app.state.config = load_config()
-    app.state.users = load_users()
     yield
 
 
@@ -35,8 +33,7 @@ app.include_router(router)
 
 @app.post("/token")
 def login(form: OAuth2PasswordRequestForm = Depends()):
-    users_config = app.state.users
-    user = users_config.users.get(form.username)
+    user = app.state.config.users.get(form.username)
     if user is None or not verify_password(form.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     token = create_access_token(form.username, user.accounts)

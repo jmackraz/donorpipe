@@ -22,30 +22,27 @@ def _make_hash(password: str) -> str:
 def client(tmp_path):
     config_file = tmp_path / "config.json"
     config_file.write_text(
-        json.dumps({"accounts": {"test_org": {"data_base": TESTDATA, "data_dirs": ["Stripe", "DonorBox", "QBO"]}}})
-    )
-
-    # Alice has test_org + nonexistent (for 404 test)
-    users_file = tmp_path / "users.json"
-    users_file.write_text(
         json.dumps(
             {
+                "accounts": {
+                    "test_org": {
+                        "data_base": TESTDATA,
+                        "data_dirs": ["Stripe", "DonorBox", "QBO"],
+                    }
+                },
                 "users": {
                     "alice": {
                         "hashed_password": _make_hash("testpass"),
+                        # alice has test_org + nonexistent (for 404 test)
                         "accounts": ["test_org", "nonexistent"],
                     }
-                }
+                },
             }
         )
     )
 
-    env_backup = {
-        k: os.environ.get(k)
-        for k in ("DONORPIPE_CONFIG", "DONORPIPE_USERS_CONFIG", "DONORPIPE_JWT_SECRET")
-    }
+    env_backup = {k: os.environ.get(k) for k in ("DONORPIPE_CONFIG", "DONORPIPE_JWT_SECRET")}
     os.environ["DONORPIPE_CONFIG"] = str(config_file)
-    os.environ["DONORPIPE_USERS_CONFIG"] = str(users_file)
     os.environ["DONORPIPE_JWT_SECRET"] = TEST_SECRET
 
     with TestClient(app) as c:

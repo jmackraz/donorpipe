@@ -37,8 +37,29 @@ This starts both servers and prints the URL. Press Ctrl+C to stop both.
 uv run fastapi dev src/donorpipe/api/app.py               # API only (port 8000)
 uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
 uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
-uv run python scripts/hash_password.py <password>         # Hash a password for users.json
+uv run python scripts/hash_password.py <password>         # Hash a password for config.json
 ```
+
+## User Management
+
+Users are stored in `config.json` under the `"users"` key alongside accounts. Only
+`DONORPIPE_JWT_SECRET` (in `.env`) must stay out of the repo — hashed passwords are safe to commit.
+
+**Add a new user or change a password:**
+```bash
+# 1. Hash the password
+uv run python scripts/hash_password.py <newpassword>
+
+# 2. Add or update the entry in config.json:
+#    "users": {
+#      "username": {
+#        "hashed_password": "<paste hash>",
+#        "accounts": ["my_org"]
+#      }
+#    }
+```
+
+`accounts` lists the account IDs (keys under `"accounts"`) the user can access.
 
 ## Frontend (TypeScript / Bun)
 

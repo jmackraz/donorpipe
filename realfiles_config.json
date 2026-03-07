@@ -4,5 +4,11 @@
       "data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
       "data_dirs": ["Stripe", "DonorBox", "QBO"]
     }
+  },
+  "users": {
+    "jim": {
+      "hashed_password": "$2b$12$e11bsBq5lJ5iqHg5VC7.Z.Cbv0srnmasJIM/MOtgOWJ4CEr4CV2Bq",
+      "accounts": ["my_org"]
+    }
   }
 }

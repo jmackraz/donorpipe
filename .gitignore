@@ -7,7 +7,6 @@ __pycache__/
 
 # Secrets
 .env
-users.json
 
 # Frontend
 frontend/node_modules/

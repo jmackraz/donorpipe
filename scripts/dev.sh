@@ -22,9 +22,8 @@ if [ -f "$ROOT/.env" ]; then
     set -a; source "$ROOT/.env"; set +a
 fi
 #uv run fastapi dev src/donorpipe/api/app.py &
-USERS_CONFIG="${DONORPIPE_USERS_CONFIG:-users.json}"
 JWT_SECRET="${DONORPIPE_JWT_SECRET:?DONORPIPE_JWT_SECRET must be set}"
-env DONORPIPE_CONFIG=$CONFIG DONORPIPE_USERS_CONFIG=$USERS_CONFIG DONORPIPE_JWT_SECRET=$JWT_SECRET \
+env DONORPIPE_CONFIG=$CONFIG DONORPIPE_JWT_SECRET=$JWT_SECRET \
     uv run fastapi dev src/donorpipe/api/app.py &
 
 

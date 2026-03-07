@@ -12,8 +12,14 @@ class AccountConfig(BaseModel):
     data_dirs: list[str]
 
 
+class UserConfig(BaseModel):
+    hashed_password: str
+    accounts: list[str]
+
+
 class AppConfig(BaseModel):
     accounts: dict[str, AccountConfig]
+    users: dict[str, UserConfig] = {}
 
 
 def load_config(path: Path | None = None) -> AppConfig:

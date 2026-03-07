@@ -4,7 +4,8 @@ import os
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from donorpipe.api.auth import UserRecord, require_account_access
+from donorpipe.api.auth import require_account_access
+from donorpipe.api.config import UserConfig
 from donorpipe.models.transaction_loader import TransactionLoader
 
 router = APIRouter()
@@ -14,7 +15,7 @@ router = APIRouter()
 def get_graph(
     account_id: str,
     request: Request,
-    _user: UserRecord = Depends(require_account_access),
+    _user: UserConfig = Depends(require_account_access),
 ) -> dict:
     config = request.app.state.config
     account = config.accounts.get(account_id)

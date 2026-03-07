@@ -7,30 +7,13 @@ import bcrypt
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from pydantic import BaseModel
+
+from donorpipe.api.config import UserConfig
 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 8
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-class UserRecord(BaseModel):
-    hashed_password: str
-    accounts: list[str]
-
-
-class UsersConfig(BaseModel):
-    users: dict[str, UserRecord]
-
-
-def load_users(path: str | None = None) -> UsersConfig:
-    import json
-
-    if path is None:
-        path = os.environ.get("DONORPIPE_USERS_CONFIG", "users.json")
-    with open(path) as f:
-        return UsersConfig.model_validate(json.load(f))
 
 
 def verify_password(plain: str, hashed: str) -> bool:
@@ -55,19 +38,18 @@ def decode_token(token: str) -> dict:
 def get_current_user(
     request: Request,
     token: str = Depends(oauth2_scheme),
-) -> UserRecord:
+) -> UserConfig:
     payload = decode_token(token)
     username: str = payload.get("sub", "")
-    users_config: UsersConfig = request.app.state.users
-    user = users_config.users.get(username)
+    user = request.app.state.config.users.get(username)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
 
 def require_account_access(
-    account_id: str, user: UserRecord = Depends(get_current_user)
-) -> UserRecord:
+    account_id: str, user: UserConfig = Depends(get_current_user)
+) -> UserConfig:
     if account_id not in user.accounts:
         raise HTTPException(status_code=403, detail="Access denied for this account")
     return user

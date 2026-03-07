@@ -29,31 +29,19 @@ def client(tmp_path):
                         "data_base": TESTDATA,
                         "data_dirs": ["Stripe", "DonorBox", "QBO"],
                     }
-                }
-            }
-        )
-    )
-
-    users_file = tmp_path / "users.json"
-    users_file.write_text(
-        json.dumps(
-            {
+                },
                 "users": {
                     "alice": {
                         "hashed_password": _make_hash("testpass"),
                         "accounts": ["test_org"],
                     }
-                }
+                },
             }
         )
     )
 
-    env_backup = {
-        k: os.environ.get(k)
-        for k in ("DONORPIPE_CONFIG", "DONORPIPE_USERS_CONFIG", "DONORPIPE_JWT_SECRET")
-    }
+    env_backup = {k: os.environ.get(k) for k in ("DONORPIPE_CONFIG", "DONORPIPE_JWT_SECRET")}
     os.environ["DONORPIPE_CONFIG"] = str(config_file)
-    os.environ["DONORPIPE_USERS_CONFIG"] = str(users_file)
     os.environ["DONORPIPE_JWT_SECRET"] = TEST_SECRET
 
     with TestClient(app) as c:
