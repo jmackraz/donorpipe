@@ -1,0 +1,15 @@
+{
+  "accounts": {
+    "my_org": {
+      "data_base": "/data",
+      "data_dirs": ["Stripe", "DonorBox", "QBO"]
+    }
+  },
+  "users": {
+      "jim": {
+        "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
+        "accounts": ["my_org"]
+      }
+    }
+
+}

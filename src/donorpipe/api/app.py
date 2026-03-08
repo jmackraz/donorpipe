@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="DonorPipe", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://donorpipe.trickybit.com"],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
