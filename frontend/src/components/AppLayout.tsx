@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
 import { useGraph } from "../hooks/useGraph"
 import { useFilters } from "../hooks/useFilters"
 import type { EntityType } from "../hooks/useFilters"
@@ -16,9 +17,27 @@ import ErrorBanner from "./ErrorBanner"
 export default function AppLayout() {
   const [searchParams, setSearchParams] = useSearchParams()
   const account = searchParams.get("account") ?? ""
+  const { accounts } = useAuth()
 
   // Local input state — only pushed to URL on form submit
   const [accountInput, setAccountInput] = useState(account)
+
+  // Auto-select first account when accounts load and no account is in URL
+  useEffect(() => {
+    if (accounts.length > 0 && !account) {
+      const first = accounts[0]
+      setAccountInput(first)
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          next.set("account", first)
+          next.delete("selected")
+          return next
+        },
+        { replace: true },
+      )
+    }
+  }, [accounts]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: store, isLoading, error, refetch } = useGraph(account)
   const { filters, setFilter, clearFilters } = useFilters()
@@ -77,6 +96,21 @@ export default function AppLayout() {
     )
   }
 
+  function handleAccountChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value
+    setAccountInput(val)
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        if (val) next.set("account", val)
+        else next.delete("account")
+        next.delete("selected")
+        return next
+      },
+      { replace: true },
+    )
+  }
+
   const hasData = !!store
 
   return (
@@ -84,22 +118,37 @@ export default function AppLayout() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4 shrink-0">
         <h1 className="text-lg font-bold text-gray-900 shrink-0">DonorPipe</h1>
-        <form onSubmit={handleAccountSubmit} className="flex gap-2">
-          <input
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm w-44"
-            placeholder="Account ID"
-            value={accountInput}
-            onChange={(e) => setAccountInput(e.target.value)}
-            aria-label="Account ID"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !accountInput}
-            className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+        {accounts.length === 1 ? (
+          <span className="text-sm text-gray-600">{account}</span>
+        ) : accounts.length > 1 ? (
+          <select
+            className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+            value={account}
+            onChange={handleAccountChange}
+            aria-label="Account"
           >
-            {isLoading ? "Loading…" : "Fetch"}
-          </button>
-        </form>
+            {accounts.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        ) : (
+          <form onSubmit={handleAccountSubmit} className="flex gap-2">
+            <input
+              className="border border-gray-300 rounded px-3 py-1.5 text-sm w-44"
+              placeholder="Account ID"
+              value={accountInput}
+              onChange={(e) => setAccountInput(e.target.value)}
+              aria-label="Account ID"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !accountInput}
+              className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isLoading ? "Loading…" : "Fetch"}
+            </button>
+          </form>
+        )}
       </header>
 
       {/* Stats bar */}
@@ -170,7 +219,7 @@ export default function AppLayout() {
       {/* Empty start state */}
       {!hasData && !isLoading && !error && (
         <div className="flex-1 flex items-center justify-center text-sm text-gray-400">
-          Enter an account ID and click Fetch.
+          {accounts.length === 0 ? "Enter an account ID and click Fetch." : "Loading…"}
         </div>
       )}
     </div>
