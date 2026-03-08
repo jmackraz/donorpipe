@@ -4,7 +4,7 @@ import type { TransactionStore } from "../lib/graph"
 import type { EntityGraph } from "../lib/types"
 import { useAuth } from "../contexts/AuthContext"
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ""
 
 async function fetchGraph(
   accountId: string,

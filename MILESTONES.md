@@ -77,3 +77,4 @@ Domain name already owned.
 * test mobile form factor
 * Filter out cash donations when appropriate
   * More filters.  day/week/month/year.  donor/recipient. service.  missing donations/receipt.  too many receipts.
+* comparison view - mis-linked receipts

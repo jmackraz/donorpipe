@@ -1,7 +1,7 @@
 {
   "accounts": {
     "my_org": {
-      "data_base": "testdata",
+      "data_base": "/data",
       "data_dirs": ["Stripe", "DonorBox", "QBO"]
     }
   },
@@ -11,4 +11,5 @@
         "accounts": ["my_org"]
       }
     }
+
 }

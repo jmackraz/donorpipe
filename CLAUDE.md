@@ -78,6 +78,26 @@ mkdir -p ~/donorpipe/data
 # Create ~/donorpipe/.env with: DONORPIPE_JWT_SECRET=<your-secret>
 ```
 
+**Viewing logs on Pi:**
+```bash
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f"        # All services
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f api"    # API only
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f nginx"  # Nginx only
+```
+
+**Restarting containers on Pi:**
+```bash
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose restart"                                    # Restart without recreating
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose down && docker compose up -d && docker compose logs -f"  # Full restart + stream logs
+ssh jim@$PI_HOST "cd ~/donorpipe && docker compose ps"             # Check container status
+ssh jim@$PI_HOST "curl -s http://localhost:8000/health"            # Check API directly
+```
+
+**Updating data files on Pi:**
+```bash
+rsync -av --delete ./data/ jim@$PI_HOST:~/donorpipe/data/  # Sync local data/ to Pi
+```
+
 This starts both servers and prints the URL. Press Ctrl+C to stop both.
 
 ### Individual servers

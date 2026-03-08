@@ -20,7 +20,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ""
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Only a boolean flag lives in state so React knows when to re-render.
