@@ -58,78 +58,6 @@ After these steps, `./scripts/dev.sh` should work.
 
 ---
 
-## Running the Dev Environment
-
-```bash
-./scripts/dev.sh                                           # Start API + frontend; open http://localhost:5173
-```
-
-## Deployment
-
-```bash
-./scripts/deploy.sh                                        # Build images and deploy to Pi (PI_HOST=donorpipe.local)
-PI_HOST=mypi.local ./scripts/deploy.sh                    # Deploy to a different host
-```
-
-**First-time Pi setup** (run once on the Pi before first deploy):
-```bash
-mkdir -p ~/donorpipe/data
-# Copy config.json to ~/donorpipe/config.json; set data_base to "/data"
-# Create ~/donorpipe/.env with: DONORPIPE_JWT_SECRET=<your-secret>
-```
-
-**Viewing logs on Pi:**
-```bash
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f"        # All services
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f api"    # API only
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f nginx"  # Nginx only
-```
-
-**Restarting containers on Pi:**
-```bash
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose restart"                                    # Restart without recreating
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose down && docker compose up -d && docker compose logs -f"  # Full restart + stream logs
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose ps"             # Check container status
-ssh jim@$PI_HOST "curl -s http://localhost:8000/health"            # Check API directly
-```
-
-**Updating data files on Pi:**
-```bash
-rsync -av --delete ./data/ jim@$PI_HOST:~/donorpipe/data/  # Sync local data/ to Pi
-```
-
-This starts both servers and prints the URL. Press Ctrl+C to stop both.
-
-### Individual servers
-
-```bash
-uv run fastapi dev src/donorpipe/api/app.py               # API only (port 8000)
-uv run python scripts/fetch_graph.py --account my_org     # Fetch graph summary
-uv run python scripts/fetch_graph.py --account my_org --json  # Fetch full JSON
-uv run python scripts/hash_password.py <password>         # Hash a password for config.json
-```
-
-## User Management
-
-Users are stored in `config.json` under the `"users"` key alongside accounts. Only
-`DONORPIPE_JWT_SECRET` (in `.env`) must stay out of the repo — hashed passwords are safe to commit.
-
-**Add a new user or change a password:**
-```bash
-# 1. Hash the password
-uv run python scripts/hash_password.py <newpassword>
-
-# 2. Add or update the entry in config.json:
-#    "users": {
-#      "username": {
-#        "hashed_password": "<paste hash>",
-#        "accounts": ["my_org"]
-#      }
-#    }
-```
-
-`accounts` lists the account IDs (keys under `"accounts"`) the user can access.
-
 ## Frontend (TypeScript / Bun)
 
 ```bash
@@ -150,6 +78,7 @@ Config is read from `config.json` by default. Override with `DONORPIPE_CONFIG=/p
 ## Project
 Read PROJECT.md for a high-level definition of the project.
 Read MILESTONES.md for the development plan
+Read docs/OPERATIONS.md for running, deploying, and managing users across environments.
 When needed, find Snippets in docs/SCRATCH.md
 When needed, information about entity relationships is in docs/relationships.md
 When needed, high-level information about the UI is in docs/webui_spec.md
@@ -161,7 +90,7 @@ When needed, high-level information about the UI is in docs/webui_spec.md
 and command-line scripts.
 * When a milestone is committed as done, move its spec from `MILESTONES.md` to
 `docs/COMPLETED_MILESTONES.md`.
-* When a new dev of ops shell command is added, document it in `CLAUDE.md`
+* When a new dev tool or command is added, document it in `CLAUDE.md`. When a new ops/deployment command is added, document it in `docs/OPERATIONS.md`.
 * Don't commit without asking or being explicitly instructed
 
 ## Frontend Notes
