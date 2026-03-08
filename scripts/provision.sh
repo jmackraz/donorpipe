@@ -11,7 +11,7 @@ set -euo pipefail
 HOST="${1:?Usage: provision.sh <host>}"
 
 # 1. Install Docker + certbot
-ssh ubuntu@$HOST "sudo apt-get update -q && sudo apt-get install -y docker.io docker-compose-plugin certbot && sudo usermod -aG docker ubuntu"
+ssh ubuntu@$HOST "curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker ubuntu && sudo apt-get install -y certbot"
 
 # 2. Dirs and config
 ssh ubuntu@$HOST "mkdir -p ~/donorpipe/nginx ~/donorpipe/data"
@@ -22,7 +22,7 @@ scp .env ubuntu@$HOST:~/donorpipe/.env          # DONORPIPE_JWT_SECRET
 ssh ubuntu@$HOST "sudo certbot certonly --standalone -d donorpipe.trickybit.com"
 
 # 4. Initial deploy
-PROD=1 PI_HOST=ubuntu@$HOST ./scripts/deploy.sh
+PROD=1 DPIPE_HOST=ubuntu@$HOST ./scripts/deploy.sh
 
 # 5. Renewal cron
 ssh ubuntu@$HOST "echo '0 3 * * * root certbot renew --quiet && docker compose -f ~/donorpipe/docker-compose.yml -f ~/donorpipe/docker-compose.prod.yml exec nginx nginx -s reload' | sudo tee /etc/cron.d/certbot-renew"

@@ -6,13 +6,71 @@ This document covers running, deploying, and managing DonorPipe across environme
 
 ## Production
 
-> **Status:** Not yet deployed. See [Milestone 13](../MILESTONES.md) for the planned AWS Lightsail deployment.
+**URL:** https://donorpipe.trickybit.com
+**Host:** AWS Lightsail — `ubuntu@donorpipe.trickybit.com`
 
-Planned URL: `https://<domain>` (TBD)
+### Lightsail firewall rules
 
-Deploy command (same as staging, targeting the production host):
+In the AWS console → Lightsail → instance → **Networking** tab → **IPv4 Firewall**, ensure these ports are open:
+
+| Port | Protocol |
+|------|----------|
+| 22   | TCP (SSH) |
+| 80   | TCP (HTTP) |
+| 443  | TCP (HTTPS) |
+
+### First-time setup (run once, locally)
+
+Prerequisites: static IP attached, ports 80+443 open in Lightsail firewall, DNS propagated, `prod_config.json` and `.env` ready locally.
+
 ```bash
-PI_HOST=<prod-host> ./scripts/deploy.sh
+./scripts/provision.sh donorpipe.trickybit.com
+```
+
+This installs Docker + certbot on the host, obtains a TLS cert, and does the initial deploy.
+
+### Deploy
+
+```bash
+PROD=1 ./scripts/deploy.sh
+```
+
+Builds images for `linux/amd64` locally, ships them to the host, and restarts containers with the prod compose override (TLS on port 443).
+
+### Logs / Restart
+
+```bash
+PROD=1 ./scripts/logs.sh             # All services
+PROD=1 ./scripts/logs.sh api         # API only
+PROD=1 ./scripts/restart.sh          # Restart all
+PROD=1 ./scripts/restart.sh api      # Restart api only
+```
+
+### Update data
+
+Real data:
+```bash
+PROD=1 ./scripts/sync-data.sh
+```
+
+Sanitized fake data to test/demo account:
+```bash
+PROD=1 ./scripts/sync-test-data.sh
+```
+
+### Update config
+
+```bash
+PROD=1 ./scripts/push-config.sh
+```
+
+Copies `prod_config.json` to the host and restarts the api container.
+
+### TLS cert renewal
+
+Renewal runs automatically via cron (`/etc/cron.d/certbot-renew`). To test manually:
+```bash
+ssh ubuntu@donorpipe.trickybit.com "sudo certbot renew --dry-run"
 ```
 
 ---
@@ -26,8 +84,8 @@ The staging environment runs on a Raspberry Pi at `donorpipe.local`.
 ### Deploy
 
 ```bash
-./scripts/deploy.sh                                        # Build and deploy to Pi (PI_HOST=donorpipe.local)
-PI_HOST=mypi.local ./scripts/deploy.sh                    # Deploy to a different host
+./scripts/deploy.sh                                        # Build and deploy to Pi (DPIPE_HOST=donorpipe.local)
+DPIPE_HOST=mypi.local ./scripts/deploy.sh                 # Deploy to a different host
 ```
 
 ### First-time Pi setup (run once on the Pi)
@@ -41,30 +99,30 @@ mkdir -p ~/donorpipe/data
 ### Logs
 
 ```bash
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f"        # All services
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f api"    # API only
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose logs -f nginx"  # Nginx only
+./scripts/logs.sh            # All services
+./scripts/logs.sh api        # API only
+./scripts/logs.sh nginx      # Nginx only
 ```
 
 ### Restart
 
 ```bash
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose restart"                                     # Restart without recreating
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose down && docker compose up -d && docker compose logs -f"  # Full restart + stream logs
-ssh jim@$PI_HOST "cd ~/donorpipe && docker compose ps"             # Check container status
-ssh jim@$PI_HOST "curl -s http://localhost:8000/health"            # Check API directly
+./scripts/restart.sh         # Restart all containers
+./scripts/restart.sh api     # Restart api only
 ```
 
 ### Update config
 
 ```bash
-rsync -av staging_config.json jim@$PI_HOST:~/donorpipe/config.json
+./scripts/push-config.sh
 ```
+
+Copies `staging_config.json` to the host and restarts the api container.
 
 ### Update data
 
 ```bash
-rsync -av --delete ./data/ jim@$PI_HOST:~/donorpipe/data/          # Sync local data/ to Pi
+./scripts/sync-data.sh       # Sync local data/ to Pi
 ```
 
 ---
