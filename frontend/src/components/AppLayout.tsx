@@ -14,6 +14,7 @@ import DetailPanel from "./DetailPanel"
 import StatsBar from "./StatsBar"
 import EmptyState from "./EmptyState"
 import ErrorBanner from "./ErrorBanner"
+import HelpModal from "./HelpModal"
 
 export default function AppLayout() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -22,6 +23,7 @@ export default function AppLayout() {
 
   // Local input state — only pushed to URL on form submit
   const [accountInput, setAccountInput] = useState(account)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   // Auto-select first account when accounts load and no account is in URL
   useEffect(() => {
@@ -61,6 +63,8 @@ export default function AppLayout() {
         if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, 1))
       } else if (e.key === "p") {
         if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, -1))
+      } else if (e.key === "?") {
+        setHelpOpen(true)
       }
     }
     window.addEventListener("keydown", handleKey)
@@ -135,6 +139,9 @@ export default function AppLayout() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+      {/* Help modal */}
+      {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
+
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4 shrink-0">
         <h1 className="text-lg font-bold text-gray-900 shrink-0">DonorPipe</h1>
@@ -169,6 +176,14 @@ export default function AppLayout() {
             </button>
           </form>
         )}
+        <button
+          onClick={() => setHelpOpen(true)}
+          className="ml-auto text-gray-400 hover:text-gray-600 text-sm font-medium px-2 py-1 rounded hover:bg-gray-100"
+          aria-label="Help"
+          title="Help (?)"
+        >
+          ?
+        </button>
       </header>
 
       {/* Stats bar */}

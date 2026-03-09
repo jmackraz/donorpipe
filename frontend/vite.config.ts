@@ -10,6 +10,7 @@ export default defineConfig({
       "/accounts": "http://localhost:8000",
       "/token": "http://localhost:8000",
       "/health": "http://localhost:8000",
+      "/help": "http://localhost:8000",
     },
   },
 })

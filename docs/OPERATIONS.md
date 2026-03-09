@@ -66,6 +66,14 @@ PROD=1 ./scripts/push-config.sh
 
 Copies `prod_config.json` to the host and restarts the api container.
 
+### Update help docs
+
+```bash
+PROD=1 ./scripts/push-help.sh
+```
+
+Copies `docs/help.md` to the host. No container restart needed — the API reads the file on each request.
+
 ### TLS cert renewal
 
 Renewal runs automatically via cron (`/etc/cron.d/certbot-renew`). To test manually:
