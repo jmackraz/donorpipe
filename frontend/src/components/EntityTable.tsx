@@ -73,8 +73,9 @@ function ReceiptRow({ r }: { r: Receipt }) {
   return (
     <>
       <span className="w-24 shrink-0 text-gray-500">{r.date}</span>
-      <span className="flex-1 font-medium text-gray-900 truncate min-w-0">{r.name || "—"}</span>
       <span className="w-28 shrink-0 text-right tabular-nums">{fmtAmt(r.net, r.currency)}</span>
+      <span className="w-24 shrink-0 text-gray-500 truncate hidden sm:block">{r.item_class || "—"}</span>
+      <span className="flex-1 font-medium text-gray-900 truncate min-w-0">{r.name || "—"}</span>
       <span className="w-28 shrink-0 text-gray-500 truncate hidden sm:block">
         {r.product || "—"}
       </span>
