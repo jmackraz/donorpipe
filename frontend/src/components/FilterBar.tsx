@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react"
 import type { Filters, DateInterval } from "../hooks/useFilters"
 
 interface Props {
@@ -5,6 +6,35 @@ interface Props {
   setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void
   clearFilters: () => void
   services: string[]
+}
+
+function DateInput({
+  value,
+  onChange,
+  label,
+}: {
+  value: string
+  onChange: (v: string) => void
+  label: string
+}) {
+  const ref = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (ref.current && ref.current.value !== value) {
+      ref.current.value = value
+    }
+  }, [value])
+
+  return (
+    <input
+      ref={ref}
+      type="date"
+      defaultValue={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1 text-sm"
+      aria-label={label}
+    />
+  )
 }
 
 const INTERVAL_OPTIONS: { value: DateInterval; label: string }[] = [
@@ -41,12 +71,10 @@ export default function FilterBar({ filters, setFilter, clearFilters, services }
   return (
     <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-white border-b border-gray-200">
       <div className="flex items-center gap-1">
-        <input
-          type="date"
+        <DateInput
           value={filters.dateStart}
-          onChange={(e) => setFilter("dateStart", e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1 text-sm"
-          aria-label="Date start"
+          onChange={(v) => setFilter("dateStart", v)}
+          label="Date start"
         />
         <select
           value={filters.dateInterval}
