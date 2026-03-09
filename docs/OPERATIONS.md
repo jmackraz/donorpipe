@@ -140,16 +140,16 @@ warehouse/sanitize.sh
 
 Reads each entry in `sanitize[]` from config and runs `scripts/sanitize_csv.py source → dest` for each.
 
-### Sync all accounts to staging
+### Sync accounts to staging
 
 ```bash
-warehouse/sync-data.sh
+warehouse/sync-data.sh <account> [account ...]
 ```
 
-### Sync all accounts to prod
+### Sync accounts to prod
 
 ```bash
-PROD=1 warehouse/sync-data.sh
+PROD=1 warehouse/sync-data.sh <account> [account ...]
 ```
 
 ---
