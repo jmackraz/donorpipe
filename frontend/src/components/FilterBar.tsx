@@ -40,54 +40,6 @@ function ToggleButton({
 export default function FilterBar({ filters, setFilter, clearFilters, services }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-white border-b border-gray-200">
-      {/* Donor input */}
-      <input
-        id="filter-text"
-        type="search"
-        placeholder="Donor name, ID…"
-        value={filters.donor}
-        onChange={(e) => setFilter("donor", e.target.value)}
-        className="border border-gray-300 rounded px-2 py-1 text-sm w-44"
-        aria-label="Donor search"
-      />
-
-      {/* Service dropdown */}
-      <select
-        value={filters.service}
-        onChange={(e) => setFilter("service", e.target.value)}
-        className="border border-gray-300 rounded px-2 py-1 text-sm"
-        aria-label="Service filter"
-      >
-        <option value="">All Services</option>
-        {services.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
-
-      {/* Toggle buttons */}
-      <div className="flex items-center gap-1">
-        <ToggleButton
-          active={filters.missing}
-          onClick={() => setFilter("missing", !filters.missing)}
-        >
-          Missing
-        </ToggleButton>
-        <ToggleButton
-          active={filters.discrepancies}
-          onClick={() => setFilter("discrepancies", !filters.discrepancies)}
-        >
-          Discrepancies
-        </ToggleButton>
-        <ToggleButton
-          active={filters.duplicates}
-          onClick={() => setFilter("duplicates", !filters.duplicates)}
-        >
-          Duplicates
-        </ToggleButton>
-      </div>
-
       {/* Date range UI (display only — logic in Phase 2) */}
       <div className="flex items-center gap-1">
         <input
@@ -135,6 +87,54 @@ export default function FilterBar({ filters, setFilter, clearFilters, services }
           className="border border-gray-300 rounded px-2 py-1 text-sm w-20"
           aria-label="Maximum amount"
         />
+      </div>
+
+      {/* Service dropdown */}
+      <select
+        value={filters.service}
+        onChange={(e) => setFilter("service", e.target.value)}
+        className="border border-gray-300 rounded px-2 py-1 text-sm"
+        aria-label="Service filter"
+      >
+        <option value="">All Services</option>
+        {services.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+
+      {/* Donor input */}
+      <input
+        id="filter-text"
+        type="search"
+        placeholder="Donor name, ID…"
+        value={filters.donor}
+        onChange={(e) => setFilter("donor", e.target.value)}
+        className="border border-gray-300 rounded px-2 py-1 text-sm w-44"
+        aria-label="Donor search"
+      />
+
+      {/* Toggle buttons */}
+      <div className="flex items-center gap-1">
+        <ToggleButton
+          active={filters.missing}
+          onClick={() => setFilter("missing", !filters.missing)}
+        >
+          Missing
+        </ToggleButton>
+        <ToggleButton
+          active={filters.discrepancies}
+          onClick={() => setFilter("discrepancies", !filters.discrepancies)}
+        >
+          Discrepancies
+        </ToggleButton>
+        <ToggleButton
+          active={filters.duplicates}
+          onClick={() => setFilter("duplicates", !filters.duplicates)}
+        >
+          Duplicates
+        </ToggleButton>
       </div>
 
       <button
