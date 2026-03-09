@@ -13,6 +13,18 @@
     "jim": {
       "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
       "accounts": ["oliveseed", "test_org"]
+    },
+    "barb": {
+      "hashed_password": "$2b$12$zEm6zh.ldDEe.voovvHG1uU96fxE5MHz2RVD1EyV.AjBkr63v0Gk6",
+      "accounts": ["oliveseed"]
+    },
+    "carol": {
+      "hashed_password": "$2b$12$bwgYFycXkompsBWmdfAcc.lZyqXbKMVj4yWRDP5Y9bRMNEBO.pYiG",
+      "accounts": ["oliveseed"]
+    },
+    "demo": {
+      "hashed_password": "$2b$12$/GvsbyUVqCTX0kwR76AP7Oq8x.sD1RV1u19Cik/U563aEFpT5HGuO",
+      "accounts": ["test_org"]
     }
   }
 }
