@@ -1,14 +1,18 @@
 {
   "accounts": {
-    "my_org": {
+    "oliveseed": {
       "data_base": "testdata",
-      "data_dirs": ["Stripe", "DonorBox", "QBO"]
+      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
+    },
+    "test_org": {
+      "data_base": "testdata",
+      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
     }
   },
   "users": {
-      "jim": {
-        "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
-        "accounts": ["my_org"]
-      }
+    "jim": {
+      "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
+      "accounts": ["oliveseed", "test_org"]
     }
+  }
 }
