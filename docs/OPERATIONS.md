@@ -86,6 +86,7 @@ The staging environment runs on a Raspberry Pi at `punkinpi.local`.
 ```bash
 ./scripts/deploy.sh                                        # Build and deploy to Pi (DPIPE_HOST=punkinpi.local)
 DPIPE_HOST=mypi.local ./scripts/deploy.sh                 # Deploy to a different host
+DPIPE_USER=ubuntu ./scripts/deploy.sh                     # Deploy with a specific SSH user (prod defaults to ubuntu)
 ```
 
 ### First-time Pi setup (run once on the Pi)
