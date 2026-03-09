@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Start API and frontend dev servers.
 # Usage: ./scripts/dev.sh
+# Override config: DPIPE_DEV_CONFIG=other_config.json ./scripts/dev.sh
 
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-CONFIG="realfiles_config.json"
+CONFIG="${DPIPE_DEV_CONFIG:-config.json}"
+
+echo CONFIG: $CONFIG
 
 # Kill background jobs on exit
 cleanup() {
