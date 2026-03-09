@@ -230,6 +230,7 @@ export default function AppLayout() {
                 type={filters.type}
                 entity={selectedEntity}
                 onClose={() => setFilter("selected", null)}
+                donations={store.donations}
               />
             )}
           </div>

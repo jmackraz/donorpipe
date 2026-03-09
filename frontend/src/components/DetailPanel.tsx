@@ -1,6 +1,7 @@
-import { useEffect, useCallback } from "react"
+import { useEffect, useCallback, useState } from "react"
 import type { Donation, Charge, Payout, Receipt } from "../lib/graph"
 import type { EntityType } from "../hooks/useFilters"
+import { findBestDonation } from "../lib/matching"
 import RelationshipGraph from "./RelationshipGraph"
 
 type AnyEntity = Donation | Charge | Payout | Receipt
@@ -9,6 +10,7 @@ interface Props {
   type: EntityType
   entity: AnyEntity
   onClose: () => void
+  donations: Map<string, Donation>
 }
 
 function fmtAmt(net: number, currency: string): string {
@@ -151,7 +153,7 @@ function PayoutDetail({ p }: { p: Payout }) {
   return <RelationshipGraph entity={p} />
 }
 
-function ReceiptDetail({ r }: { r: Receipt }) {
+function ReceiptDetail({ r, onFindDonation }: { r: Receipt; onFindDonation?: () => void }) {
   return (
     <>
       <section className="mb-4">
@@ -202,6 +204,17 @@ function ReceiptDetail({ r }: { r: Receipt }) {
       )}
 
       <RelationshipGraph entity={r} />
+
+      {!r.donation && r.product !== "Direct Cash Donation" && onFindDonation && (
+        <section className="mt-4">
+          <button
+            onClick={onFindDonation}
+            className="text-sm text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded px-3 py-1.5"
+          >
+            Find Donation
+          </button>
+        </section>
+      )}
     </>
   )
 }
@@ -220,12 +233,21 @@ const TYPE_BADGE_COLORS: Record<EntityType, string> = {
   receipts: "bg-orange-100 text-orange-700",
 }
 
-export default function DetailPanel({ type, entity, onClose }: Props) {
+export default function DetailPanel({ type, entity, onClose, donations }: Props) {
+  const [guessedDonation, setGuessedDonation] = useState<Donation | null | "none">(null)
+
+  useEffect(() => {
+    setGuessedDonation(null)
+  }, [entity.id])
+
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") {
+        if (guessedDonation !== null) setGuessedDonation(null)
+        else onClose()
+      }
     },
-    [onClose],
+    [onClose, guessedDonation],
   )
 
   useEffect(() => {
@@ -233,9 +255,104 @@ export default function DetailPanel({ type, entity, onClose }: Props) {
     return () => window.removeEventListener("keydown", handleKey)
   }, [handleKey])
 
+  function handleFindDonation() {
+    const result = findBestDonation(entity as Receipt, donations)
+    setGuessedDonation(result ?? "none")
+  }
+
+  const panelClass = "w-full sm:w-96 border-l border-gray-200 bg-white overflow-y-auto flex-shrink-0"
+
+  // Guessed donation found
+  if (guessedDonation !== null && guessedDonation !== "none") {
+    const d = guessedDonation
+    return (
+      <div className={panelClass} aria-label="Detail panel">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3">
+          <button
+            onClick={() => setGuessedDonation(null)}
+            className="text-xs text-blue-500 hover:text-blue-700 mb-2"
+          >
+            ← Back to Receipt
+          </button>
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-medium rounded px-1.5 py-0.5 bg-blue-100 text-blue-700">
+                  Donation (suggested)
+                </span>
+                <span className="text-xs text-gray-500">{d.date}</span>
+              </div>
+              {d.name && (
+                <div className="text-base font-medium text-gray-800 truncate">{d.name}</div>
+              )}
+              <div className="text-lg font-semibold text-gray-900">
+                {fmtAmt(d.net, d.currency)}
+              </div>
+              <div className="font-mono text-xs text-gray-400 truncate mt-0.5">{d.id}</div>
+            </div>
+            <div className="flex items-center gap-2 ml-2 shrink-0">
+              <button
+                onClick={() => copyToClipboard(d.tx_id)}
+                className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded px-2 py-1"
+                title="Copy transaction ID to paste into QBO"
+              >
+                Copy TX ID
+              </button>
+              <button
+                onClick={onClose}
+                aria-label="Close detail panel"
+                className="text-gray-400 hover:text-gray-700 text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="px-4 py-3">
+          <DonationDetail d={d} />
+          <details className="mt-2">
+            <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 select-none">
+              Raw JSON
+            </summary>
+            <pre className="mt-2 p-2 bg-gray-50 rounded overflow-auto text-xs text-gray-700 max-h-64">
+              {JSON.stringify(toFlatJson("donations", d), null, 2)}
+            </pre>
+          </details>
+        </div>
+      </div>
+    )
+  }
+
+  // No match found
+  if (guessedDonation === "none") {
+    return (
+      <div className={panelClass} aria-label="Detail panel">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => setGuessedDonation(null)}
+            className="text-xs text-blue-500 hover:text-blue-700"
+          >
+            ← Back to Receipt
+          </button>
+          <button
+            onClick={onClose}
+            aria-label="Close detail panel"
+            className="text-gray-400 hover:text-gray-700 text-lg leading-none"
+          >
+            ×
+          </button>
+        </div>
+        <div className="px-4 py-3">
+          <p className="text-sm text-gray-500">No matching donation found.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Normal view
   return (
     <div
-      className="w-full sm:w-96 border-l border-gray-200 bg-white overflow-y-auto flex-shrink-0"
+      className={panelClass}
       aria-label="Detail panel"
     >
       {/* Header */}
@@ -283,7 +400,9 @@ export default function DetailPanel({ type, entity, onClose }: Props) {
         {type === "donations" && <DonationDetail d={entity as Donation} />}
         {type === "charges" && <ChargeDetail c={entity as Charge} />}
         {type === "payouts" && <PayoutDetail p={entity as Payout} />}
-        {type === "receipts" && <ReceiptDetail r={entity as Receipt} />}
+        {type === "receipts" && (
+          <ReceiptDetail r={entity as Receipt} onFindDonation={handleFindDonation} />
+        )}
 
         <details className="mt-2">
           <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 select-none">
