@@ -54,16 +54,23 @@ export default function AppLayout() {
       } else if (e.key === "/") {
         e.preventDefault()
         document.getElementById("filter-text")?.focus()
+      } else if (e.key === "c" || e.key === "C") {
+        clearFilters()
       }
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
   }, [setFilter])
 
-  const receiptServices = useMemo(
+  const availableServices = useMemo(
     () =>
       store
-        ? [...new Set([...store.receipts.values()].map((r) => r.service))].sort()
+        ? [
+            ...new Set([
+              ...[...store.donations.values()].map((d) => d.service),
+              ...[...store.payouts.values()].map((p) => p.service),
+            ]),
+          ].sort()
         : [],
     [store],
   )
@@ -191,7 +198,7 @@ export default function AppLayout() {
             }}
           />
 
-          <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} services={receiptServices} />
+          <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} services={availableServices} />
 
           <div className="flex flex-1 overflow-hidden">
             {/* List pane — hidden on mobile when detail panel is open */}

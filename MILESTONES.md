@@ -46,8 +46,7 @@ All conditions persist but are ignored when viewing listings where they are not 
 * Implement date range filter.
 * Implement keyboard shortcuts for date range.
   * These shortcuts should be 'global' in that they do not require the FilterBar to have focus.
-  * These should be 'n' for 'next interval', 'p' for 'previous interval', and 'r' for 'reset'.  If it's weird
-  for the UI to have a button "Clear" and we say "Reset", we should be consistent.
+  * These should be 'n' for 'next interval', 'p' for 'previous interval', and 'c' for 'clear' (already implemented).
 
 **Phase 3:**
 * Design and implement a set of shortcuts for navigation, focus and selection.

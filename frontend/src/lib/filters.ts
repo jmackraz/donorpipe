@@ -13,6 +13,7 @@ export function filterDonations(donations: Map<string, Donation>, f: Filters): D
 
   for (const d of donations.values()) {
     if (!inAmountRange(d.net, f.amountMin, f.amountMax)) continue
+    if (f.service && d.service !== f.service) continue
     if (
       donor &&
       !d.name.toLowerCase().includes(donor) &&
@@ -45,6 +46,7 @@ export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[
 
   for (const p of payouts.values()) {
     if (!inAmountRange(p.net, f.amountMin, f.amountMax)) continue
+    if (f.service && p.service !== f.service) continue
     results.push(p)
   }
 
@@ -66,7 +68,6 @@ export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Rece
       continue
     if (f.missing && r.donation !== null) continue
     if (f.discrepancies && r.discrepancies.length === 0) continue
-    if (f.service && r.service !== f.service) continue
     results.push(r)
   }
 
