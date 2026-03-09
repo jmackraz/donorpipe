@@ -2,11 +2,11 @@
   "accounts": {
     "oliveseed": {
       "data_base": "testdata",
-      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity","QBO"]
     },
     "test_org": {
       "data_base": "testdata",
-      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity","QBO"]
     }
   },
   "users": {

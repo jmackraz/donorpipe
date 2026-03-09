@@ -3,11 +3,11 @@
     "oliveseed": {
       "google_data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
       "data_base": "/Users/jim/p/donorpipe_data/oliveseed",
-      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity","QBO"]
     },
     "test_org": {
       "data_base": "/Users/jim/p/donorpipe_data/testdata",
-      "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity","QBO"]
     }
   },
   "users": {
