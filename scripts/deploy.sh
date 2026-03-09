@@ -16,13 +16,23 @@
 
 set -euo pipefail
 
-DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
-DPIPE_DIR="${DPIPE_DIR:-~/donorpipe}"
 PROD="${PROD:-0}"
+
+if [ "$PROD" = "1" ]; then
+    DPIPE_HOST="${DPIPE_HOST:-donorpipe.trickybit.com}"
+else
+    DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
+fi
+DPIPE_DIR="${DPIPE_DIR:-~/donorpipe}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_DIR"
+
+if [ "$PROD" = "1" ]; then
+    read -r -p "Deploy to PRODUCTION ($DPIPE_HOST)? [y/N] " confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 1; }
+fi
 
 echo "==> Building frontend..."
 (cd frontend && bun run build)
