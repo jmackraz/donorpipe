@@ -1,5 +1,83 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 15 - Handle Receipts with Missing Donations
+
+#### Goals
+* Help the user find the right donation for a given receipt when the relationship to a donation is missing.
+* Help the user make corrections to the receipt in QBO (usually by correcting the reference ID)
+
+#### Common causes:
+* Reference ID was not entered when creating the receipt.  It should be the raw transaction ID of the online donation.
+* The reference ID was entered incorrectly.  In particular, when receipts are created from Benevity donations,
+the payment ID is sometimes entered as the reference ID, instead of the line-item transaction ID.
+* The donation is not an online donation, it's usually Direct Cash Donations.  We should suppress those receipts
+much of the time.
+* The report containing the corresponding donation is missing from our dataset. (rare)
+
+#### Approach
+* When inspecting a receipt with a missing donation, we offer to try to automatically identify the donation.
+* When we display the donation we guessed, we offer a button to copy the raw transaction ID of the donation to
+the clipboard. That's convenient for pasting into QBO.
+
+#### UI
+* In the details pane of any receipt, if the donation is missing, and the "product" is not "Direct Cash Donation",
+we offer a **Find Donation** button: replace the detail pane with the detail of our best-guess donation (or a
+message if we can't find one). The "Copy ID" and close buttons work as usual; when closed, we return to the
+receipt detail rather than closing the detail pane.
+* Manual Search was considered and skipped.
+
+#### Identifying the donation
+* Filter donations: Missing flag, amount range within 10% of receipt net, date range = week containing receipt.
+* Any donations in that filtered set missing receipts are strong candidates.
+* The strongest candidate is the one with the closest net amount.
+* If there are multiple candidates, pick one arbitrarily.
+* If there are no candidates, loosen the filter criteria and try again, details TBD.
+
+---
+
+## Milestone 14 - Improvement of filters
+
+**Goals:**
+* We add filter criteria with defaults that important for the app.
+* We craft an excellent keyboard shortcut system for filtering.
+* Filters are as common as possible across listings of different types.
+  * E.g., filtering for 'missing' will find receipts with missing donations in the Receipts list, and
+  donations with missing receipts in the Donations list.
+  * E.g., the 'missing' filter will remain in the filter bar, but ignored when viewing payouts.
+
+**Filters:**
+All conditions persist but are ignored when viewing listings where they are not relevant.
+* **Missing** matches receipts with missing donations, and donations with missing receipts.
+* **Discrepancies** Matches receipts with discrepancies,
+* **Duplicates** Matches donations with duplicate receipts
+* **Donor** Matches donations with a specific donor, by pattern
+* **Service** Matches receipts with a single specific service,
+* **Date range** Matches receipts with a specific date range, see note below.
+
+**Note on Date Range:**
+* Should take the form:
+  * Start date
+  * Interval: day, week, month, year
+* Ranges are aligned on the natural interval, e.g., a start date of 5 Jan 2020 and an interval of month will
+  match 1 Jan 2020 to 31 Jan 2020.
+* A keyboard shortcut will change the start date to the beginning of the next natural interval.  For example,
+  if the start date is 5 Jan 2020 and the interval is month, pressing 'n' will change the start date to 1 Feb 2020.
+* The keyboard shortcut 'p' will do the same for the previous interval.
+
+**Phase 1 (completed):**
+* Implement the UI for all of these filters (in FilterBar)
+* Implement all filters except date range.
+
+**Phase 2 (completed):**
+* Implement date range filter.
+* Implement keyboard shortcuts for date range.
+  * These shortcuts should be 'global' in that they do not require the FilterBar to have focus.
+  * These should be 'n' for 'next interval', 'p' for 'previous interval', and 'c' for 'clear' (already implemented).
+
+**Phase 3:** Folded into backlog (navigation/focus shortcuts and complete filter shortcut set).
+
+---
+
 ## Milestone 13: Public Deployment (AWS Lightsail)
 
 **Goal:** Make the app publicly accessible over HTTPS to a small audience.
