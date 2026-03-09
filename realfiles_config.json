@@ -1,11 +1,12 @@
 {
   "accounts": {
     "oliveseed": {
-      "data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
+      "google_data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
+      "data_base": "/Users/jim/p/donorpipe_data/oliveseed",
       "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
     },
     "test_org": {
-      "data_base": "testdata",
+      "data_base": "/Users/jim/p/donorpipe_data/testdata",
       "data_dirs": ["Stripe", "DonorBox", "Benevity","QBO"]
     }
   },
