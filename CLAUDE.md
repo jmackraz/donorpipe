@@ -84,15 +84,6 @@ When needed, information about entity relationships is in docs/relationships.md
 When needed, high-level information about the UI is in docs/webui_spec.md
 
 
-## Guidelines
-* When I ask you to modify a file or files, ask before changing any other files.
-* As we add functionality, update the 'run' instructions to include new tools
-and command-line scripts.
-* When a milestone is committed as done, move its spec from `MILESTONES.md` to
-`docs/COMPLETED_MILESTONES.md`.
-* When a new dev tool or command is added, document it in `CLAUDE.md`. When a new ops/deployment command is added, document it in `docs/OPERATIONS.md`.
-* Don't commit without asking or being explicitly instructed
-
 ## Frontend Notes
 * Amounts are stored as floats (dollars). Filter inputs from the user are in dollars and can be compared directly.
 * Virtual scroll uses a fixed row height of 48px with overscan 8 (`useVirtualizer`).
