@@ -1,5 +1,25 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 16 - in-app user documentation
+
+### Goals
+* Provide high-level instructions for using the app within the app itself.
+* Include documentation sections for specific use cases, even if you don't yet know what to say:
+  * Reconciling with bank deposits
+  * Adding new online donations
+  * Viewing and fixing errors in receipts:
+    * Missing donations
+    * Data discrepancies
+    * Duplicate receipts
+* There should also be a quick-reference guide for keyboard shortcuts.
+
+### Topics
+* Doc should be co-authored by agent and developer
+* Help text in app should be styled to look good
+* Doc may be iterated frequently; it should be deployable without a full image push.
+
+---
+
 ## Milestone 15 - Handle Receipts with Missing Donations
 
 #### Goals

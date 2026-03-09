@@ -6,28 +6,9 @@ All steps should be implemented in line with the memorized plan.
 The first milestone will help us set up some durable test data files.  All further milestones can
 use these files for their automated tests.
 
-Completed milestones (1–15) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–16) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
-
-## Milestone 16 - in-app user documentation
-
-### Goals
-* Provide high-level instructions for using the app within the app itself.
-* Include documentation sections for specific use cases, even if you don't yet know what to say:
-  * Reconciling with bank deposits
-  * Adding new online donations
-  * Viewing and fixing errors in receipts:
-    * Missing donations
-    * Data discrepancies
-    * Duplicate receipts
-* There should also be a quick-reference guide for keyboard shortcuts.
-
-### Topics
-* Doc should be co-authored by agent and developer
-* Help text in app should be styled to look good
-* Doc may be iterated frequently; it should be deployable without a full image push.
-
 
 ## Backlog
 **Production Checklist:**
