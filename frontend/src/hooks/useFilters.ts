@@ -2,16 +2,19 @@ import { useCallback, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 
 export type EntityType = "donations" | "payouts" | "receipts"
-export type DonationMatch = "all" | "has_charge" | "has_receipt" | "unmatched"
+export type DateInterval = "day" | "week" | "month" | "year"
 
 export interface Filters {
   type: EntityType
-  dateFrom: string
-  dateTo: string
-  text: string
+  donor: string
+  missing: boolean
+  discrepancies: boolean
+  duplicates: boolean
+  service: string
+  dateStart: string
+  dateInterval: DateInterval
   amountMin: number | null
   amountMax: number | null
-  donationMatch: DonationMatch
   selected: string | null
 }
 
@@ -19,8 +22,8 @@ function isEntityType(v: string | null): v is EntityType {
   return v === "donations" || v === "payouts" || v === "receipts"
 }
 
-function isDonationMatch(v: string | null): v is DonationMatch {
-  return v === "all" || v === "has_charge" || v === "has_receipt" || v === "unmatched"
+function isDateInterval(v: string | null): v is DateInterval {
+  return v === "day" || v === "week" || v === "month" || v === "year"
 }
 
 export function useFilters() {
@@ -28,15 +31,18 @@ export function useFilters() {
 
   const filters: Filters = useMemo(() => {
     const rawType = params.get("type")
-    const rawMatch = params.get("donationMatch")
+    const rawInterval = params.get("dateInterval")
     return {
       type: isEntityType(rawType) ? rawType : "donations",
-      dateFrom: params.get("dateFrom") ?? "",
-      dateTo: params.get("dateTo") ?? "",
-      text: params.get("text") ?? "",
+      donor: params.get("donor") ?? "",
+      missing: params.get("missing") === "1",
+      discrepancies: params.get("discrepancies") === "1",
+      duplicates: params.get("duplicates") === "1",
+      service: params.get("service") ?? "",
+      dateStart: params.get("dateStart") ?? "",
+      dateInterval: isDateInterval(rawInterval) ? rawInterval : "month",
       amountMin: params.get("amountMin") ? Number(params.get("amountMin")) : null,
       amountMax: params.get("amountMax") ? Number(params.get("amountMax")) : null,
-      donationMatch: isDonationMatch(rawMatch) ? rawMatch : "all",
       selected: params.get("selected"),
     }
   }, [params])
@@ -46,8 +52,10 @@ export function useFilters() {
       setParams(
         (prev) => {
           const next = new URLSearchParams(prev)
-          if (value === null || value === "") {
+          if (value === null || value === "" || value === false) {
             next.delete(key)
+          } else if (value === true) {
+            next.set(key, "1")
           } else {
             next.set(key, String(value))
           }
@@ -67,7 +75,6 @@ export function useFilters() {
           const v = prev.get(key)
           if (v) next.set(key, v)
         }
-        // Dates reset to defaults (omit from URL → defaults applied on next read)
         return next
       },
       { replace: true },

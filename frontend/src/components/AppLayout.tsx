@@ -60,6 +60,14 @@ export default function AppLayout() {
     return () => window.removeEventListener("keydown", handleKey)
   }, [setFilter])
 
+  const receiptServices = useMemo(
+    () =>
+      store
+        ? [...new Set([...store.receipts.values()].map((r) => r.service))].sort()
+        : [],
+    [store],
+  )
+
   const filteredEntities = useMemo((): AnyEntity[] => {
     if (!store) return []
     switch (filters.type) {
@@ -183,7 +191,7 @@ export default function AppLayout() {
             }}
           />
 
-          <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} />
+          <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} services={receiptServices} />
 
           <div className="flex flex-1 overflow-hidden">
             {/* List pane — hidden on mobile when detail panel is open */}

@@ -1,12 +1,6 @@
 import type { Donation, Charge, Payout, Receipt } from "./graph"
 import type { Filters } from "../hooks/useFilters"
 
-function inDateRange(date: string, from: string, to: string): boolean {
-  if (from && date < from) return false
-  if (to && date > to) return false
-  return true
-}
-
 function inAmountRange(net: number, min: number | null, max: number | null): boolean {
   if (min !== null && net < min) return false
   if (max !== null && net > max) return false
@@ -14,23 +8,21 @@ function inAmountRange(net: number, min: number | null, max: number | null): boo
 }
 
 export function filterDonations(donations: Map<string, Donation>, f: Filters): Donation[] {
-  const text = f.text.toLowerCase()
+  const donor = f.donor.toLowerCase()
   const results: Donation[] = []
 
   for (const d of donations.values()) {
-    if (!inDateRange(d.date, f.dateFrom, f.dateTo)) continue
     if (!inAmountRange(d.net, f.amountMin, f.amountMax)) continue
     if (
-      text &&
-      !d.name.toLowerCase().includes(text) &&
-      !d.id.toLowerCase().includes(text) &&
-      !(d.designation ?? "").toLowerCase().includes(text) &&
-      !(d.email ?? "").toLowerCase().includes(text)
+      donor &&
+      !d.name.toLowerCase().includes(donor) &&
+      !d.id.toLowerCase().includes(donor) &&
+      !(d.designation ?? "").toLowerCase().includes(donor) &&
+      !(d.email ?? "").toLowerCase().includes(donor)
     )
       continue
-    if (f.donationMatch === "has_charge" && d.charge === null) continue
-    if (f.donationMatch === "has_receipt" && d.receipts.length === 0) continue
-    if (f.donationMatch === "unmatched" && (d.charge !== null || d.receipts.length > 0)) continue
+    if (f.missing && d.receipts.length !== 0) continue
+    if (f.duplicates && d.receipts.length <= 1) continue
     results.push(d)
   }
 
@@ -38,19 +30,10 @@ export function filterDonations(donations: Map<string, Donation>, f: Filters): D
 }
 
 export function filterCharges(charges: Map<string, Charge>, f: Filters): Charge[] {
-  const text = f.text.toLowerCase()
   const results: Charge[] = []
 
   for (const c of charges.values()) {
-    if (!inDateRange(c.date, f.dateFrom, f.dateTo)) continue
     if (!inAmountRange(c.net, f.amountMin, f.amountMax)) continue
-    if (
-      text &&
-      !c.name.toLowerCase().includes(text) &&
-      !c.id.toLowerCase().includes(text) &&
-      !(c.description ?? "").toLowerCase().includes(text)
-    )
-      continue
     results.push(c)
   }
 
@@ -61,7 +44,6 @@ export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[
   const results: Payout[] = []
 
   for (const p of payouts.values()) {
-    if (!inDateRange(p.date, f.dateFrom, f.dateTo)) continue
     if (!inAmountRange(p.net, f.amountMin, f.amountMax)) continue
     results.push(p)
   }
@@ -70,19 +52,21 @@ export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[
 }
 
 export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Receipt[] {
-  const text = f.text.toLowerCase()
+  const donor = f.donor.toLowerCase()
   const results: Receipt[] = []
 
   for (const r of receipts.values()) {
-    if (!inDateRange(r.date, f.dateFrom, f.dateTo)) continue
     if (!inAmountRange(r.net, f.amountMin, f.amountMax)) continue
     if (
-      text &&
-      !r.name.toLowerCase().includes(text) &&
-      !r.id.toLowerCase().includes(text) &&
-      !(r.product ?? "").toLowerCase().includes(text)
+      donor &&
+      !r.name.toLowerCase().includes(donor) &&
+      !r.id.toLowerCase().includes(donor) &&
+      !(r.product ?? "").toLowerCase().includes(donor)
     )
       continue
+    if (f.missing && r.donation !== null) continue
+    if (f.discrepancies && r.discrepancies.length === 0) continue
+    if (f.service && r.service !== f.service) continue
     results.push(r)
   }
 
