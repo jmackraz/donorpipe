@@ -18,7 +18,8 @@
       "Bash(docker-compose:*)",
       "Bash(bun:*)",
       "Bash(npm root:*)",
-      "Bash(chmod +x:*)"
+      "Bash(chmod +x:*)",
+      "Bash(git:*)"
     ]
   }
 }
