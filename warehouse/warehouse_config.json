@@ -1,0 +1,22 @@
+{
+  "sanitize": [
+    {
+      "source": "~/p/data_sanitization_test_box/real_data",
+      "dest": "~/p/data_sanitization_test_box/sanitized_data"
+    }
+  ],
+  "accounts": {
+    "oliveseed": "~/p/data_sanitization_test_box/real_data",
+    "test_org":  "~/p/data_sanitization_test_box/sanitized_data"
+  },
+  "hosts": {
+    "staging": {
+      "host": "donorpipe.local",
+      "dir":  "~/donorpipe"
+    },
+    "prod": {
+      "host": "ubuntu@donorpipe.trickybit.com",
+      "dir":  "~/donorpipe"
+    }
+  }
+}

@@ -127,6 +127,32 @@ Copies `staging_config.json` to the host and restarts the api container.
 
 ---
 
+## Warehouse (data sanitization + sync)
+
+Config: `warehouse/warehouse_config.json` — defines sanitize operations, account→source mappings, and host targets.
+
+### Refresh sanitized data
+
+```bash
+warehouse/sanitize.sh
+```
+
+Reads each entry in `sanitize[]` from config and runs `scripts/sanitize_csv.py source → dest` for each.
+
+### Sync all accounts to staging
+
+```bash
+warehouse/sync-data.sh
+```
+
+### Sync all accounts to prod
+
+```bash
+PROD=1 warehouse/sync-data.sh
+```
+
+---
+
 ## Dev
 
 **URL:** http://localhost:5173
