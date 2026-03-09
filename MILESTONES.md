@@ -101,20 +101,33 @@ we offer two buttons:
 
 ## Backlog
 **Production Checklist:**
-* Logins for team
 * Logging, alarms
 
 **Architecture:**
 * Merge in trickybit.csvstore (not anytime soon)
-* Serve a cached serialized graph 
-* Forced refresh (data version?)
+
+**Improve data management:**
+* Serve a cached serialized graph, no need for CSV files on servers.
+* Automated scripts for downloading reports
+* Update for new data
+  * Calculate complete serialized data graph
+  * Deploy to staging and/or production
+* Dynamic updating
+  * Detect or tickle new data files
+  * App provides information to front-end - poll or push
+  * Front end updates with new data, informs user
 
 **UI:**
 * Add notice about proprietary data
 * tune keyboard shortcuts, document
 * Filter out cash donations when appropriate
-* comparison view - mis-linked receipts (BIG)
+* comparison view - mis-linked receipts (BIG, not needed?)
 * add "transaction id" filter, works with "copy ID" for emailing, etc.
+
+**User Docs:**
+* Might be easiest to author in markdown w/ agent help
+* Viewer in the app, contents must be styled to look good
+* Keyboard shortcut quick-reference
 
 **Demo:**
 * Realistic fake data (BIG)
