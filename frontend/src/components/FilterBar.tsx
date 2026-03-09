@@ -40,7 +40,6 @@ function ToggleButton({
 export default function FilterBar({ filters, setFilter, clearFilters, services }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-white border-b border-gray-200">
-      {/* Date range UI (display only — logic in Phase 2) */}
       <div className="flex items-center gap-1">
         <input
           type="date"

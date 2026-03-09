@@ -1,10 +1,17 @@
 import type { Donation, Charge, Payout, Receipt } from "./graph"
-import type { Filters } from "../hooks/useFilters"
+import type { Filters, DateInterval } from "../hooks/useFilters"
+import { computeDateRange } from "./dateRange"
 
 function inAmountRange(net: number, min: number | null, max: number | null): boolean {
   if (min !== null && net < min) return false
   if (max !== null && net > max) return false
   return true
+}
+
+function inDateRange(date: string, dateStart: string, dateInterval: DateInterval): boolean {
+  if (!dateStart) return true
+  const { start, end } = computeDateRange(dateStart, dateInterval)
+  return date >= start && date <= end
 }
 
 export function filterDonations(donations: Map<string, Donation>, f: Filters): Donation[] {
@@ -13,6 +20,7 @@ export function filterDonations(donations: Map<string, Donation>, f: Filters): D
 
   for (const d of donations.values()) {
     if (!inAmountRange(d.net, f.amountMin, f.amountMax)) continue
+    if (!inDateRange(d.date, f.dateStart, f.dateInterval)) continue
     if (f.service && d.service !== f.service) continue
     if (
       donor &&
@@ -35,6 +43,7 @@ export function filterCharges(charges: Map<string, Charge>, f: Filters): Charge[
 
   for (const c of charges.values()) {
     if (!inAmountRange(c.net, f.amountMin, f.amountMax)) continue
+    if (!inDateRange(c.date, f.dateStart, f.dateInterval)) continue
     results.push(c)
   }
 
@@ -46,6 +55,7 @@ export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[
 
   for (const p of payouts.values()) {
     if (!inAmountRange(p.net, f.amountMin, f.amountMax)) continue
+    if (!inDateRange(p.date, f.dateStart, f.dateInterval)) continue
     if (f.service && p.service !== f.service) continue
     results.push(p)
   }
@@ -59,6 +69,7 @@ export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Rece
 
   for (const r of receipts.values()) {
     if (!inAmountRange(r.net, f.amountMin, f.amountMax)) continue
+    if (!inDateRange(r.date, f.dateStart, f.dateInterval)) continue
     if (
       donor &&
       !r.name.toLowerCase().includes(donor) &&

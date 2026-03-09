@@ -5,6 +5,7 @@ import { useGraph } from "../hooks/useGraph"
 import { useFilters } from "../hooks/useFilters"
 import type { EntityType } from "../hooks/useFilters"
 import { filterDonations, filterPayouts, filterReceipts } from "../lib/filters"
+import { advanceDate } from "../lib/dateRange"
 import type { AnyEntity } from "./EntityTable"
 import TypeTabs from "./TypeTabs"
 import FilterBar from "./FilterBar"
@@ -56,11 +57,15 @@ export default function AppLayout() {
         document.getElementById("filter-text")?.focus()
       } else if (e.key === "c" || e.key === "C") {
         clearFilters()
+      } else if (e.key === "n") {
+        if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, 1))
+      } else if (e.key === "p") {
+        if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, -1))
       }
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
-  }, [setFilter])
+  }, [setFilter, filters])
 
   const availableServices = useMemo(
     () =>
