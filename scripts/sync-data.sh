@@ -12,6 +12,6 @@ if [ "$PROD" = "1" ]; then
     DPIPE_HOST="${DPIPE_HOST:-ubuntu@donorpipe.trickybit.com}"
     rsync -av --delete ~/p/data_sanitization_test_box/real_data/ "$DPIPE_HOST:$DPIPE_DIR/data/oliveseed/"
 else
-    DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
+    DPIPE_HOST="${DPIPE_HOST:-punkinpi.local}"
     rsync -av --delete ./data/ "$DPIPE_HOST:$DPIPE_DIR/data/"
 fi

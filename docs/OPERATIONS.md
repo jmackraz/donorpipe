@@ -77,14 +77,14 @@ ssh ubuntu@donorpipe.trickybit.com "sudo certbot renew --dry-run"
 
 ## Staging (Pi)
 
-The staging environment runs on a Raspberry Pi at `donorpipe.local`.
+The staging environment runs on a Raspberry Pi at `punkinpi.local`.
 
-**URL:** http://donorpipe.local
+**URL:** http://punkinpi.local
 
 ### Deploy
 
 ```bash
-./scripts/deploy.sh                                        # Build and deploy to Pi (DPIPE_HOST=donorpipe.local)
+./scripts/deploy.sh                                        # Build and deploy to Pi (DPIPE_HOST=punkinpi.local)
 DPIPE_HOST=mypi.local ./scripts/deploy.sh                 # Deploy to a different host
 ```
 

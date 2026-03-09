@@ -2,7 +2,7 @@
 # Deploy donorpipe to a Raspberry Pi (or any remote Docker host).
 #
 # Environment variables:
-#   DPIPE_HOST     SSH hostname of the target host (default: donorpipe.local)
+#   DPIPE_HOST     SSH hostname of the target host (default: punkinpi.local)
 #   DPIPE_DIR      Working directory on the target host (default: ~/donorpipe)
 #   PROD           Set to 1 to deploy with TLS (uses docker-compose.prod.yml override)
 #
@@ -21,7 +21,7 @@ PROD="${PROD:-0}"
 if [ "$PROD" = "1" ]; then
     DPIPE_HOST="${DPIPE_HOST:-donorpipe.trickybit.com}"
 else
-    DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
+    DPIPE_HOST="${DPIPE_HOST:-punkinpi.local}"
 fi
 DPIPE_DIR="${DPIPE_DIR:-~/donorpipe}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

@@ -13,7 +13,7 @@ if [ "$PROD" = "1" ]; then
     COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
     CONFIG_SRC="prod_config.json"
 else
-    DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
+    DPIPE_HOST="${DPIPE_HOST:-punkinpi.local}"
     COMPOSE="docker compose"
     CONFIG_SRC="staging_config.json"
 fi

@@ -13,7 +13,7 @@ if [ "$PROD" = "1" ]; then
     DPIPE_HOST="${DPIPE_HOST:-ubuntu@donorpipe.trickybit.com}"
     COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 else
-    DPIPE_HOST="${DPIPE_HOST:-donorpipe.local}"
+    DPIPE_HOST="${DPIPE_HOST:-punkinpi.local}"
     COMPOSE="docker compose"
 fi
 
