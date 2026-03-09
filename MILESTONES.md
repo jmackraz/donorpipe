@@ -64,31 +64,18 @@ All conditions persist but are ignored when viewing listings where they are not 
 ## Backlog
 **Production Checklist:**
 * Logins for team
-* Clean up data organization
-* Set up test_org organization
 * Logging, alarms
 
-**General:**
-* (nah) baby CI/CD just to make pushes easier for me?
-* Merge in csvstore
-* sort out files
-  * directories to rsync
-  * script to rsync and bounce/reload (now it's just browser refresh)
-  * sanitization script runs routinely
-* Separate engine for automated downloading
+**Architecture:**
+* Merge in trickybit.csvstore (not anytime soon)
 * Serve a cached serialized graph 
 * Forced refresh (data version?)
 
 **UI:**
 * Add notice about proprietary data
 * tune keyboard shortcuts, document
-* test mobile form factor
 * Filter out cash donations when appropriate
-  * More filters.  day/week/month/year.  donor/recipient. service.  missing donations/receipt.  too many receipts.
-* comparison view - mis-linked receipts
-
-
+* comparison view - mis-linked receipts (BIG)
 
 **Demo:**
-* Realistic fake data
-* Demo account
+* Realistic fake data (BIG)
