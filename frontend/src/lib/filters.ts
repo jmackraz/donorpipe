@@ -77,7 +77,7 @@ export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Rece
       !(r.product ?? "").toLowerCase().includes(donor)
     )
       continue
-    if (f.missing && r.donation !== null) continue
+    if (f.missing && (r.donation !== null || r.product !== "Online Donations")) continue
     if (f.discrepancies && r.discrepancies.length === 0) continue
     results.push(r)
   }
