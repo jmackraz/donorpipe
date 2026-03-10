@@ -11,11 +11,11 @@ duplicate receipts.
 After logging in, select your account from the header. DonorPipe will load all donation, payout,
 and receipt data for that account.
 
-Use the **tabs** (Donations / Payouts / Receipts) to switch between entity types, and the
+Use the **tabs** (Donations / Receipts / Payouts) to switch between entity types, and the
 **filter bar** to narrow results by date range, amount, service, or donor name.
 
 **Keyboard shortcuts:**
-- `1` / `2` / `3` — Switch tabs
+- `1` — Donations tab, `2` — Receipts tab, `3` — Payouts tab
 - `/` — Focus the donor search field
 - `n` / `p` — Step forward / backward by one date period
 - `c` — Clear all filters

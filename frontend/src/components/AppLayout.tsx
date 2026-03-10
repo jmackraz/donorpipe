@@ -47,7 +47,7 @@ export default function AppLayout() {
 
   // Tab keyboard shortcuts 1–4 and "/" to focus filter text
   useEffect(() => {
-    const types: EntityType[] = ["donations", "payouts", "receipts"]
+    const types: EntityType[] = ["donations", "receipts", "payouts"]
     function handleKey(e: KeyboardEvent) {
       const target = e.target as Element
       if (target.tagName === "INPUT" || target.tagName === "SELECT") return

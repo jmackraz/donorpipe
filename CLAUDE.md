@@ -124,6 +124,9 @@ When needed, find Snippets in docs/SCRATCH.md
 When needed, information about entity relationships is in docs/relationships.md
 When needed, high-level information about the UI is in docs/webui_spec.md
 
+## Guidelines
+* When we add or modify keyboard shortcuts, update that section of docs/help.md
+
 
 ## Frontend Notes
 * Amounts are stored as floats (dollars). Filter inputs from the user are in dollars and can be compared directly.
