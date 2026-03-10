@@ -15,6 +15,8 @@ echo "==> Deploying app..."
 
 echo "==> Pushing config..."
 "$SCRIPT_DIR/push-config.sh"
+echo "==> Pushing help..."
+"$SCRIPT_DIR/push-help.sh"
 
 echo "==> Syncing data..."
 "$PROJECT_DIR/warehouse/sync-data.sh" oliveseed testdata

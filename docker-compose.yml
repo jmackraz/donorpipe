@@ -10,7 +10,7 @@ services:
     volumes:
       - ./config.json:/app/config.json:ro
       - ${DONORPIPE_DATA:-./data}:/data:ro
-      - ./docs/help.md:/app/docs/help.md:ro
+      - ./docs:/app/docs:ro
     restart: unless-stopped
 
   nginx:

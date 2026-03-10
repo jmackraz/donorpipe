@@ -24,28 +24,30 @@ Use the **tabs** (Donations / Receipts / Payouts) to switch between entity types
 ---
 
 ## Reconciling with Bank Deposits
-
-*(More detail to be added here.)*
-
-When a payout from Stripe or PayPal lands in your bank account, you can verify it in DonorPipe:
+Deposits in the bank account correspond to payouts listed here. When reconciling
+a deposit in QBO, we need to match it up with the donation or donations that it paid out.
 
 1. Switch to the **Payouts** tab.
-2. Filter by date to find the payout period matching your bank deposit.
-3. Click a payout to open the detail panel, which shows the charges and donations included in
+2. Filter (e.g., by date) to find the payout item matching your bank deposit.
+3. Click the item to open the detail panel, which shows the donations included in
    that payout.
-4. Confirm the total matches your bank statement.
+4. Use that list to match the bank deposit to donations in QBO.
 
 ---
-
 ## Adding New Online Donations
+We enter online donations into QBO manually. One reason is to assign classes correctly. Our recipe
+has been to download CSV reports from our giving platforms, and copy select fields into QBO.
 
-*(More detail to be added here.)*
+This app presents the information from those CSV reports in a way that's ready to enter.
 
-When new donation data has been exported from your giving platforms and loaded into DonorPipe:
+Donations are flagged as "missing" if they do not have a matching receipt in QBO.
 
 1. Switch to the **Donations** tab.
-2. Set the date filter to the relevant period.
-3. Review incoming donations by service.
+2. Enable the "Missing" filter.
+3. Select each donation in turn and use the information in the detail panel to enter it into QBO.
+
+**Note:** It is a good practice to first fix any receipts that are missing their donation link (see below). 
+If that link is not made, it is easy to create a duplicate receipt.
 
 ---
 
@@ -56,23 +58,37 @@ specific issues.
 
 ### Missing Donations
 
-The **Missing** filter shows receipts that have no matching donation in the system. This may mean:
+A Receipt is flagged as "missing" if it is not paired with a corresponding online Donation.
 
-- The donation was processed through a channel not yet imported.
-- The donation amount or date in QBO does not match any imported donation.
+- The receipt was for a donation by a check or ACH, and is not recorded as an online donation.
+- The reference ID in the receipt was entered incorrectly. This was a frequent error when donations
+were copied from a raw CSV report.
 
-*(Steps for resolution to be added here.)*
+1. Switch to the **Receipts** tab.
+2. Enable the "Missing" filter.
+3. Select one listed receipt.
+4. In the detail panel, click "Find Donation" to display the best guess of the corresponding donation.
+5. Open the receipt in QBO (search by receipt number)
+6. Copy the reference ID from the donation detail, and paste it into QBO.
 
 ### Data Discrepancies
 
 The **Discrepancies** filter shows receipts where key fields (amount, date, donor name) do not
 match the linked donation record.
 
-*(Steps for resolution to be added here.)*
+Most of the time, there's an intended difference between the donor name in QBO and the name on the donation.
+1. Switch to the **Receipts** tab or the **Donations** tab.
+2. Enable the "Discrepancies" filter
+3. Click to see the specific discrepancies
+4. Correct errors in QBO or ignore them.
 
 ### Duplicate Receipts
 
-The **Duplicates** filter shows receipts that appear to be duplicates of another receipt for the
-same donation.
+Duplicate receipts may have been accidentally created for a single donation.
 
-*(Steps for resolution to be added here.)*
+1. Switch to the **Donations** tab.
+2. Enable the "Duplicates" filter.
+3. Select a listed donation to see the duplicate receipts.
+4. You can click on each receipt shown to see its details.
+5. In QBO, decide which receipt to delete. One of them may have been reconciled to a banking deposit.
+
