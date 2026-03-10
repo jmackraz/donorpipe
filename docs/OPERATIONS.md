@@ -37,6 +37,14 @@ PROD=1 ./scripts/deploy.sh
 
 Builds images for `linux/amd64` locally, ships them to the host, and restarts containers with the prod compose override (TLS on port 443).
 
+### Full deploy (app + config + data)
+
+```bash
+PROD=1 ./scripts/deploy-all.sh
+```
+
+Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-data.sh oliveseed testdata` in sequence.
+
 ### Logs / Restart
 
 ```bash
@@ -104,6 +112,14 @@ mkdir -p ~/donorpipe/data
 # Copy staging_config.json to ~/donorpipe/config.json; set data_base to "/data"
 # Create ~/donorpipe/.env with: DONORPIPE_JWT_SECRET=<your-secret>
 ```
+
+### Full deploy (app + config + data)
+
+```bash
+./scripts/deploy-all.sh
+```
+
+Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-data.sh oliveseed testdata` in sequence.
 
 ### Logs
 
