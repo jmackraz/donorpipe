@@ -1,8 +1,10 @@
 {
   "accounts": {
     "oliveseed": {
-      "google_data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
-      "data_base": "/Users/jim/p/donorpipe_data/oliveseed",
+      "xgoogle_data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/My Drive/Oliveseed (Jim's)/New QCSV Exports",
+      "google_data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
+      "local_data_base": "/Users/jim/p/donorpipe_data/oliveseed",
+      "data_base": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
       "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity","QBO"]
     },
     "test_org": {

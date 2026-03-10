@@ -1,12 +1,14 @@
 {
   "sanitize": [
     {
-      "source": "~/p/donorpipe_data/oliveseed",
+      "local_source": "~/p/donorpipe_data/oliveseed",
+      "source": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
       "dest": "~/p/donorpipe_data/testdata"
     }
   ],
   "accounts": {
-    "oliveseed": "~/p/donorpipe_data/oliveseed",
+    "local_oliveseed": "~/p/donorpipe_data/oliveseed",
+    "oliveseed": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
     "test_org": "~/p/donorpipe_data/testdata"
   },
   "hosts": {
