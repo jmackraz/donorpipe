@@ -1,5 +1,30 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 18 - more realistic fake names in sanitized data
+
+### Goals
+* The names used to replace PII in the sanitized data should be more realistic.
+
+### What was built
+* `scripts/sanitize_csv.py` was significantly reworked:
+  * Added `REALISTIC_NAMES` — 50 NBA All-Star players (2014–2024) used as fake donor names.
+  * Added `COLUMN_CONFIG` — a two-level dict keyed by file type (prefix of filename, lowercased)
+    then exact column name, mapping each sensitive column to a classification:
+    `full-name`, `first-name`, `last-name`, `simple-sub`, `placeholder`, `erase`, `leave`.
+  * File types covered: `donorbox`, `stripe`, `qbo`, `paypal`, `chase`, `benevity`.
+  * Name substitution is coordinated per row: full/first/last name columns all derive from
+    the same hash key, so they remain consistent with each other. Secondary full-name columns
+    (e.g. Honoree Name, Recipient Name) are hashed independently.
+  * Hash keys are normalized (lowercase, whitespace-collapsed) before hashing, so
+    "Alice Smith" and "ALICE SMITH" always map to the same fake name.
+  * The same original name maps to the same fake name across all files in a run (shared `name_map`).
+  * Unknown file types fall back to the original `SENSITIVE_PATTERN` + counter behavior.
+  * Added `validate_config(data_dir)` — checks that all sensitive columns found in CSV files
+    are covered by `COLUMN_CONFIG`. Reports missing columns and unknown file types.
+  * Added `--validate` CLI flag to run validation instead of sanitizing.
+* Tests updated and expanded to 22 tests covering all classification types, name coordination,
+  cross-file consistency, `_get_file_type`, and `validate_config`.
+
 ## Milestone 17 - inspect any related transaction
 
 ### Goals

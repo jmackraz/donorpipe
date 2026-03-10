@@ -6,7 +6,7 @@ All steps should be implemented in line with the memorized plan.
 The first milestone will help us set up some durable test data files.  All further milestones can
 use these files for their automated tests.
 
-Completed milestones (1–17) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–18) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
 
