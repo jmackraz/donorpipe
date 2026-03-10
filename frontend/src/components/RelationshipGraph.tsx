@@ -65,12 +65,28 @@ function fmtAmt(net: number, currency: string): string {
 
 const SELECTED_CLS = "bg-blue-50 rounded px-1 -mx-1 font-medium"
 
-function PayoutNode({ payout, selectedId }: { payout: Payout | null; selectedId: string }) {
+type OnSelectEntity = (entity: Payout | Donation | Receipt) => void
+
+const CLICKABLE_CLS = "cursor-pointer hover:text-blue-600"
+
+function PayoutNode({
+  payout,
+  selectedId,
+  onSelectEntity,
+}: {
+  payout: Payout | null
+  selectedId: string
+  onSelectEntity?: OnSelectEntity
+}) {
   if (!payout) {
     return <div className="text-gray-400 italic text-sm">— No payout —</div>
   }
+  const clickable = onSelectEntity && payout.id !== selectedId
   return (
-    <div className={`text-sm ${payout.id === selectedId ? SELECTED_CLS : ""}`}>
+    <div
+      className={`text-sm ${payout.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
+      onClick={clickable ? () => onSelectEntity(payout) : undefined}
+    >
       <span className="text-xs text-gray-400 mr-2">Payout</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{payout.id}</span>
       <span className="text-gray-900">
@@ -80,12 +96,24 @@ function PayoutNode({ payout, selectedId }: { payout: Payout | null; selectedId:
   )
 }
 
-function DonationNode({ donation, selectedId }: { donation: Donation | null; selectedId: string }) {
+function DonationNode({
+  donation,
+  selectedId,
+  onSelectEntity,
+}: {
+  donation: Donation | null
+  selectedId: string
+  onSelectEntity?: OnSelectEntity
+}) {
   if (!donation) {
     return <div className="text-gray-400 italic text-sm ml-4">— No donation —</div>
   }
+  const clickable = onSelectEntity && donation.id !== selectedId
   return (
-    <div className={`text-sm ml-4 ${donation.id === selectedId ? SELECTED_CLS : ""}`}>
+    <div
+      className={`text-sm ml-4 ${donation.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
+      onClick={clickable ? () => onSelectEntity(donation) : undefined}
+    >
       <span className="text-xs text-gray-400 mr-2">Donation</span>
       <span className="text-gray-900">{donation.name || "—"}</span>
       <span className="text-gray-500 mx-1">·</span>
@@ -96,9 +124,21 @@ function DonationNode({ donation, selectedId }: { donation: Donation | null; sel
   )
 }
 
-function ReceiptNode({ receipt, selectedId }: { receipt: Receipt; selectedId: string }) {
+function ReceiptNode({
+  receipt,
+  selectedId,
+  onSelectEntity,
+}: {
+  receipt: Receipt
+  selectedId: string
+  onSelectEntity?: OnSelectEntity
+}) {
+  const clickable = onSelectEntity && receipt.id !== selectedId
   return (
-    <div className={`text-sm ${receipt.id === selectedId ? SELECTED_CLS : ""}`}>
+    <div
+      className={`text-sm ${receipt.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
+      onClick={clickable ? () => onSelectEntity(receipt) : undefined}
+    >
       <span className="text-xs text-gray-400 mr-2">Receipt</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{receipt.id}</span>
       <span className={`mr-2 ${receipt.item_class ? "text-gray-700" : "text-gray-400 italic"}`}>
@@ -111,14 +151,22 @@ function ReceiptNode({ receipt, selectedId }: { receipt: Receipt; selectedId: st
   )
 }
 
-function ReceiptSection({ receipts, selectedId }: { receipts: Receipt[]; selectedId: string }) {
+function ReceiptSection({
+  receipts,
+  selectedId,
+  onSelectEntity,
+}: {
+  receipts: Receipt[]
+  selectedId: string
+  onSelectEntity?: OnSelectEntity
+}) {
   if (receipts.length === 0) {
     return <div className="text-gray-400 italic text-sm ml-8">— No receipt —</div>
   }
   if (receipts.length === 1) {
     return (
       <div className="ml-8">
-        <ReceiptNode receipt={receipts[0]!} selectedId={selectedId} />
+        <ReceiptNode receipt={receipts[0]!} selectedId={selectedId} onSelectEntity={onSelectEntity} />
       </div>
     )
   }
@@ -126,7 +174,7 @@ function ReceiptSection({ receipts, selectedId }: { receipts: Receipt[]; selecte
     <div className="ml-8 space-y-1">
       {receipts.map((r) => (
         <div key={r.id} className="border border-amber-200 rounded px-2 py-1 bg-amber-50">
-          <ReceiptNode receipt={r} selectedId={selectedId} />
+          <ReceiptNode receipt={r} selectedId={selectedId} onSelectEntity={onSelectEntity} />
         </div>
       ))}
     </div>
@@ -135,9 +183,10 @@ function ReceiptSection({ receipts, selectedId }: { receipts: Receipt[]; selecte
 
 interface Props {
   entity: Donation | Charge | Payout | Receipt
+  onSelectEntity?: OnSelectEntity
 }
 
-export default function RelationshipGraph({ entity }: Props) {
+export default function RelationshipGraph({ entity, onSelectEntity }: Props) {
   const form = buildCanonicalForm(entity)
   const selectedId = entity.id
   return (
@@ -146,11 +195,11 @@ export default function RelationshipGraph({ entity }: Props) {
         Relationships
       </h3>
       <div className="space-y-2">
-        <PayoutNode payout={form.payout} selectedId={selectedId} />
+        <PayoutNode payout={form.payout} selectedId={selectedId} onSelectEntity={onSelectEntity} />
         {form.entries.map((entry, i) => (
           <div key={entry.donation?.id ?? `placeholder-${i}`} className="space-y-1">
-            <DonationNode donation={entry.donation} selectedId={selectedId} />
-            <ReceiptSection receipts={entry.receipts} selectedId={selectedId} />
+            <DonationNode donation={entry.donation} selectedId={selectedId} onSelectEntity={onSelectEntity} />
+            <ReceiptSection receipts={entry.receipts} selectedId={selectedId} onSelectEntity={onSelectEntity} />
           </div>
         ))}
       </div>

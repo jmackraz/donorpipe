@@ -65,7 +65,9 @@ function toFlatJson(type: EntityType, entity: AnyEntity): Record<string, unknown
   }
 }
 
-function DonationDetail({ d }: { d: Donation }) {
+type OnSelectGraphEntity = (entity: Payout | Donation | Receipt) => void
+
+function DonationDetail({ d, onSelectEntity }: { d: Donation; onSelectEntity?: OnSelectGraphEntity }) {
   return (
     <>
       <section className="mb-4">
@@ -108,12 +110,12 @@ function DonationDetail({ d }: { d: Donation }) {
         </dl>
       </section>
 
-      <RelationshipGraph entity={d} />
+      <RelationshipGraph entity={d} onSelectEntity={onSelectEntity} />
     </>
   )
 }
 
-function ChargeDetail({ c }: { c: Charge }) {
+function ChargeDetail({ c, onSelectEntity }: { c: Charge; onSelectEntity?: OnSelectGraphEntity }) {
   return (
     <>
       <section className="mb-4">
@@ -144,16 +146,16 @@ function ChargeDetail({ c }: { c: Charge }) {
         </dl>
       </section>
 
-      <RelationshipGraph entity={c} />
+      <RelationshipGraph entity={c} onSelectEntity={onSelectEntity} />
     </>
   )
 }
 
-function PayoutDetail({ p }: { p: Payout }) {
-  return <RelationshipGraph entity={p} />
+function PayoutDetail({ p, onSelectEntity }: { p: Payout; onSelectEntity?: OnSelectGraphEntity }) {
+  return <RelationshipGraph entity={p} onSelectEntity={onSelectEntity} />
 }
 
-function ReceiptDetail({ r, onFindDonation }: { r: Receipt; onFindDonation?: () => void }) {
+function ReceiptDetail({ r, onFindDonation, onSelectEntity }: { r: Receipt; onFindDonation?: () => void; onSelectEntity?: OnSelectGraphEntity }) {
   return (
     <>
       <section className="mb-4">
@@ -203,7 +205,7 @@ function ReceiptDetail({ r, onFindDonation }: { r: Receipt; onFindDonation?: () 
         </section>
       )}
 
-      <RelationshipGraph entity={r} />
+      <RelationshipGraph entity={r} onSelectEntity={onSelectEntity} />
 
       {!r.donation && r.product !== "Direct Cash Donation" && onFindDonation && (
         <section className="mt-4">
@@ -235,19 +237,22 @@ const TYPE_BADGE_COLORS: Record<EntityType, string> = {
 
 export default function DetailPanel({ type, entity, onClose, donations }: Props) {
   const [guessedDonation, setGuessedDonation] = useState<Donation | null | "none">(null)
+  const [poppedEntity, setPoppedEntity] = useState<{ type: EntityType; entity: AnyEntity } | null>(null)
 
   useEffect(() => {
     setGuessedDonation(null)
+    setPoppedEntity(null)
   }, [entity.id])
 
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (guessedDonation !== null) setGuessedDonation(null)
+        if (poppedEntity !== null) setPoppedEntity(null)
+        else if (guessedDonation !== null) setGuessedDonation(null)
         else onClose()
       }
     },
-    [onClose, guessedDonation],
+    [onClose, guessedDonation, poppedEntity],
   )
 
   useEffect(() => {
@@ -260,7 +265,82 @@ export default function DetailPanel({ type, entity, onClose, donations }: Props)
     setGuessedDonation(result ?? "none")
   }
 
+  function handleSelectGraphEntity(graphEntity: Payout | Donation | Receipt) {
+    let t: EntityType
+    if ("charges" in graphEntity) t = "payouts"
+    else if ("receipts" in graphEntity) t = "donations"
+    else t = "receipts"
+    setPoppedEntity({ type: t, entity: graphEntity })
+  }
+
   const panelClass = "w-full sm:w-96 border-l border-gray-200 bg-white overflow-y-auto flex-shrink-0"
+
+  // Popped entity from relationship graph
+  if (poppedEntity !== null) {
+    const { type: pType, entity: pEntity } = poppedEntity
+    return (
+      <div className={panelClass} aria-label="Detail panel">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3">
+          <button
+            onClick={() => setPoppedEntity(null)}
+            className="text-xs text-blue-500 hover:text-blue-700 mb-2"
+          >
+            ← Back to {TYPE_LABELS[type]}
+          </button>
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`text-xs font-medium rounded px-1.5 py-0.5 ${TYPE_BADGE_COLORS[pType]}`}>
+                  {TYPE_LABELS[pType]}
+                </span>
+                <span className="text-xs text-gray-500">{pEntity.date}</span>
+              </div>
+              {(pType === "donations" || pType === "receipts") &&
+                (pEntity as Donation | Receipt).name && (
+                  <div className="text-base font-medium text-gray-800 truncate">
+                    {(pEntity as Donation | Receipt).name}
+                  </div>
+                )}
+              <div className="text-lg font-semibold text-gray-900">
+                {fmtAmt(pEntity.net, pEntity.currency)}
+              </div>
+              <div className="font-mono text-xs text-gray-400 truncate mt-0.5">{pEntity.id}</div>
+            </div>
+            <div className="flex items-center gap-2 ml-2 shrink-0">
+              <button
+                onClick={() => copyToClipboard(pEntity.id)}
+                className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded px-2 py-1"
+                title="Copy ID"
+              >
+                Copy ID
+              </button>
+              <button
+                onClick={onClose}
+                aria-label="Close detail panel"
+                className="text-gray-400 hover:text-gray-700 text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="px-4 py-3">
+          {pType === "donations" && <DonationDetail d={pEntity as Donation} />}
+          {pType === "charges" && <ChargeDetail c={pEntity as Charge} />}
+          {pType === "payouts" && <PayoutDetail p={pEntity as Payout} />}
+          {pType === "receipts" && <ReceiptDetail r={pEntity as Receipt} />}
+          <details className="mt-2">
+            <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 select-none">
+              Raw JSON
+            </summary>
+            <pre className="mt-2 p-2 bg-gray-50 rounded overflow-auto text-xs text-gray-700 max-h-64">
+              {JSON.stringify(toFlatJson(pType, pEntity), null, 2)}
+            </pre>
+          </details>
+        </div>
+      </div>
+    )
+  }
 
   // Guessed donation found
   if (guessedDonation !== null && guessedDonation !== "none") {
@@ -397,11 +477,11 @@ export default function DetailPanel({ type, entity, onClose, donations }: Props)
 
       {/* Body */}
       <div className="px-4 py-3">
-        {type === "donations" && <DonationDetail d={entity as Donation} />}
-        {type === "charges" && <ChargeDetail c={entity as Charge} />}
-        {type === "payouts" && <PayoutDetail p={entity as Payout} />}
+        {type === "donations" && <DonationDetail d={entity as Donation} onSelectEntity={handleSelectGraphEntity} />}
+        {type === "charges" && <ChargeDetail c={entity as Charge} onSelectEntity={handleSelectGraphEntity} />}
+        {type === "payouts" && <PayoutDetail p={entity as Payout} onSelectEntity={handleSelectGraphEntity} />}
         {type === "receipts" && (
-          <ReceiptDetail r={entity as Receipt} onFindDonation={handleFindDonation} />
+          <ReceiptDetail r={entity as Receipt} onFindDonation={handleFindDonation} onSelectEntity={handleSelectGraphEntity} />
         )}
 
         <details className="mt-2">
