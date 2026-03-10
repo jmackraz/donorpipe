@@ -23,6 +23,18 @@ uv run python -m ruff check .                             # Lint
 uv run python -m ruff format .                            # Format
 ```
 
+### CLI with local test data
+
+`OSF_EXPORTS` normally points to Google Drive (set in shell environment). Override it to use `testdata/` locally:
+
+```bash
+env OSF_EXPORTS=testdata uv run src/donorpipe/cli/model_cli.py -d Stripe DonorBox QBO
+```
+
+Note: `testdata/` has Stripe, DonorBox, and QBO — no Paypal dir (omit it). Missing dirs are handled gracefully.
+
+> **TODO (laptop setup):** Copy this `OSF_EXPORTS` override pattern to `~/.claude/CLAUDE.md` so it's available across all projects on the new machine.
+
 ## New Dev Environment Setup
 
 One-time steps when setting up a fresh clone:
@@ -74,6 +86,35 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 ```
 
 Config is read from `config.json` by default. Override with `DONORPIPE_CONFIG=/path/to/config.json`.
+
+## Environment Variables
+
+### Backend (Python)
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DONORPIPE_JWT_SECRET` | Yes | — | Secret key for signing/verifying JWT auth tokens. Generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`. Set in `.env`. |
+| `DONORPIPE_CONFIG` | No | `config.json` | Path to the config file. Defaults to `config.json` in the working directory. |
+| `OSF_EXPORTS` | No | — | Base directory prepended to relative data dir args. In production this points to Google Drive. Override with `testdata/` for local development (see CLI example above). |
+| `DONORPIPE_HELP` | No | `docs/help.md` | Path to the Markdown file served as in-app help content. |
+
+### Frontend (Vite/TypeScript)
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `VITE_API_BASE_URL` | No | `""` (same origin) | Base URL for API requests. Leave unset when the frontend is served by the same server. Set to e.g. `http://localhost:8000` for local frontend-only dev against a separate API process. |
+
+### Scripts (`scripts/*.sh`)
+
+These variables control which host the deployment/ops scripts target. All have sensible defaults.
+
+| Variable | Default | Description |
+|---|---|---|
+| `PROD` | `0` | Set to `1` to target production instead of the staging host (`punkinpi.local`). |
+| `DPIPE_HOST` | `punkinpi.local` (staging) or `ubuntu@donorpipe.trickybit.com` (prod) | SSH target host. Override to deploy to a different machine. |
+| `DPIPE_USER` | `""` (staging) or `ubuntu` (prod) | SSH user. Prepended to `DPIPE_HOST` if non-empty. |
+| `DPIPE_DIR` | `~/donorpipe` | Remote directory where the app is installed. |
+| `DPIPE_DEV_CONFIG` | `config.json` | Config file used by `scripts/dev.sh`. Override to run against a different local config. |
 
 ## Project
 Read PROJECT.md for a high-level definition of the project.
