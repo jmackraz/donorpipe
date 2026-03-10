@@ -22,5 +22,5 @@ for account, src in c['accounts'].items():
         print(account + '|' + os.path.expanduser(src))
 " -- "$@" | while IFS='|' read -r ACCOUNT SRC; do
   echo "[$TARGET] $SRC → $HOST:$REMOTE_DIR/data/$ACCOUNT/"
-  rsync -avz --delete "$SRC/" "$HOST:$REMOTE_DIR/data/$ACCOUNT/"
+  rsync -avz --delete --exclude='/[Oo][Ll][Dd]*/' "$SRC/" "$HOST:$REMOTE_DIR/data/$ACCOUNT/"
 done
