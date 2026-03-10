@@ -1,14 +1,37 @@
 # Milestone Plan for DonorPipe
 
 ## Overview
-All steps should be implemented in line with the memorized plan.
-
-The first milestone will help us set up some durable test data files.  All further milestones can
-use these files for their automated tests.
-
 Completed milestones (1–18) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
+## Milestone 19 - Content management
+This is a major milestone in several phases.
+We may want to work on a feature branch for this.
+
+### Goals
+* Simplify management of CSV files
+  * Rather than deploy copies of the CSV files around, we should be able to deploy a single serialized graph of data.
+* A mix of automated and manual download of reports
+* Automated processing and data updates
+
+**Behavior:**
+* Automated downloads are initiated on a schedule or on demand by admin.
+* Updates down the pipeline for data changes:
+  * New CSV triggers recalculation of serialized graph
+  * New serialized graph triggers deployment to staging and/or production
+  * Front end updates with new data,
+
+**Special use case:**
+1. A user (bookkeeper) uses the app to enter or correct data in QBO.
+2. They want to (quickly) see their changes reflected in the app.
+3. If we have a way to download the CSV automatically, they can use the app to invoke the download (and consequentely
+   the updates)
+4. If we don't have a way to download, the user can download a CSV file manually to their computer and then do something with it, for example:
+  * Copy the file to google drive or other shared location
+  * Upload the file to the app
+  * Put it into some other convenient, reliable and secure sharing pipeline we can use.
+
+  
 
 ## Backlog
 **Production Checklist:**
@@ -17,16 +40,6 @@ Completed milestones (1–18) have been moved to [docs/COMPLETED_MILESTONES.md](
 **Architecture:**
 * Merge in trickybit.csvstore (not anytime soon)
 
-**Improve data management:**
-* Serve a cached serialized graph, no need for CSV files on servers.
-* Automated scripts for downloading reports
-* Update for new data
-  * Calculate complete serialized data graph
-  * Deploy to staging and/or production
-* Dynamic updating
-  * Detect or tickle new data files
-  * App provides information to front-end - poll or push
-  * Front end updates with new data, informs user
 
 **UI:**
 * Add notice about proprietary data
@@ -37,4 +50,4 @@ Completed milestones (1–18) have been moved to [docs/COMPLETED_MILESTONES.md](
 * "What's New" message pops up if unseen, can reach through help or something
 
 **Demo:**
-* Realistic fake data (BIG)
+* Realistic fake data (BIG. DONE!)
