@@ -88,7 +88,7 @@ function PayoutNode({
       onClick={clickable ? () => onSelectEntity(payout) : undefined}
     >
       <span className="text-xs text-gray-400 mr-2">Payout</span>
-      <span className="font-mono text-xs text-gray-600 mr-2">{payout.id}</span>
+      <span className="font-mono text-xs text-gray-600 mr-2">{payout.service}</span>
       <span className="text-gray-900">
         {fmtAmt(payout.net, payout.currency)} · {payout.date}
       </span>
