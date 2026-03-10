@@ -1,27 +1,27 @@
 # Milestone Plan for DonorPipe
 
 ## Overview
-Completed milestones (1–18) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–18.5) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
-## Milestone 19 - Content management
+### Milestone 19 - Content management
 This is a major milestone in several phases.
 We may want to work on a feature branch for this.
 
-### Goals
+#### Goals
 * Simplify management of CSV files
   * Rather than deploy copies of the CSV files around, we should be able to deploy a single serialized graph of data.
 * A mix of automated and manual download of reports
 * Automated processing and data updates
 
-**Behavior:**
+#### Behavior
 * Automated downloads are initiated on a schedule or on demand by admin.
 * Updates down the pipeline for data changes:
   * New CSV triggers recalculation of serialized graph
   * New serialized graph triggers deployment to staging and/or production
   * Front end updates with new data,
 
-**Special use case:**
+#### Special use case 
 1. A user (bookkeeper) uses the app to enter or correct data in QBO.
 2. They want to (quickly) see their changes reflected in the app.
 3. If we have a way to download the CSV automatically, they can use the app to invoke the download (and consequentely

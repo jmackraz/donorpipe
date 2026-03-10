@@ -1,5 +1,25 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 18.5 - Collapsible filter panel
+
+Especially on mobile, the filter panel takes up too much space.
+
+### Behavior
+* Filter panel is collapsible
+* Filter panel is collapsed by default
+* Filter panel can be expanded by clicking on the filter panel title
+* Filter panel can be expanded by typing a hot key ('f')
+* Filter panel can be collapsed by clicking on the filter panel title again
+* Filter panel collapses when the user clicks outside of the filter panel
+* Filter panel collapses when the user presses the escape key
+
+### What was built
+* `FilterBar.tsx`: clickable title row with active-filters badge; CSS `grid-rows-[0fr/1fr]` collapse animation; click-outside via `pointerdown` listener
+* `AppLayout.tsx`: `filterPanelOpen` state; `f` and `Escape` hotkeys; `/` shortcut opens panel before focusing donor search
+* `docs/help.md`: keyboard shortcuts updated
+
+---
+
 ## Milestone 18 - more realistic fake names in sanitized data
 
 ### Goals
