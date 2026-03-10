@@ -6,7 +6,7 @@ All steps should be implemented in line with the memorized plan.
 The first milestone will help us set up some durable test data files.  All further milestones can
 use these files for their automated tests.
 
-Completed milestones (1–16) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–17) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
 
@@ -35,11 +35,7 @@ Completed milestones (1–16) have been moved to [docs/COMPLETED_MILESTONES.md](
 * Keyboard shortcuts — complete filter shortcut set requiring FilterBar focus (M14 phase 3)
 * tune keyboard shortcuts, document
 * add "transaction id" filter, works with "copy ID" for emailing, etc.
-
-**User Docs:**
-* Might be easiest to author in markdown w/ agent help
-* Viewer in the app, contents must be styled to look good
-* Keyboard shortcut quick-reference
+* "What's New" message pops up if unseen, can reach through help or something
 
 **Demo:**
 * Realistic fake data (BIG)

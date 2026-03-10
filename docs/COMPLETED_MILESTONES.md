@@ -1,5 +1,17 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 17 - inspect any related transaction
+
+### Goals
+* The user can inspect any related transaction in the relationship graph in the detail pane.
+
+### Idea
+* The elements in the relationship graph are clickable (except the current, highlighted element)
+* Clicking on an element in the relationship graph will open a detail pane for that element, following
+the same model we use for the "Find Donation" button in the missing receipt detail pane.
+* No stacking: To avoid complexity, the relationship graph in these popped up detail panes will not be clickable
+* The button to dismiss the pop-up detail should be well-labeled as it is for 'find donation'
+
 ## Milestone 16 - in-app user documentation
 
 ### Goals
