@@ -16,9 +16,11 @@ Use the **tabs** (Donations / Receipts / Payouts) to switch between entity types
 
 **Keyboard shortcuts:**
 - `1` — Donations tab, `2` — Receipts tab, `3` — Payouts tab
-- `/` — Focus the donor search field
+- `f` — Toggle the filter panel open/closed
+- `/` — Focus the donor search field (opens filter panel if collapsed)
 - `n` / `p` — Step forward / backward by one date period
 - `c` — Clear all filters
+- `Escape` — Collapse the filter panel
 - `?` — Open this help panel
 
 ---

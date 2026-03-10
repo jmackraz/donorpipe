@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react"
+import { useMemo, useEffect, useState, useCallback } from "react"
 import { useSearchParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { useGraph } from "../hooks/useGraph"
@@ -24,6 +24,8 @@ export default function AppLayout() {
   // Local input state — only pushed to URL on form submit
   const [accountInput, setAccountInput] = useState(account)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  const closeFilterPanel = useCallback(() => setFilterPanelOpen(false), [])
 
   // Auto-select first account when accounts load and no account is in URL
   useEffect(() => {
@@ -56,7 +58,12 @@ export default function AppLayout() {
         if (t) setFilter("type", t)
       } else if (e.key === "/") {
         e.preventDefault()
+        setFilterPanelOpen(true)
         document.getElementById("filter-text")?.focus()
+      } else if (e.key === "f" || e.key === "F") {
+        setFilterPanelOpen((v) => !v)
+      } else if (e.key === "Escape") {
+        setFilterPanelOpen(false)
       } else if (e.key === "c" || e.key === "C") {
         clearFilters()
       } else if (e.key === "n") {
@@ -69,7 +76,7 @@ export default function AppLayout() {
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
-  }, [setFilter, filters])
+  }, [setFilter, filters, clearFilters])
 
   const availableServices = useMemo(
     () =>
@@ -218,7 +225,15 @@ export default function AppLayout() {
             }}
           />
 
-          <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} services={availableServices} />
+          <FilterBar
+            filters={filters}
+            setFilter={setFilter}
+            clearFilters={clearFilters}
+            services={availableServices}
+            isOpen={filterPanelOpen}
+            onToggle={() => setFilterPanelOpen((v) => !v)}
+            onClose={closeFilterPanel}
+          />
 
           <div className="flex flex-1 overflow-hidden">
             {/* List pane — hidden on mobile when detail panel is open */}
