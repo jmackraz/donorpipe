@@ -29,7 +29,6 @@ Completed milestones (1–17) have been moved to [docs/COMPLETED_MILESTONES.md](
   * Front end updates with new data, informs user
 
 **UI:**
-* Inspect details of any entity in the relationship graph in any detail pane
 * Add notice about proprietary data
 * Keyboard shortcuts — navigation, focus and selection (M14 phase 3)
 * Keyboard shortcuts — complete filter shortcut set requiring FilterBar focus (M14 phase 3)
