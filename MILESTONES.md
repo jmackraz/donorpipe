@@ -21,7 +21,7 @@ We may want to work on a feature branch for this.
   * New serialized graph triggers deployment to staging and/or production
   * Front end updates with new data,
 
-#### Special use case 
+#### Special use case
 1. A user (bookkeeper) uses the app to enter or correct data in QBO.
 2. They want to (quickly) see their changes reflected in the app.
 3. If we have a way to download the CSV automatically, they can use the app to invoke the download (and consequentely
@@ -30,6 +30,30 @@ We may want to work on a feature branch for this.
   * Copy the file to google drive or other shared location
   * Upload the file to the app
   * Put it into some other convenient, reliable and secure sharing pipeline we can use.
+
+#### Sub-milestones
+
+##### Milestone 19a - Pre-built graph serving
+`build_graphs.sh` writes `graph.json` per account; `graph_route.py` serves the pre-built file (falls back to live build if not present). Decouples data processing from request handling.
+
+Status: Not started.
+
+##### Milestone 19b - Automated downloads
+Automated download of export files from donation/payment processors on a schedule or on demand.
+* **Stripe** — API-based, straightforward
+* **PayPal** — investigate API availability
+* **DonorBox** — confirm plan tier supports API access
+* **Benevity** — investigate API availability
+
+Status: Not started.
+
+##### Milestone 19c - QBO OAuth2 download
+Automated download of QBO "Sales Transaction Export" report.
+* QBO has a "run report" API in addition to entity queries (either works)
+* OAuth2 is the main complexity — 100-day refresh token lifecycle
+* Report format is a fixed custom export
+
+Status: Not started.
 
   
 

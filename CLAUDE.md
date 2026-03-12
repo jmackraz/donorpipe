@@ -127,6 +127,16 @@ When needed, high-level information about the UI is in docs/webui_spec.md
 ## Guidelines
 * When we add or modify keyboard shortcuts, update that section of docs/help.md
 
+## Key Requirement
+This application processes reports of charitable donation activity.  The "real data" exported or fectched
+from the various services contains personal information, including names, addresses, emails, philanthropic interests,
+personal notes and so on.
+* The agent is not to consume real data.
+* This includes but is not limited to exported report files, payloads returned from service APIs,
+our serialized graph created from the reports.
+* The operator will test, compare or pull information out of real files as needed.
+
+
 
 ## Frontend Notes
 * Amounts are stored as floats (dollars). Filter inputs from the user are in dollars and can be compared directly.
