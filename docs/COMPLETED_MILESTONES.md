@@ -1,5 +1,19 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 19a - Pre-built graph serving
+
+`build_graphs.sh` writes `graph.json` per account from local CSVs; `graph_route.py` serves the pre-built file directly (503 if not present — no CSV fallback in the API). Decouples data processing from request handling; no CSV files needed on the server.
+
+### What was built
+- `scripts/build_graphs.sh` — reads `data_base`/`data_dirs` from an app config, calls `generate_graph_json.py --output {data_base}/graph.json` per account
+- `warehouse/sync-graphs.sh` — rsyncs only `graph.json` (not CSVs) to staging/prod
+- `scripts/generate_graph_json.py` — added `--output/-o` flag; updated docstring with dev example
+- `src/donorpipe/api/graph_route.py` — reads from disk only; 503 if `graph.json` missing
+- `tests/api/test_graph_route.py` — fixture builds `graph.json` into `tmp_path`; 503 test added
+- `docs/OPERATIONS.md` — "Build and deploy pre-built graphs" section added
+
+---
+
 ## Milestone 18.5 - Collapsible filter panel
 
 Especially on mobile, the filter panel takes up too much space.

@@ -34,9 +34,9 @@ We may want to work on a feature branch for this.
 #### Sub-milestones
 
 ##### Milestone 19a - Pre-built graph serving
-`build_graphs.sh` writes `graph.json` per account; `graph_route.py` serves the pre-built file (falls back to live build if not present). Decouples data processing from request handling.
+`build_graphs.sh` writes `graph.json` per account; `graph_route.py` serves the pre-built file (503 if not present — no CSV fallback). Decouples data processing from request handling.
 
-Status: Not started.
+Status: Complete.
 
 ##### Milestone 19b - Automated downloads
 Automated download of export files from donation/payment processors on a schedule or on demand.
