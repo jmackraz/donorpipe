@@ -1,7 +1,7 @@
 # Milestone Plan for DonorPipe
 
 ## Overview
-Completed milestones (1–18.5) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–19a) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
 ### Milestone 19 - Content management
@@ -32,11 +32,6 @@ We may want to work on a feature branch for this.
   * Put it into some other convenient, reliable and secure sharing pipeline we can use.
 
 #### Sub-milestones
-
-##### Milestone 19a - Pre-built graph serving
-`build_graphs.sh` writes `graph.json` per account; `graph_route.py` serves the pre-built file (503 if not present — no CSV fallback). Decouples data processing from request handling.
-
-Status: Complete.
 
 ##### Milestone 19b - Automated downloads
 Automated download of export files from donation/payment processors on a schedule or on demand.
