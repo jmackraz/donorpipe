@@ -1,5 +1,6 @@
 """FastAPI application."""
 
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -12,6 +13,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from donorpipe.api.auth import create_access_token, verify_password
 from donorpipe.api.config import load_config
 from donorpipe.api.graph_route import router
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s %(name)s: %(message)s",
+)
 
 
 @asynccontextmanager

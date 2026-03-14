@@ -1,7 +1,14 @@
 #! /usr/bin/env python3
-"""Generate tests/data/graph.json from real CSV exports.
+"""Generate a graph.json from CSV exports.
+
+The API serves graph.json from each account's data_base directory.
+Run this script to build one before starting the dev server.
 
 Usage:
+    # Build graph.json into ./testdata (for dev with testdata):
+    env OSF_EXPORTS=testdata uv run scripts/generate_graph_json.py -d Stripe DonorBox QBO --output testdata/graph.json
+
+    # Build into tests/data/ (default, for test fixtures):
     env OSF_EXPORTS=testdata uv run scripts/generate_graph_json.py -d Stripe DonorBox QBO
 """
 from __future__ import annotations
@@ -16,13 +23,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from donorpipe.models.transaction_loader import TransactionLoader
 
-OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "tests", "data", "graph.json")
+DEFAULT_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "tests", "data", "graph.json")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate graph.json from CSV exports")
     parser.add_argument("--file", "-f", dest="files", nargs="+", action="extend", required=False)
     parser.add_argument("--dir", "-d", dest="dirs", nargs="+", action="extend", required=False)
+    parser.add_argument("--output", "-o", dest="output", default=None, help="Output path (default: tests/data/graph.json)")
     args = parser.parse_args()
 
     if args.files is None and args.dirs is None:
@@ -33,7 +41,7 @@ def main() -> None:
 
     graph = tx_store.to_graph()
 
-    output_path = os.path.abspath(OUTPUT_PATH)
+    output_path = os.path.abspath(args.output if args.output is not None else DEFAULT_OUTPUT_PATH)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(graph, f, indent=2)

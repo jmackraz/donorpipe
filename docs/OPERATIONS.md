@@ -54,6 +54,26 @@ PROD=1 ./scripts/restart.sh          # Restart all
 PROD=1 ./scripts/restart.sh api      # Restart api only
 ```
 
+### Build and deploy pre-built graphs
+
+Build `graph.json` from local CSVs (admin machine), then sync to the server. Once deployed, the API serves from the pre-built file on each request — no CSV parsing, no CSV files needed on the server.
+
+```bash
+# 1. Build graph.json for all accounts (uses data_base paths from the config)
+./scripts/build_graphs.sh --config <local-build-config.json>
+
+# Or build a specific account:
+./scripts/build_graphs.sh --config <local-build-config.json> oliveseed
+
+# 2. Sync graph.json to staging
+./warehouse/sync-graphs.sh oliveseed testdata
+
+# 2. Sync graph.json to prod
+PROD=1 ./warehouse/sync-graphs.sh oliveseed
+```
+
+The config passed to `build_graphs.sh` must have `data_base` pointing to the local path where CSVs live on the admin machine (not the server-side `/data/...` path). No API restart is needed after syncing — the route reads from disk on each request.
+
 ### Update data
 
 Real data:

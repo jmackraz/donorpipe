@@ -1,12 +1,12 @@
 """GET /accounts/{account_id}/graph route."""
 
-import os
+import json
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from donorpipe.api.auth import require_account_access
 from donorpipe.api.config import UserConfig
-from donorpipe.models.transaction_loader import TransactionLoader
 
 router = APIRouter()
 
@@ -22,16 +22,9 @@ def get_graph(
     if account is None:
         raise HTTPException(status_code=404, detail=f"Account '{account_id}' not found")
 
-    data_base = os.path.abspath(account.data_base)
-    env_backup = os.environ.get("OSF_EXPORTS")
-    os.environ["OSF_EXPORTS"] = data_base
-    try:
-        loader = TransactionLoader([], account.data_dirs)
-        store = loader.load()
-    finally:
-        if env_backup is None:
-            os.environ.pop("OSF_EXPORTS", None)
-        else:
-            os.environ["OSF_EXPORTS"] = env_backup
+    graph_path = Path(account.data_base).resolve() / "graph.json"
+    if not graph_path.exists():
+        raise HTTPException(status_code=503, detail=f"Graph not built for account '{account_id}'")
 
-    return store.to_graph()
+    with open(graph_path) as f:
+        return json.load(f)
