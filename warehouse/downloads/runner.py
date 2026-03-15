@@ -1,7 +1,7 @@
 """Orchestrator: download fresh CSVs from external services before graph build.
 
 Usage:
-    uv run src/donorpipe/downloads/runner.py --output-dir /path/to/data [--year 2026]
+    uv run warehouse/downloads/runner.py --output-dir /path/to/data [--year 2026]
 
 Environment variables:
     STRIPE_API_KEY  — required to run the Stripe downloader
@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 def run_stripe(api_key: str, output_dir: Path, year: int) -> None:
-    from donorpipe.downloads.stripe import StripeDownloader
+    from stripe import StripeDownloader
 
     with StripeDownloader(api_key=api_key, output_dir=output_dir) as dl:
         path = dl.download(year=year)

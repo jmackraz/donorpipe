@@ -2,8 +2,8 @@
 # Download fresh CSVs from external services, rebuild graphs, and sync to server.
 #
 # Usage:
-#   ./scripts/refresh.sh [--config <config.json>] [--year <year>] [account_id ...]
-#   PROD=1 ./scripts/refresh.sh [account_id ...]
+#   ./warehouse/refresh.sh [--config <config.json>] [--year <year>] [account_id ...]
+#   PROD=1 ./warehouse/refresh.sh [account_id ...]
 #
 # If no account_ids are given, all accounts in the config are processed.
 # Services are skipped silently if their API key is not set in .env.
@@ -74,7 +74,7 @@ accounts    = sys.argv[3:]
 with open(config_path) as f:
     config = json.load(f)
 root   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-runner = os.path.join(root, "src", "donorpipe", "downloads", "runner.py")
+runner = os.path.join(root, "warehouse", "downloads", "runner.py")
 for account_id in accounts:
     data_base = os.path.expanduser(config["accounts"][account_id]["data_base"])
     subprocess.run(
@@ -86,7 +86,7 @@ PYEOF
 # ── Step 2: Build graphs ──────────────────────────────────────────────────────
 echo ""
 echo "=== Build ==="
-"$SCRIPTS/build_graphs.sh" --config "$CONFIG" "${RESOLVED_ACCOUNTS[@]}"
+"$ROOT/scripts/build_graphs.sh" --config "$CONFIG" "${RESOLVED_ACCOUNTS[@]}"
 
 # ── Step 3: Sync to server ────────────────────────────────────────────────────
 echo ""

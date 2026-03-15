@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import pytest
 
-from donorpipe.downloads.stripe import StripeDownloader
+from stripe import StripeDownloader
 from donorpipe.models.transaction_store import TransactionStore
 from donorpipe.models.util import csv_rows
 
