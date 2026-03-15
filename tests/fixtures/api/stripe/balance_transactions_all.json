@@ -1,0 +1,51 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "txn_charge1",
+      "object": "balance_transaction",
+      "type": "charge",
+      "amount": 10000,
+      "net": 9711,
+      "fee": 289,
+      "created": 1767268800,
+      "description": "Donation via DonorBox",
+      "source": {
+        "id": "ch_1aaa",
+        "object": "charge",
+        "metadata": {"donorbox_name": "Jane Sample"}
+      }
+    },
+    {
+      "id": "txn_charge2",
+      "object": "balance_transaction",
+      "type": "payment",
+      "amount": 5000,
+      "net": 4855,
+      "fee": 145,
+      "created": 1767268800,
+      "description": "ACH donation",
+      "source": {
+        "id": "ch_1bbb",
+        "object": "charge",
+        "metadata": {"donorbox_name": "John Doe"}
+      }
+    },
+    {
+      "id": "txn_payout1",
+      "object": "balance_transaction",
+      "type": "payout",
+      "amount": -14566,
+      "net": -14566,
+      "fee": 0,
+      "created": 1767355200,
+      "description": "STRIPE PAYOUT",
+      "source": {
+        "id": "po_1test",
+        "object": "payout"
+      }
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/balance_transactions"
+}

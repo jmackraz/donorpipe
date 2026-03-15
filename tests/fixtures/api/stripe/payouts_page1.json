@@ -1,0 +1,17 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "po_1test",
+      "object": "payout",
+      "amount": 14566,
+      "net": 14566,
+      "created": 1767355200,
+      "description": "STRIPE PAYOUT",
+      "arrival_date": 1767441600,
+      "status": "paid"
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/payouts"
+}

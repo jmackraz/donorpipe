@@ -13,6 +13,11 @@ set -euo pipefail
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPTS/.." && pwd)"
 
+# Load .env if present (provides STRIPE_API_KEY etc.)
+if [ -f "$ROOT/.env" ]; then
+    set -a; source "$ROOT/.env"; set +a
+fi
+
 CONFIG="config.json"
 ACCOUNTS=()
 

@@ -1,0 +1,29 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "txn_charge1",
+      "object": "balance_transaction",
+      "type": "charge",
+      "amount": 10000,
+      "net": 9711,
+      "fee": 289,
+      "created": 1767268800,
+      "description": "Donation via DonorBox",
+      "source": "ch_1aaa"
+    },
+    {
+      "id": "txn_charge2",
+      "object": "balance_transaction",
+      "type": "payment",
+      "amount": 5000,
+      "net": 4855,
+      "fee": 145,
+      "created": 1767268800,
+      "description": "ACH donation",
+      "source": "ch_1bbb"
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/balance_transactions"
+}

@@ -56,3 +56,38 @@ or other files. Each service gets its own subdirectory.
 * An automated or semi-manual process is implemented to collect reports for services with no API.
 * The download, collection and sanitization processes are automated to repeat
 
+# API/Download Notes
+
+## Stripe
+Stripe has test api keys.  Not sure if they return fake data.
+We download transactions, not reports. Our headers are:
+id,Type,Source,Amount,Fee,Destination Platform Fee,Destination Platform Fee Currency,Net,Currency,Created (UTC)
+Available On (UTC),Description,Customer Facing Amount,Customer Facing Currency,Transfer,Transfer Date (UTC)
+Transfer Group,description (metadata),
+
+donorbox_address_line_2 (metadata),donorbox_country (metadata),donorbox_idempotency_key (metadata)
+donorbox_gift_aid (metadata),donorbox_plan_interval (metadata),donorbox_donation_type (metadata)
+donorbox_form_id (metadata),donorbox_postal_code (metadata),donorbox_state (metadata),donorbox_city (metadata)
+donorbox_address (metadata),donorbox_donor_id (metadata),donorbox_recurring_donation (metadata)
+donorbox_name (metadata),donorbox_last_name (metadata),donorbox_first_recurring_charge (metadata)
+donorbox_first_name (metadata),donorbox_email (metadata),donorbox_designation (metadata),donorbox_campaign (metadata)
+
+GPT says the closest API is "Balance Transactions"  It's return schema:
+The Balance Transaction object (example)
+{
+  "id": "txn_1MiN3gLkdIwHu7ixxapQrznl",
+  "object": "balance_transaction",
+  "amount": -400,
+  "available_on": 1678043844,
+  "created": 1678043844,
+  "currency": "usd",
+  "description": null,
+  "exchange_rate": null,
+  "fee": 0,
+  "fee_details": [],
+  "net": -400,
+  "reporting_category": "transfer",
+  "source": "tr_1MiN3gLkdIwHu7ixNCZvFdgA",
+  "status": "available",
+  "type": "transfer"
+}
