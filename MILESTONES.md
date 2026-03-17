@@ -55,7 +55,51 @@ Automated download of QBO "Sales Transaction Export" report.
 Status: Not started.
 
 ### Milestone 20 - Update from manual downloads
-  
+
+#### Milestone 20a - Manifest, Change Detection, Scheduled Refresh, Data Freshness
+
+**Goal**: Detect when CSV files in the warehouse have changed and keep the app showing
+fresh data automatically, with a clear indication of when data was last updated.
+
+**Components**:
+1. **Manifest in graph.json**: `generate_graph_json.py` adds a `_meta` block recording
+   each source CSV file with `path`, `size`, `mtime`, and `sha256` checksum.
+   `generated_at` timestamp also stored.
+2. **Change detection** (`warehouse/should_rebuild.py`): compares current CSV stats
+   against `graph._meta`; uses mtime for a fast first-pass, SHA-256 to confirm actual
+   content change. Returns true only if a rebuild is needed.
+3. **Scheduled refresh** (`warehouse/refresh.sh` via systemd timer): on a schedule
+   (e.g., every 10–30 min) runs rclone sync from Google Drive → should_rebuild check →
+   rebuild graph + sync to server if changed.
+4. **App: data freshness display**: frontend reads `graph._meta.generated_at` and
+   displays a "Last updated: [timestamp]" indicator. Shows a visual stale warning if
+   data is older than a threshold.
+
+Status: Not started.
+
+#### Milestone 20b - Triggered Refresh (Bookkeeper UI + Warehouse Polling)
+
+**Goal**: Let the bookkeeper request a data refresh from within the app and see when
+it has completed, without needing access to the warehouse server.
+
+**Architecture**: Bookkeeper clicks "New data please" in the app. The app sets a
+"refresh requested" status. The warehouse (on the Pi) polls the app API every 30–60
+seconds; when it sees "requested", it runs a full refresh cycle, then calls back to
+confirm completion. The app returns to green.
+
+**Components**:
+1. **UI**: "New data please" button (admin/bookkeeper role). Status badge replaces the
+   static timestamp: green = current, red = refresh requested/in-progress.
+2. **API endpoints** (new):
+   - `POST /admin/request-refresh` — sets status to "requested"
+   - `GET /admin/refresh-status` — returns `{ status, last_updated }` (warehouse polls this)
+   - `POST /admin/confirm-refresh` — warehouse calls after delivering new data; resets to green
+3. **Status persistence**: small JSON file in `data_base` alongside `graph.json`.
+4. **Warehouse polling service**: long-running service unit polls `GET /admin/refresh-status`
+   every 30–60 seconds; triggers full refresh when requested.
+
+Status: Not started.
+
 
 ## Backlog
 **Production Checklist:**
