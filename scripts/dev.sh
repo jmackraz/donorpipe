@@ -27,7 +27,8 @@ fi
 #uv run fastapi dev src/donorpipe/api/app.py &
 JWT_SECRET="${DONORPIPE_JWT_SECRET:?DONORPIPE_JWT_SECRET must be set}"
 env DONORPIPE_CONFIG=$CONFIG DONORPIPE_JWT_SECRET=$JWT_SECRET \
-    uv run fastapi dev src/donorpipe/api/app.py &
+    uv run uvicorn donorpipe.api.app:app --reload \
+    --log-config "$ROOT/scripts/uvicorn_log_config.json" &
 
 
 echo "Starting frontend (port 5173)..."

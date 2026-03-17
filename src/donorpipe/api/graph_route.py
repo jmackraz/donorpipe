@@ -1,9 +1,12 @@
 """GET /accounts/{account_id}/graph route."""
 
 import json
+import logging
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+
+logger = logging.getLogger(__name__)
 
 from donorpipe.api.auth import require_account_access
 from donorpipe.api.config import UserConfig
@@ -24,6 +27,7 @@ def get_graph(
 
     graph_path = Path(account.data_base).resolve() / "graph.json"
     if not graph_path.exists():
+        logger.warning("Graph not found for account '%s': %s", account_id, graph_path)
         raise HTTPException(status_code=503, detail=f"Graph not built for account '{account_id}'")
 
     with open(graph_path) as f:
