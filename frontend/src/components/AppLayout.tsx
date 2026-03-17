@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { useGraph } from "../hooks/useGraph"
 import { useFilters } from "../hooks/useFilters"
 import type { EntityType } from "../hooks/useFilters"
-import { filterDonations, filterPayouts, filterReceipts } from "../lib/filters"
+import { filterDonations, filterCharges, filterPayouts, filterReceipts } from "../lib/filters"
 import { advanceDate } from "../lib/dateRange"
 import type { AnyEntity } from "./EntityTable"
 import TypeTabs from "./TypeTabs"
@@ -30,7 +30,7 @@ export default function AppLayout() {
   // Auto-select first account when accounts load and no account is in URL
   useEffect(() => {
     if (accounts.length > 0 && !account) {
-      const first = accounts[0]
+      const first = accounts[0]!
       setAccountInput(first)
       setSearchParams(
         (prev) => {
@@ -96,6 +96,8 @@ export default function AppLayout() {
     switch (filters.type) {
       case "donations":
         return filterDonations(store.donations, filters)
+      case "charges":
+        return filterCharges(store.charges, filters)
       case "payouts":
         return filterPayouts(store.payouts, filters)
       case "receipts":
@@ -107,6 +109,7 @@ export default function AppLayout() {
     if (!store || !filters.selected) return null
     return (
       store.donations.get(filters.selected) ??
+      store.charges.get(filters.selected) ??
       store.payouts.get(filters.selected) ??
       store.receipts.get(filters.selected) ??
       null

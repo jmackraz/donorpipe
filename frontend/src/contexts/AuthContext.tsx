@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const data = (await res.json()) as { access_token: string }
     _token = data.access_token
-    const b64 = _token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")
+    const b64 = _token.split(".")[1]!.replace(/-/g, "+").replace(/_/g, "/")
     const payload = JSON.parse(atob(b64)) as { accounts?: string[] }
     _accounts = payload.accounts ?? []
     setAccounts(_accounts)

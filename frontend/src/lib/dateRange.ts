@@ -6,7 +6,7 @@ export interface DateRange {
 }
 
 function parseIsoDate(dateStr: string): { year: number; month: number; day: number } {
-  const [year, month, day] = dateStr.split("-").map(Number)
+  const [year, month, day] = dateStr.split("-").map(Number) as [number, number, number]
   return { year, month, day }
 }
 
