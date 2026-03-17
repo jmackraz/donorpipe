@@ -87,7 +87,7 @@ function PayoutNode({
       className={`text-sm ${payout.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
       onClick={clickable ? () => onSelectEntity(payout) : undefined}
     >
-      <span className="text-xs text-gray-400 mr-2">Payout</span>
+      <span className="text-xs text-blue-700 mr-2">Payout</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{payout.service}</span>
       <span className="text-gray-900">
         {fmtAmt(payout.net, payout.currency)} · {payout.date}
@@ -114,7 +114,7 @@ function DonationNode({
       className={`text-sm ml-4 ${donation.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
       onClick={clickable ? () => onSelectEntity(donation) : undefined}
     >
-      <span className="text-xs text-gray-400 mr-2">Donation</span>
+      <span className="text-xs text-blue-700 mr-2">Donation</span>
       <span className="text-gray-900">{donation.name || "—"}</span>
       <span className="text-gray-500 mx-1">·</span>
       <span className="text-gray-900">{fmtAmt(donation.net, donation.currency)}</span>
@@ -139,7 +139,7 @@ function ReceiptNode({
       className={`text-sm ${receipt.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
       onClick={clickable ? () => onSelectEntity(receipt) : undefined}
     >
-      <span className="text-xs text-gray-400 mr-2">Receipt</span>
+      <span className="text-xs text-blue-700 mr-2">Receipt</span>
       <span className="font-mono text-xs text-gray-600 mr-2">{receipt.id}</span>
       <span className={`mr-2 ${receipt.item_class ? "text-gray-700" : "text-gray-400 italic"}`}>
         {receipt.item_class ?? "no class"}
