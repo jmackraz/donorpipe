@@ -16,10 +16,23 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 
+def find_service_dir(output_dir: Path, service_name: str) -> Path:
+    """Return a pre-existing subdirectory whose name matches service_name (case-insensitive).
+
+    Falls back to output_dir itself if no match is found.
+    """
+    needle = service_name.lower()
+    for entry in output_dir.iterdir():
+        if entry.is_dir() and entry.name.lower() == needle:
+            return entry
+    return output_dir
+
+
 def run_donorbox(email: str, api_key: str, output_dir: Path, year: int) -> None:
     from donorbox import DonorBoxDownloader
 
-    with DonorBoxDownloader(email=email, api_key=api_key, output_dir=output_dir) as dl:
+    service_dir = find_service_dir(output_dir, "DonorBox")
+    with DonorBoxDownloader(email=email, api_key=api_key, output_dir=service_dir) as dl:
         path = dl.download(year=year)
     print(f"[donorbox] wrote {path}")
 
@@ -27,7 +40,8 @@ def run_donorbox(email: str, api_key: str, output_dir: Path, year: int) -> None:
 def run_stripe(api_key: str, output_dir: Path, year: int) -> None:
     from stripe import StripeDownloader
 
-    with StripeDownloader(api_key=api_key, output_dir=output_dir) as dl:
+    service_dir = find_service_dir(output_dir, "Stripe")
+    with StripeDownloader(api_key=api_key, output_dir=service_dir) as dl:
         path = dl.download(year=year)
     print(f"[stripe] wrote {path}")
 
