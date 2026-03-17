@@ -1,4 +1,4 @@
-import type { EntityGraph, RawDonation, RawCharge, RawPayout, RawReceipt } from "./types"
+import type { EntityGraph, GraphMeta, RawDonation, RawCharge, RawPayout, RawReceipt } from "./types"
 
 // Resolved types — object references instead of IDs
 export interface Donation extends Omit<RawDonation, "charge_id" | "payout_id" | "receipt_ids"> {
@@ -21,6 +21,7 @@ export interface Receipt extends Omit<RawReceipt, "donation_id"> {
 }
 
 export interface TransactionStore {
+  meta:      GraphMeta | undefined
   donations: Map<string, Donation>
   charges:   Map<string, Charge>
   payouts:   Map<string, Payout>
@@ -91,5 +92,5 @@ export function fromGraph(data: EntityGraph): TransactionStore {
     donation.payout = donation.charge?.payout ?? null
   }
 
-  return { donations, charges, payouts, receipts }
+  return { meta: data._meta, donations, charges, payouts, receipts }
 }

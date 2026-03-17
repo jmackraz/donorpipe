@@ -1,6 +1,19 @@
 import { useState, useMemo } from "react"
 import type { TransactionStore } from "../lib/graph"
 
+const STALE_HOURS = 48
+
+function formatUpdated(isoString: string): { label: string; stale: boolean } {
+  const dt = new Date(isoString)
+  const now = new Date()
+  const ageMs = now.getTime() - dt.getTime()
+  const stale = ageMs > STALE_HOURS * 60 * 60 * 1000
+  const label = dt.toLocaleString(undefined, {
+    month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  })
+  return { label, stale }
+}
+
 interface Props {
   store: TransactionStore
 }
@@ -39,6 +52,7 @@ export default function StatsBar({ store }: Props) {
   }, [store])
 
   const { totals } = stats
+  const updated = store.meta ? formatUpdated(store.meta.generated_at) : null
 
   return (
     <div className="bg-gray-50 border-b border-gray-200">
@@ -52,6 +66,11 @@ export default function StatsBar({ store }: Props) {
           {totals.donations} donations · {totals.payouts} payouts ·{" "}
           {totals.receipts} receipts
         </span>
+        {updated && (
+          <span className={`ml-auto ${updated.stale ? "text-amber-600" : "text-gray-400"}`}>
+            Updated {updated.label}
+          </span>
+        )}
       </button>
 
       {open && (

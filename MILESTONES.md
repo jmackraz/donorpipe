@@ -38,8 +38,8 @@ Automated download of export files from donation/payment processors on a schedul
 * **Stripe** — **COMPLETE** API-based, straightforward
 * **DonorBox** — **COMPLETE** API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
 * **PayPal** — investigate API availability
-* **Benevity** — investigate API availability
-Status: Stripe and DonorBox complete.
+* **Benevity** — No automated options, other than browser automation
+Status: Stripe and DonorBox complete.  Benevity excluded.
 
 **DonorBox Platform Fees** - empirically determined to be:
 * 1.75% until 4/1/2025

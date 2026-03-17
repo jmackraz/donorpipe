@@ -83,6 +83,38 @@ for account_id in accounts:
     )
 PYEOF
 
+# ── Step 1.5: Check whether any account needs a rebuild ───────────────────────
+echo ""
+echo "=== Change detection ==="
+NEEDS_REBUILD=0
+python3 - "$CONFIG" "${RESOLVED_ACCOUNTS[@]}" <<'PYEOF'
+import json, os, subprocess, sys
+config_path = sys.argv[1]
+accounts    = sys.argv[2:]
+with open(config_path) as f:
+    config = json.load(f)
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+checker = os.path.join(root, "warehouse", "should_rebuild.py")
+needs_rebuild = False
+for account_id in accounts:
+    acct = config["accounts"][account_id]
+    data_base = os.path.expanduser(acct["data_base"])
+    graph_path = os.path.join(data_base, "graph.json")
+    result = subprocess.run(
+        ["uv", "run", checker, "--graph", graph_path, "--dir", data_base],
+        cwd=root,
+    )
+    if result.returncode == 0:
+        needs_rebuild = True
+sys.exit(0 if needs_rebuild else 1)
+PYEOF
+NEEDS_REBUILD=$?
+
+if [[ $NEEDS_REBUILD -ne 0 ]]; then
+    echo "No changes detected across all accounts. Skipping rebuild and sync."
+    exit 0
+fi
+
 # ── Step 2: Build graphs ──────────────────────────────────────────────────────
 echo ""
 echo "=== Build ==="

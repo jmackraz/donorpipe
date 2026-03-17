@@ -36,7 +36,18 @@ export interface RawReceipt extends Transaction {
   discrepancies: string[]
 }
 
+export interface GraphMeta {
+  generated_at: string   // ISO 8601 UTC
+  files: {
+    path: string
+    size: number
+    mtime: string        // ISO 8601 UTC
+    sha256: string
+  }[]
+}
+
 export interface EntityGraph {
+  _meta?: GraphMeta
   donations: Record<string, RawDonation>
   charges:   Record<string, RawCharge>
   payouts:   Record<string, RawPayout>

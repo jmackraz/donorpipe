@@ -41,3 +41,85 @@ last-modified date is reliable on Google Drive.
 It probably makes sense to record these data directly in the generated graph. Then the semantics become simply: "Are
 there any files newer than the graph?"
 
+## Scheduled Refresh with systemd (Raspberry Pi)
+
+Two files are needed: a service unit (what to run) and a timer unit (when to run it).
+
+### Service unit: `/etc/systemd/system/donorpipe-refresh.service`
+
+```ini
+[Unit]
+Description=DonorPipe warehouse refresh
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/donorpipe
+ExecStart=/home/pi/donorpipe/warehouse/refresh.sh
+# PATH must include uv and python3
+Environment=PATH=/home/pi/.local/bin:/usr/local/bin:/usr/bin:/bin
+StandardOutput=journal
+StandardError=journal
+```
+
+Adjust `User=` and `WorkingDirectory=` to match the installation path on the Pi.
+`uv` installs to `~/.local/bin` by default; confirm with `which uv` on the Pi and update `PATH` if needed.
+
+### Timer unit: `/etc/systemd/system/donorpipe-refresh.timer`
+
+```ini
+[Unit]
+Description=Run DonorPipe warehouse refresh on a schedule
+
+[Timer]
+OnCalendar=*:0/15
+RandomizedDelaySec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+`OnCalendar=*:0/15` runs every 15 minutes. Change to `*:0/30` for every 30 minutes.
+`RandomizedDelaySec=60` staggers the start by up to 60 seconds.
+`Persistent=true` means if the Pi was off, it runs once when it comes back up.
+
+### Enable and start
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now donorpipe-refresh.timer
+
+# Verify the timer is active
+systemctl list-timers donorpipe-refresh.timer
+```
+
+### Trigger a manual run
+
+```bash
+sudo systemctl start donorpipe-refresh.service
+```
+
+Useful when the bookkeeper uploads a new file and doesn't want to wait for the next scheduled run.
+
+### Check logs
+
+```bash
+journalctl -u donorpipe-refresh.service        # all recent runs
+journalctl -u donorpipe-refresh.service -f     # follow live
+journalctl -u donorpipe-refresh.service -n 50  # last run only
+```
+
+### The command
+
+The service calls `warehouse/refresh.sh` with no arguments — it reads `config.json` from the
+working directory. To use a specific config path:
+
+```ini
+ExecStart=/home/pi/donorpipe/warehouse/refresh.sh --config /home/pi/donorpipe/config.json
+```
+
+With change detection in place, most runs will print "No changes detected. Skipping rebuild
+and sync." and exit in a second or two. A full rebuild only runs when files have actually changed.
