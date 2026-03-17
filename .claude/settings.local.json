@@ -19,7 +19,11 @@
       "Bash(bun:*)",
       "Bash(npm root:*)",
       "Bash(chmod +x:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Read(//tmp/**)",
+      "Skill(keybindings-help)",
+      "Bash(ls:*)",
+      "Bash(env OSF_EXPORTS=testdata:*)"
     ]
   }
 }
