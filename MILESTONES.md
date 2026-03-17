@@ -56,27 +56,6 @@ Status: Not started.
 
 ### Milestone 20 - Update from manual downloads
 
-#### Milestone 20a - Manifest, Change Detection, Scheduled Refresh, Data Freshness
-
-**Goal**: Detect when CSV files in the warehouse have changed and keep the app showing
-fresh data automatically, with a clear indication of when data was last updated.
-
-**Components**:
-1. **Manifest in graph.json**: `generate_graph_json.py` adds a `_meta` block recording
-   each source CSV file with `path`, `size`, `mtime`, and `sha256` checksum.
-   `generated_at` timestamp also stored.
-2. **Change detection** (`warehouse/should_rebuild.py`): compares current CSV stats
-   against `graph._meta`; uses mtime for a fast first-pass, SHA-256 to confirm actual
-   content change. Returns true only if a rebuild is needed.
-3. **Scheduled refresh** (`warehouse/refresh.sh` via systemd timer): on a schedule
-   (e.g., every 10–30 min) runs rclone sync from Google Drive → should_rebuild check →
-   rebuild graph + sync to server if changed.
-4. **App: data freshness display**: frontend reads `graph._meta.generated_at` and
-   displays a "Last updated: [timestamp]" indicator. Shows a visual stale warning if
-   data is older than a threshold.
-
-Status: Not started.
-
 #### Milestone 20b - Triggered Refresh (Bookkeeper UI + Warehouse Polling)
 
 **Goal**: Let the bookkeeper request a data refresh from within the app and see when
