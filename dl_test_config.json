@@ -1,0 +1,19 @@
+{
+  "accounts": {
+    "from_api": {
+      "data_base": "/Users/jim/p/donorpipe_data/comparison_tests/from_api",
+      "data_dirs": ["Stripe"]
+    },
+    "web_download": {
+      "data_base": "/Users/jim/p/donorpipe_data/comparison_tests/web_download",
+      "data_dirs": ["Stripe"]
+    }
+  },
+  "users": {
+    "jim": {
+      "funny_old_hashed_password": "$2b$12$e11bsBq5lJ5iqHg5VC7.Z.Cbv0srnmasJIM/MOtgOWJ4CEr4CV2Bq",
+      "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
+      "accounts": ["oliveseed", "test_org"]
+    }
+  }
+}
