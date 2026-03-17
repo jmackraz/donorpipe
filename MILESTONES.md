@@ -33,6 +33,41 @@ We may want to work on a feature branch for this.
 
 #### Sub-milestones
 
+##### Milestone 19a.a - Set up repository operations
+This is mostly an operator set of tasks.
+
+**Repository**
+1. Set up primary repository directory
+2. Create a config file for it
+3. Initialize Stripe and DonorBox by downloading years since 2023
+4. Initialize other with copies of manual downloads
+5. Build graph for 'oliveseed'
+6. Test dev.
+
+**Staging**
+1. Fresh deployment of staging, clean out data directory
+2. Deploy graph manually
+3. Test staging
+4. Use refresh.sh to deploy graph, test update detection
+5. Automate updates to staging
+6. Add test_account: sanitize, generate, sync.
+
+**Production**
+1. Repeat staging steps
+2. Add prod to refresh config.
+3. Announce.
+
+**RClone**
+1. Get it set up
+2. Clone new stuff from gdrive (not stripe, donorbox) to primary
+3. Update stripe, donorbox in gdrive from primary
+
+**Move Warehouse to Pi**
+1. Deploy code to Pi
+2. Copy primary to pi
+3. Set up rclone
+4. Set up automation
+
 ##### Milestone 19b - Automated downloads
 Automated download of export files from donation/payment processors on a schedule or on demand.
 * **Stripe** — **COMPLETE** API-based, straightforward
