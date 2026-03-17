@@ -4,9 +4,9 @@ import json
 import logging
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-
 logger = logging.getLogger(__name__)
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from donorpipe.api.auth import require_account_access
 from donorpipe.api.config import UserConfig
