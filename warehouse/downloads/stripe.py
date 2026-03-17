@@ -76,10 +76,12 @@ class StripeDownloader:
         output_path = self.output_dir / f"stripe_{year}.csv"
 
         # Pass 1: fetch payouts + build charge_id → payout_id mapping.
+        # Extend the payout window 30 days past year-end so that charges made
+        # in late December (which settle in early January) still get mapped.
         charge_to_payout: dict[str, str] = {}
         payout_items: list[dict] = self._paginate(
             "payouts",
-            {"created[gte]": start, "created[lte]": end, "limit": 100},
+            {"created[gte]": start, "created[lte]": end + 30 * 86400, "limit": 100},
         )
         for payout in payout_items:
             payout_id = payout["id"]
