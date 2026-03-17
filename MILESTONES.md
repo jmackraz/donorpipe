@@ -35,12 +35,16 @@ We may want to work on a feature branch for this.
 
 ##### Milestone 19b - Automated downloads
 Automated download of export files from donation/payment processors on a schedule or on demand.
-* **Stripe** — API-based, straightforward
+* **Stripe** — **COMPLETE** API-based, straightforward
+* **DonorBox** — **COMPLETE** API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
 * **PayPal** — investigate API availability
-* **DonorBox** — confirm plan tier supports API access
 * **Benevity** — investigate API availability
+Status: Stripe and DonorBox complete.
 
-Status: Not started.
+**DonorBox Platform Fees** - empirically determined to be:
+* 1.75% until 4/1/2025
+* 2.0% after 4/1/2025 
+
 
 ##### Milestone 19c - QBO OAuth2 download
 Automated download of QBO "Sales Transaction Export" report.
@@ -50,6 +54,7 @@ Automated download of QBO "Sales Transaction Export" report.
 
 Status: Not started.
 
+### Milestone 20 - Update from manual downloads
   
 
 ## Backlog
