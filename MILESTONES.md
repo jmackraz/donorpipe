@@ -48,9 +48,9 @@ This is mostly an operator set of tasks.
 **Staging**
 1. Fresh deployment of staging, clean out data directory
 2. Deploy graph manually
-3. Test staging
-4. Use refresh.sh to deploy graph, test update detection
-5. Automate updates to staging
+3. Use refresh.sh to deploy graph, test update detection
+4. Test staging **NEXT TO DO**
+5. Automate updates to staging (mac job scheduling different than staging & prod?)
 
 **Production**
 1. Repeat staging steps
@@ -72,7 +72,8 @@ This is mostly an operator set of tasks.
 Automated download of export files from donation/payment processors on a schedule or on demand.
 * **Stripe** — **COMPLETE** API-based, straightforward
 * **DonorBox** — **COMPLETE** API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
-* **PayPal** — investigate API availability
+* **PayPal** — API is readily available. It looks like 'transaction history' will be fine. I'll capture the schema via
+Postman for this.
 * **Benevity** — No automated options, other than browser automation
 Status: Stripe and DonorBox complete.  Benevity excluded.
 
@@ -105,12 +106,18 @@ confirm completion. The app returns to green.
 1. **UI**: "New data please" button (admin/bookkeeper role). Status badge replaces the
    static timestamp: green = current, red = refresh requested/in-progress.
 2. **API endpoints** (new):
-   - `POST /admin/request-refresh` — sets status to "requested"
-   - `GET /admin/refresh-status` — returns `{ status, last_updated }` (warehouse polls this)
-   - `POST /admin/confirm-refresh` — warehouse calls after delivering new data; resets to green
-3. **Status persistence**: small JSON file in `data_base` alongside `graph.json`.
-4. **Warehouse polling service**: long-running service unit polls `GET /admin/refresh-status`
-   every 30–60 seconds; triggers full refresh when requested.
+   - `POST /admin/request-refresh` — records `refresh_requested_at` timestamp
+   - `GET /admin/refresh-status` — returns `{ pending, requested_at, last_updated }`;
+     `pending` is derived by comparing `requested_at` to `graph._meta.generated_at`
+3. **Status persistence**: `data_base/refresh_state.json` — written by the app only
+   (by policy; no file-permission enforcement). `data_base/graph.json` is written by
+   the warehouse only. Format: `{ "requested_at": "<ISO timestamp or null>" }`.
+   Human-readable and editable for operational convenience.
+4. **Status derivation**: no explicit "confirm" step. If `graph._meta.generated_at >=
+   requested_at`, the request is satisfied. The warehouse just delivers new data;
+   the app derives freshness from timestamps alone.
+5. **Warehouse polling service**: long-running service unit polls `GET /admin/refresh-status`
+   every 30–60 seconds; triggers full refresh when `pending` is true.
 
 Status: Not started.
 
