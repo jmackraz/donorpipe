@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Download fresh CSVs from external services, rebuild graphs, and sync to server.
+# Only downloads into real data accounts — sanitized accounts (e.g. test_org) are
+# refreshed manually via warehouse/sanitize.sh + warehouse/sync-graphs.sh.
 #
 # Usage:
-#   ./warehouse/refresh.sh [--config <config.json>] [--year <year>] [account_id ...]
-#   PROD=1 ./warehouse/refresh.sh [account_id ...]
+#   ./warehouse/refresh.sh [--config <config.json>] [--year <year>] <account_id>
+#   PROD=1 ./warehouse/refresh.sh <account_id>
 #
-# If no account_ids are given, all accounts in the config are processed.
 # Services are skipped silently if their API key is not set in .env.
 set -euo pipefail
 
@@ -19,15 +20,24 @@ fi
 
 CONFIG="$SCRIPTS/warehouse_config.json"
 YEAR=$(date +%Y)
-ACCOUNTS=()
+ACCOUNT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
     --year)   YEAR="$2";   shift 2 ;;
-    *)        ACCOUNTS+=("$1"); shift ;;
+    *)
+      if [[ -n "$ACCOUNT" ]]; then
+        echo "Error: refresh.sh takes exactly one account argument" >&2; exit 1
+      fi
+      ACCOUNT="$1"; shift ;;
   esac
 done
+
+if [[ -z "$ACCOUNT" ]]; then
+  echo "Usage: ./warehouse/refresh.sh [--config <config>] [--year <year>] <account_id>" >&2
+  exit 1
+fi
 
 if [[ "$CONFIG" != /* ]]; then
   CONFIG="$(pwd)/$CONFIG"
@@ -38,42 +48,29 @@ if [[ ! -f "$CONFIG" ]]; then
   exit 1
 fi
 
-# Resolve account list (all accounts if none specified).
-RESOLVED=$(python3 - "$CONFIG" "${ACCOUNTS[@]}" <<'PYEOF'
+# Validate account exists in config.
+python3 - "$CONFIG" "$ACCOUNT" <<'PYEOF'
 import json, sys
-config_path = sys.argv[1]
-requested   = set(sys.argv[2:])
+config_path, account_id = sys.argv[1], sys.argv[2]
 with open(config_path) as f:
     config = json.load(f)
-accounts = config.get("accounts", {})
-if requested:
-    missing = requested - set(accounts)
-    if missing:
-        print(f"Error: unknown account(s): {', '.join(sorted(missing))}", file=sys.stderr)
-        sys.exit(1)
-    targets = [k for k in accounts if k in requested]
-else:
-    targets = list(accounts.keys())
-if not targets:
-    print("No accounts found in config.", file=sys.stderr)
+if account_id not in config.get("accounts", {}):
+    print(f"Error: unknown account: {account_id}", file=sys.stderr)
     sys.exit(1)
-print(" ".join(targets))
 PYEOF
-)
-read -ra RESOLVED_ACCOUNTS <<< "$RESOLVED"
-echo "Accounts: ${RESOLVED_ACCOUNTS[*]}"
+echo "Account: $ACCOUNT"
 
 # ── Step 1: Download ──────────────────────────────────────────────────────────
 echo ""
 echo "=== Download ==="
-python3 - "$CONFIG" "$YEAR" "${RESOLVED_ACCOUNTS[@]}" <<'PYEOF'
+python3 - "$ROOT" "$CONFIG" "$YEAR" "$ACCOUNT" <<'PYEOF'
 import json, os, subprocess, sys
-config_path = sys.argv[1]
-year        = sys.argv[2]
-accounts    = sys.argv[3:]
+root        = sys.argv[1]
+config_path = sys.argv[2]
+year        = sys.argv[3]
+accounts    = sys.argv[4:]
 with open(config_path) as f:
     config = json.load(f)
-root   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 runner = os.path.join(root, "warehouse", "downloads", "runner.py")
 for account_id in accounts:
     data_base = os.path.expanduser(config["accounts"][account_id]["data_base"])
@@ -87,13 +84,13 @@ PYEOF
 echo ""
 echo "=== Change detection ==="
 NEEDS_REBUILD=0
-python3 - "$CONFIG" "${RESOLVED_ACCOUNTS[@]}" <<'PYEOF'
+python3 - "$ROOT" "$CONFIG" "$ACCOUNT" <<'PYEOF'
 import json, os, subprocess, sys
-config_path = sys.argv[1]
-accounts    = sys.argv[2:]
+root        = sys.argv[1]
+config_path = sys.argv[2]
+accounts    = sys.argv[3:]
 with open(config_path) as f:
     config = json.load(f)
-root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 checker = os.path.join(root, "warehouse", "should_rebuild.py")
 needs_rebuild = False
 for account_id in accounts:
@@ -118,9 +115,9 @@ fi
 # ── Step 2: Build graphs ──────────────────────────────────────────────────────
 echo ""
 echo "=== Build ==="
-"$ROOT/scripts/build_graphs.sh" --config "$CONFIG" "${RESOLVED_ACCOUNTS[@]}"
+"$ROOT/scripts/build_graphs.sh" --config "$CONFIG" "$ACCOUNT"
 
 # ── Step 3: Sync to server ────────────────────────────────────────────────────
 echo ""
 echo "=== Sync ==="
-"$ROOT/warehouse/sync-graphs.sh" "${RESOLVED_ACCOUNTS[@]}"
+"$ROOT/warehouse/sync-graphs.sh" "$ACCOUNT"
