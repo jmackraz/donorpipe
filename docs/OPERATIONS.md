@@ -192,11 +192,19 @@ Note: all services download the same data regardless of account. The account arg
 ### Rebuild and sync changed graphs
 
 ```bash
+# Sync to staging (normal frequent run):
 warehouse/refresh.sh [account_id ...]
-PROD=1 warehouse/refresh.sh [account_id ...]
+
+# Sync to staging, then prod only if staging actually synced:
+warehouse/refresh.sh [accounts] && PROD=1 warehouse/refresh.sh --sync-only [accounts]
+
+# Sync to prod unconditionally (skip rebuild, e.g. after a manual build):
+PROD=1 warehouse/refresh.sh --sync-only [account_id ...]
 ```
 
-Checks each account's data directory for changes since the last build. Rebuilds `graph.json` and syncs to staging (or prod with `PROD=1`) only for accounts whose data has changed. Processes all accounts in the config if none are specified. Safe to run frequently — exits quickly when nothing has changed.
+Checks each account's data directory for changes since the last build. Rebuilds `graph.json` and syncs to staging only for accounts whose data has changed. Processes all accounts in the config if none are specified. Safe to run frequently — exits 1 (no-op) when nothing has changed, 0 when it synced.
+
+`--sync-only` skips change detection and build; goes straight to sync. The `&&` pattern uses the exit code to gate the prod sync: if staging found no changes (exit 1), prod is skipped too.
 
 Intended workflow: run `download.sh` on a longer schedule (e.g. hourly), and `refresh.sh` on a shorter schedule (e.g. every few minutes) to pick up both scheduled and manual downloads promptly.
 

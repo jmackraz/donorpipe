@@ -6,8 +6,16 @@
 # Usage:
 #   ./warehouse/refresh.sh [--config <config.json>] [account_id ...]
 #   PROD=1 ./warehouse/refresh.sh [account_id ...]
+#   PROD=1 ./warehouse/refresh.sh --sync-only [account_id ...]
 #
 # If no account_ids given, processes all accounts in the config.
+#
+# Exit codes:
+#   0 — graphs rebuilt and synced (or --sync-only completed)
+#   1 — no changes detected (nothing synced), or error
+#
+# To sync to both staging and prod, gate the prod run on the staging exit code:
+#   warehouse/refresh.sh [accounts] && PROD=1 warehouse/refresh.sh --sync-only [accounts]
 set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,11 +28,13 @@ fi
 
 CONFIG="$SCRIPTS/warehouse_config.json"
 ACCOUNTS=()
+SYNC_ONLY=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --config) CONFIG="$2"; shift 2 ;;
-    *)        ACCOUNTS+=("$1"); shift ;;
+    --config)    CONFIG="$2"; shift 2 ;;
+    --sync-only) SYNC_ONLY=1; shift ;;
+    *)           ACCOUNTS+=("$1"); shift ;;
   esac
 done
 
@@ -37,12 +47,27 @@ if [[ ! -f "$CONFIG" ]]; then
   exit 1
 fi
 
-# ── Change detection ──────────────────────────────────────────────────────────
-echo ""
-echo "=== Change detection ==="
+if [[ $SYNC_ONLY == 1 ]]; then
+  # ── Sync-only mode: skip detection and build ──────────────────────────────
+  echo ""
+  echo "=== Sync-only ==="
+  if [[ ${#ACCOUNTS[@]} -eq 0 ]]; then
+    REBUILD_ACCOUNTS=()
+    while IFS= read -r line; do
+      [[ -n "$line" ]] && REBUILD_ACCOUNTS+=("$line")
+    done < <(python3 -c "
+import json; c = json.load(open('$CONFIG')); print('\n'.join(c['accounts']))
+")
+  else
+    REBUILD_ACCOUNTS=("${ACCOUNTS[@]}")
+  fi
+else
+  # ── Change detection ────────────────────────────────────────────────────────
+  echo ""
+  echo "=== Change detection ==="
 
-# Prints account IDs (stdout) that need a rebuild; status messages go to stderr.
-REBUILD_LIST=$(python3 - "$ROOT" "$CONFIG" "${ACCOUNTS[@]+"${ACCOUNTS[@]}"}" <<'PYEOF'
+  # Prints account IDs (stdout) that need a rebuild; status messages go to stderr.
+  REBUILD_LIST=$(python3 - "$ROOT" "$CONFIG" "${ACCOUNTS[@]+"${ACCOUNTS[@]}"}" <<'PYEOF'
 import json, os, subprocess, sys
 
 root        = sys.argv[1]
@@ -85,20 +110,21 @@ for account_id, acct in targets.items():
 PYEOF
 )
 
-REBUILD_ACCOUNTS=()
-while IFS= read -r line; do
-  [[ -n "$line" ]] && REBUILD_ACCOUNTS+=("$line")
-done <<< "$REBUILD_LIST"
+  REBUILD_ACCOUNTS=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && REBUILD_ACCOUNTS+=("$line")
+  done <<< "$REBUILD_LIST"
 
-if [[ ${#REBUILD_ACCOUNTS[@]} -eq 0 ]]; then
-  echo "No changes detected. Skipping rebuild and sync."
-  exit 0
+  if [[ ${#REBUILD_ACCOUNTS[@]} -eq 0 ]]; then
+    echo "No changes detected. Skipping rebuild and sync."
+    exit 1
+  fi
+
+  # ── Build graphs ────────────────────────────────────────────────────────────
+  echo ""
+  echo "=== Build ==="
+  "$ROOT/scripts/build_graphs.sh" --config "$CONFIG" "${REBUILD_ACCOUNTS[@]}"
 fi
-
-# ── Build graphs ──────────────────────────────────────────────────────────────
-echo ""
-echo "=== Build ==="
-"$ROOT/scripts/build_graphs.sh" --config "$CONFIG" "${REBUILD_ACCOUNTS[@]}"
 
 # ── Sync to server ────────────────────────────────────────────────────────────
 echo ""
