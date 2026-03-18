@@ -1,15 +1,25 @@
 {
   "sanitize": [
     {
-      "local_source": "~/p/donorpipe_data/oliveseed",
-      "source": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
-      "dest": "~/p/donorpipe_data/testdata"
+      "source": "/Users/jim/p/donorpipe_data/primary_repository/oliveseed",
+      "dest": "/Users/jim/p/donorpipe_data/primary_repository/test_org"
     }
   ],
   "accounts": {
-    "local_oliveseed": "~/p/donorpipe_data/oliveseed",
-    "oliveseed": "/Users/jim/Library/CloudStorage/GoogleDrive-jmackraz@gmail.com/.shortcut-targets-by-id/1aWvnb7vuVQsP-5IESed7GUsDDY3O6rZA/OLIVESEED CORPORATE DOCS/FINANCIALS & RECEIPTS/BOOKKEEPING/EXPORTED REPORTS",
-    "test_org": "~/p/donorpipe_data/testdata"
+    "oliveseed": {
+      "data_base": "/Users/jim/p/donorpipe_data/primary_repository/oliveseed",
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity", "QBO"]
+    },
+    "test_org": {
+      "data_base": "/Users/jim/p/donorpipe_data/primary_repository/test_org",
+      "data_dirs": ["Stripe", "Paypal", "DonorBox", "Benevity", "QBO"]
+    }
+  },
+  "users": {
+    "jim": {
+      "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
+      "accounts": ["oliveseed", "test_org"]
+    }
   },
   "hosts": {
     "staging": {

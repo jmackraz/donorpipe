@@ -1,9 +1,26 @@
 # working file for repeated manual test commands
 
 
-test_dir="/Users/jim/p/donorpipe_data/comparison_tests/"
+repository_dir="/Users/jim/p/donorpipe_data/primary_repository/oliveseed"
+sanitized_dir="/Users/jim/p/donorpipe_data/primary_repository/test_org"
 
-#uv run warehouse/downloads/runner.py  --output-dir $test_dir/from_api --year 2025
-#uv run scripts/generate_graph_json.py  --dir $test_dir/from_api/ --output $test_dir/from_api/graph.json
-#uv run scripts/generate_graph_json.py  --dir $test_dir/web_download/ --output $test_dir/web_download/graph.json
-diff $test_dir/web_download/graph.json $test_dir/from_api/graph.json
+# Full download refresh
+# echo 2023...
+# uv run warehouse/downloads/runner.py  --output-dir $repository_dir --year 2023
+# echo 2024...
+# uv run warehouse/downloads/runner.py  --output-dir $repository_dir --year 2024
+# echo 2025...
+# uv run warehouse/downloads/runner.py  --output-dir $repository_dir --year 2025
+# echo 2026...
+# uv run warehouse/downloads/runner.py  --output-dir $repository_dir --year 2026
+
+# create sanitized test data
+
+#echo santize...
+#python scripts/sanitize_csv.py  $repository_dir $sanitized_dir
+#echo exiting
+
+# build graphs for oliveseed and testdata
+echo building graphs...
+uv run scripts/generate_graph_json.py  --dir $repository_dir --output $repository_dir/graph.json
+uv run scripts/generate_graph_json.py  --dir $sanitized_dir --output $sanitized_dir/graph.json

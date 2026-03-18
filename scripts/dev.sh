@@ -6,7 +6,7 @@
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-CONFIG="${DPIPE_DEV_CONFIG:-config.json}"
+CONFIG="${DPIPE_DEV_CONFIG:-warehouse/warehouse_config.json}"
 
 echo CONFIG: $CONFIG
 

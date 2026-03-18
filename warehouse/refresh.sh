@@ -17,7 +17,7 @@ if [ -f "$ROOT/.env" ]; then
     set -a; source "$ROOT/.env"; set +a
 fi
 
-CONFIG="config.json"
+CONFIG="$SCRIPTS/warehouse_config.json"
 YEAR=$(date +%Y)
 ACCOUNTS=()
 

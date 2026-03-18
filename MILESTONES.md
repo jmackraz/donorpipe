@@ -36,11 +36,12 @@ We may want to work on a feature branch for this.
 ##### Milestone 19a.a - Set up repository operations
 This is mostly an operator set of tasks.
 
-**Repository**
+**Repository** COMPLETE
 1. Set up primary repository directory
 2. Create a config file for it
 3. Initialize Stripe and DonorBox by downloading years since 2023
 4. Initialize other with copies of manual downloads
+6. Sanitize to create test_org/
 5. Build graph for 'oliveseed'
 6. Test dev.
 
@@ -50,7 +51,6 @@ This is mostly an operator set of tasks.
 3. Test staging
 4. Use refresh.sh to deploy graph, test update detection
 5. Automate updates to staging
-6. Add test_account: sanitize, generate, sync.
 
 **Production**
 1. Repeat staging steps

@@ -43,7 +43,7 @@ Builds images for `linux/amd64` locally, ships them to the host, and restarts co
 PROD=1 ./scripts/deploy-all.sh
 ```
 
-Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-data.sh oliveseed testdata` in sequence.
+Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-graphs.sh oliveseed test_org` in sequence.
 
 ### Logs / Restart
 
@@ -66,7 +66,7 @@ Build `graph.json` from local CSVs (admin machine), then sync to the server. Onc
 ./scripts/build_graphs.sh --config <local-build-config.json> oliveseed
 
 # 2. Sync graph.json to staging
-./warehouse/sync-graphs.sh oliveseed testdata
+./warehouse/sync-graphs.sh oliveseed test_org
 
 # 2. Sync graph.json to prod
 PROD=1 ./warehouse/sync-graphs.sh oliveseed
@@ -76,6 +76,7 @@ The config passed to `build_graphs.sh` must have `data_base` pointing to the loc
 
 ### Update data
 
+**OBSOLETE** We don't push the data we push the derived graphs
 Real data:
 ```bash
 PROD=1 ./scripts/sync-data.sh
@@ -139,7 +140,7 @@ mkdir -p ~/donorpipe/data
 ./scripts/deploy-all.sh
 ```
 
-Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-data.sh oliveseed testdata` in sequence.
+Runs `deploy.sh`, `push-config.sh`, and `warehouse/sync-graphs.sh oliveseed test_org` in sequence.
 
 ### Logs
 
@@ -166,6 +167,7 @@ Copies `staging_config.json` to the host and restarts the api container.
 
 ### Update data
 
+**OBSOLETE** We don't push the data we push the derived graphs
 ```bash
 ./scripts/sync-data.sh       # Sync local data/ to Pi
 ```
@@ -186,11 +188,13 @@ Reads each entry in `sanitize[]` from config and runs `scripts/sanitize_csv.py s
 
 ### Sync accounts to staging
 
+**OBSOLETE** We don't push the data we push the derived graphs
 ```bash
 warehouse/sync-data.sh <account> [account ...]
 ```
 
 ### Sync accounts to prod
+**OBSOLETE** We don't push the data we push the derived graphs
 
 ```bash
 PROD=1 warehouse/sync-data.sh <account> [account ...]

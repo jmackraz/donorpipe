@@ -19,4 +19,4 @@ echo "==> Pushing help..."
 "$SCRIPT_DIR/push-help.sh"
 
 echo "==> Syncing data..."
-"$PROJECT_DIR/warehouse/sync-data.sh" oliveseed testdata
+"$PROJECT_DIR/warehouse/sync-graphs.sh" oliveseed test_org

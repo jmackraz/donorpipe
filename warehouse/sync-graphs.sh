@@ -32,7 +32,7 @@ done < <(python3 -c "
 import json, os, sys
 c = json.load(open('$CONFIG'))
 requested = sys.argv[1:]
-for account, src in c['accounts'].items():
+for account, acct in c['accounts'].items():
     if account in requested:
-        print(account + '|' + os.path.expanduser(src))
+        print(account + '|' + os.path.expanduser(acct['data_base']))
 " -- "$@")

@@ -114,7 +114,7 @@ These variables control which host the deployment/ops scripts target. All have s
 | `DPIPE_HOST` | `punkinpi.local` (staging) or `ubuntu@donorpipe.trickybit.com` (prod) | SSH target host. Override to deploy to a different machine. |
 | `DPIPE_USER` | `""` (staging) or `ubuntu` (prod) | SSH user. Prepended to `DPIPE_HOST` if non-empty. |
 | `DPIPE_DIR` | `~/donorpipe` | Remote directory where the app is installed. |
-| `DPIPE_DEV_CONFIG` | `config.json` | Config file used by `scripts/dev.sh`. Override to run against a different local config. |
+| `DPIPE_DEV_CONFIG` | `warehouse/warehouse_config.json` | Config file used by `scripts/dev.sh`. Override to run against a different local config (e.g. `config.json` for testdata). |
 
 ## Project
 Read PROJECT.md for a high-level definition of the project.
