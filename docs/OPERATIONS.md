@@ -178,6 +178,28 @@ Copies `staging_config.json` to the host and restarts the api container.
 
 Config: `warehouse/warehouse_config.json` — defines sanitize operations, account→source mappings, and host targets.
 
+### Download fresh data
+
+```bash
+warehouse/download.sh <account_id>
+warehouse/download.sh --year 2025 <account_id>
+```
+
+Fetches CSVs from external services (Stripe, DonorBox, etc.) into the given account's `data_base` directory. Exactly one account must be specified. API keys must be set in `.env`; services without a key are skipped silently. Only use for real data accounts — sanitized accounts are refreshed via `warehouse/sanitize.sh`.
+
+Note: all services download the same data regardless of account. The account argument determines where files land. Multi-account download support will require per-account download configuration when the time comes.
+
+### Rebuild and sync changed graphs
+
+```bash
+warehouse/refresh.sh [account_id ...]
+PROD=1 warehouse/refresh.sh [account_id ...]
+```
+
+Checks each account's data directory for changes since the last build. Rebuilds `graph.json` and syncs to staging (or prod with `PROD=1`) only for accounts whose data has changed. Processes all accounts in the config if none are specified. Safe to run frequently — exits quickly when nothing has changed.
+
+Intended workflow: run `download.sh` on a longer schedule (e.g. hourly), and `refresh.sh` on a shorter schedule (e.g. every few minutes) to pick up both scheduled and manual downloads promptly.
+
 ### Refresh sanitized data
 
 ```bash
