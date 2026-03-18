@@ -208,6 +208,8 @@ def sanitize_file(
     """Read input_path, replace sensitive column values, write to output_path."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    print("sanitize file:", input_path)
+
     with input_path.open(newline="") as infile:
         rows = list(csv.reader(infile))
 
@@ -223,8 +225,16 @@ def sanitize_file(
         return
 
     file_type = _get_file_type(input_path.name)
+
+    print("file type:", file_type)
+
     col_config = COLUMN_CONFIG.get(file_type)
-    half = len(header) / 2
+    # Known file types (e.g. DonorBox API downloads) may have many intentionally
+    # empty columns, so use a lower sparsity threshold to avoid skipping real rows.
+    half = len(header) / 4 if col_config is not None else len(header) / 2
+
+    if not col_config:
+        print("column config is None")
 
     with output_path.open("w", newline="") as outfile:
         writer = csv.writer(outfile)
@@ -241,6 +251,7 @@ def sanitize_file(
 
             if col_config is None:
                 # Unknown file type: fall back to SENSITIVE_PATTERN + simple-sub
+                print("unknown file type, falling back to SENSITIVE_PATTERN + simple-sub")
                 for i, h in enumerate(header):
                     if i < len(new_row) and SENSITIVE_PATTERN.search(h):
                         label = _sensitive_label(h)
@@ -253,6 +264,7 @@ def sanitize_file(
                     for i, h in enumerate(header)
                     if i < len(new_row) and col_config.get(h) in _NAME_CLASSES
                 }
+                print("name indices:", len(name_indices), name_indices)
                 if name_indices:
                     _sanitize_name_fields(new_row, name_indices, name_map)
 

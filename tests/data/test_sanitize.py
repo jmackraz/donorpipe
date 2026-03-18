@@ -354,6 +354,43 @@ def test_validate_config_detects_missing(tmp_path, mod):
     assert any("secret_name_field" in issue for issue in issues)
 
 
+def test_donorbox_api_sparse_rows_sanitized(tmp_path, mod):
+    """DonorBox API rows with many empty cols (< half the header) are still sanitized.
+
+    The API downloader writes ~22 columns as empty strings, so data rows can
+    have fewer than len(header)/2 non-empty cells.  They must not be skipped.
+    """
+    # Minimal simulation: 10-column header, only 3 cells filled (below old half=5)
+    fieldnames = [
+        "Name", "Donor's First Name", "Donor's Last Name",
+        "Amount", "Currency",
+        "Fair Market Value", "Tax Fee", "Card Type", "Honoree Name", "Recipient Name",
+    ]
+    src = tmp_path / "in" / "donorbox_api.csv"
+    write_csv(
+        src,
+        [{
+            "Name": "Alice Smith",
+            "Donor's First Name": "Alice",
+            "Donor's Last Name": "Smith",
+            "Amount": "100.00",
+            "Currency": "usd",
+            "Fair Market Value": "",
+            "Tax Fee": "",
+            "Card Type": "",
+            "Honoree Name": "",
+            "Recipient Name": "",
+        }],
+        fieldnames,
+    )
+    out = tmp_path / "out" / "donorbox_api.csv"
+    mod.sanitize_file(src, out, __import__("collections").defaultdict(int), {})
+    row = read_csv(out)[0]
+    assert row["Name"] in mod.REALISTIC_NAMES
+    assert row["Donor's First Name"] != "Alice"
+    assert row["Donor's Last Name"] != "Smith"
+
+
 def test_validate_config_detects_unknown_type(tmp_path, mod):
     """validate_config reports files whose type is not in COLUMN_CONFIG."""
     write_csv(
