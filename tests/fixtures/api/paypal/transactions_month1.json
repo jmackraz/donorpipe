@@ -1,0 +1,131 @@
+{
+  "transaction_details": [
+    {
+      "transaction_info": {
+        "paypal_account_id": "TESTACCTID001",
+        "transaction_id": "25B16188FF732802U",
+        "paypal_reference_id": "0CY56775FD262270J",
+        "paypal_reference_id_type": "TXN",
+        "transaction_event_code": "T0013",
+        "transaction_initiation_date": "2025-03-01T15:40:49Z",
+        "transaction_updated_date": "2025-03-01T15:40:49Z",
+        "transaction_amount": {
+          "currency_code": "USD",
+          "value": "50.00"
+        },
+        "fee_amount": {
+          "currency_code": "USD",
+          "value": "-1.49"
+        },
+        "transaction_status": "S",
+        "transaction_subject": "donation to Test Project from donor@example.com",
+        "ending_balance": {
+          "currency_code": "USD",
+          "value": "48.51"
+        },
+        "available_balance": {
+          "currency_code": "USD",
+          "value": "48.51"
+        },
+        "invoice_id": "51339764",
+        "protection_eligibility": "02",
+        "instrument_type": "PayPal",
+        "instrument_sub_type": "PayPal Wallet"
+      },
+      "payer_info": {
+        "account_id": "TESTPAYERID001",
+        "email_address": "donor@example.com",
+        "address_status": "N",
+        "payer_status": "N",
+        "payer_name": {
+          "given_name": "Test",
+          "surname": "Donor",
+          "alternate_full_name": "Test Donor"
+        },
+        "country_code": "US"
+      },
+      "shipping_info": {},
+      "cart_info": {},
+      "store_info": {},
+      "auction_info": {},
+      "incentive_info": {}
+    },
+    {
+      "transaction_info": {
+        "transaction_id": "5PU95094C5021335H",
+        "paypal_reference_id": "25B16188FF732802U",
+        "paypal_reference_id_type": "TXN",
+        "transaction_event_code": "T0113",
+        "transaction_initiation_date": "2025-03-01T15:40:49Z",
+        "transaction_updated_date": "2025-03-01T15:40:49Z",
+        "transaction_amount": {
+          "currency_code": "USD",
+          "value": "-0.88"
+        },
+        "transaction_status": "S",
+        "transaction_subject": "donation to Test Project from donor@example.com",
+        "ending_balance": {
+          "currency_code": "USD",
+          "value": "47.63"
+        },
+        "available_balance": {
+          "currency_code": "USD",
+          "value": "47.63"
+        },
+        "invoice_id": "51339764",
+        "protection_eligibility": "02",
+        "instrument_type": "PayPal",
+        "instrument_sub_type": "PayPal Wallet"
+      },
+      "payer_info": {
+        "address_status": "N",
+        "payer_name": {}
+      },
+      "shipping_info": {},
+      "cart_info": {},
+      "store_info": {},
+      "auction_info": {},
+      "incentive_info": {}
+    },
+    {
+      "transaction_info": {
+        "transaction_id": "45X02981NP708135E",
+        "transaction_event_code": "T0403",
+        "transaction_initiation_date": "2025-03-01T17:14:58Z",
+        "transaction_updated_date": "2025-03-01T17:14:58Z",
+        "transaction_amount": {
+          "currency_code": "USD",
+          "value": "-47.63"
+        },
+        "transaction_status": "S",
+        "ending_balance": {
+          "currency_code": "USD",
+          "value": "0.00"
+        },
+        "available_balance": {
+          "currency_code": "USD",
+          "value": "0.00"
+        },
+        "protection_eligibility": "02",
+        "instrument_type": "PayPal",
+        "instrument_sub_type": "PayPal Wallet"
+      },
+      "payer_info": {
+        "address_status": "N",
+        "payer_name": {}
+      },
+      "shipping_info": {},
+      "cart_info": {},
+      "store_info": {},
+      "auction_info": {},
+      "incentive_info": {}
+    }
+  ],
+  "account_number": "TESTACCTNUM001",
+  "start_date": "2025-03-01T00:00:00Z",
+  "end_date": "2025-03-31T23:59:59Z",
+  "last_refreshed_datetime": "2026-03-18T17:59:59Z",
+  "page": 1,
+  "total_items": 3,
+  "total_pages": 1
+}

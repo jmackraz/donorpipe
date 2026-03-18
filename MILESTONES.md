@@ -72,10 +72,9 @@ This is mostly an operator set of tasks.
 Automated download of export files from donation/payment processors on a schedule or on demand.
 * **Stripe** — **COMPLETE** API-based, straightforward
 * **DonorBox** — **COMPLETE** API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
-* **PayPal** — API is readily available. It looks like 'transaction history' will be fine. I'll capture the schema via
-Postman for this.
+* **PayPal** — **COMPLETE** API-based; see `docs/paypal_downloading.md`
 * **Benevity** — No automated options, other than browser automation
-Status: Stripe and DonorBox complete.  Benevity excluded.
+Status: Stripe, DonorBox, and PayPal complete.  Benevity excluded.
 
 **DonorBox Platform Fees** - empirically determined to be:
 * 1.75% until 4/1/2025

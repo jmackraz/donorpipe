@@ -7,6 +7,8 @@ Environment variables:
     STRIPE_API_KEY      — required to run the Stripe downloader
     DONORBOX_EMAIL      — org login email; required to run the DonorBox downloader
     DONORBOX_API_KEY    — DonorBox API key; required to run the DonorBox downloader
+    PAYPAL_CLIENT_ID    — required to run the PayPal downloader
+    PAYPAL_SECRET_KEY   — PayPal OAuth2 secret; required to run the PayPal downloader
 """
 from __future__ import annotations
 
@@ -35,6 +37,15 @@ def run_donorbox(email: str, api_key: str, output_dir: Path, year: int) -> None:
     with DonorBoxDownloader(email=email, api_key=api_key, output_dir=service_dir) as dl:
         path = dl.download(year=year)
     print(f"[donorbox] wrote {path}")
+
+
+def run_paypal(client_id: str, secret_key: str, output_dir: Path, year: int) -> None:
+    from paypal import PayPalDownloader
+
+    service_dir = find_service_dir(output_dir, "Paypal")
+    with PayPalDownloader(client_id=client_id, secret_key=secret_key, output_dir=service_dir) as dl:
+        path = dl.download(year=year)
+    print(f"[paypal] wrote {path}")
 
 
 def run_stripe(api_key: str, output_dir: Path, year: int) -> None:
@@ -87,6 +98,21 @@ def main() -> None:
     else:
         print(
             "STRIPE_API_KEY not set — skipping Stripe download", file=sys.stderr
+        )
+
+    paypal_id = os.environ.get("PAYPAL_CLIENT_ID")
+    paypal_secret = os.environ.get("PAYPAL_SECRET_KEY")
+    if paypal_id and paypal_secret:
+        run_paypal(
+            client_id=paypal_id,
+            secret_key=paypal_secret,
+            output_dir=args.output_dir,
+            year=args.year,
+        )
+    else:
+        print(
+            "PAYPAL_CLIENT_ID / PAYPAL_SECRET_KEY not set — skipping PayPal download",
+            file=sys.stderr,
         )
 
 
