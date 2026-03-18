@@ -1,7 +1,7 @@
 """Orchestrator: download fresh CSVs from external services before graph build.
 
 Usage:
-    uv run warehouse/downloads/runner.py --output-dir /path/to/data [--year 2026]
+    uv run warehouse/downloads/runner.py --output-dir /path/to/data [--year 2026] [--services donorbox stripe paypal]
 
 Environment variables:
     STRIPE_API_KEY      — required to run the Stripe downloader
@@ -75,45 +75,59 @@ def main() -> None:
         default=datetime.now(tz=UTC).year,
         help="Year to download (default: current year)",
     )
+    parser.add_argument(
+        "--services",
+        nargs="+",
+        metavar="SERVICE",
+        choices=["donorbox", "stripe", "paypal"],
+        default=None,
+        help="Services to download (default: all with credentials set). "
+             "Choices: donorbox stripe paypal",
+    )
     args = parser.parse_args()
 
-    donorbox_email = os.environ.get("DONORBOX_EMAIL")
-    donorbox_key = os.environ.get("DONORBOX_API_KEY")
-    if donorbox_email and donorbox_key:
-        run_donorbox(
-            email=donorbox_email,
-            api_key=donorbox_key,
-            output_dir=args.output_dir,
-            year=args.year,
-        )
-    else:
-        print(
-            "DONORBOX_EMAIL / DONORBOX_API_KEY not set — skipping DonorBox download",
-            file=sys.stderr,
-        )
+    requested = set(args.services) if args.services else {"donorbox", "stripe", "paypal"}
 
-    stripe_key = os.environ.get("STRIPE_API_KEY")
-    if stripe_key:
-        run_stripe(api_key=stripe_key, output_dir=args.output_dir, year=args.year)
-    else:
-        print(
-            "STRIPE_API_KEY not set — skipping Stripe download", file=sys.stderr
-        )
+    if "donorbox" in requested:
+        donorbox_email = os.environ.get("DONORBOX_EMAIL")
+        donorbox_key = os.environ.get("DONORBOX_API_KEY")
+        if donorbox_email and donorbox_key:
+            run_donorbox(
+                email=donorbox_email,
+                api_key=donorbox_key,
+                output_dir=args.output_dir,
+                year=args.year,
+            )
+        else:
+            print(
+                "DONORBOX_EMAIL / DONORBOX_API_KEY not set — skipping DonorBox download",
+                file=sys.stderr,
+            )
 
-    paypal_id = os.environ.get("PAYPAL_CLIENT_ID")
-    paypal_secret = os.environ.get("PAYPAL_SECRET_KEY")
-    if paypal_id and paypal_secret:
-        run_paypal(
-            client_id=paypal_id,
-            secret_key=paypal_secret,
-            output_dir=args.output_dir,
-            year=args.year,
-        )
-    else:
-        print(
-            "PAYPAL_CLIENT_ID / PAYPAL_SECRET_KEY not set — skipping PayPal download",
-            file=sys.stderr,
-        )
+    if "stripe" in requested:
+        stripe_key = os.environ.get("STRIPE_API_KEY")
+        if stripe_key:
+            run_stripe(api_key=stripe_key, output_dir=args.output_dir, year=args.year)
+        else:
+            print(
+                "STRIPE_API_KEY not set — skipping Stripe download", file=sys.stderr
+            )
+
+    if "paypal" in requested:
+        paypal_id = os.environ.get("PAYPAL_CLIENT_ID")
+        paypal_secret = os.environ.get("PAYPAL_SECRET_KEY")
+        if paypal_id and paypal_secret:
+            run_paypal(
+                client_id=paypal_id,
+                secret_key=paypal_secret,
+                output_dir=args.output_dir,
+                year=args.year,
+            )
+        else:
+            print(
+                "PAYPAL_CLIENT_ID / PAYPAL_SECRET_KEY not set — skipping PayPal download",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
