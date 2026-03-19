@@ -1,7 +1,7 @@
 """Orchestrator: download fresh CSVs from external services before graph build.
 
 Usage:
-    uv run warehouse/downloads/runner.py --output-dir /path/to/data [--year 2026] [--services donorbox stripe paypal]
+    uv run warehouse/downloads/runner.py --output-dir /path/to/data [--year 2026] [--services donorbox stripe paypal qbo] [--tokens-dir /path/to/tokens]
 
 Environment variables:
     STRIPE_API_KEY      — required to run the Stripe downloader
@@ -9,6 +9,8 @@ Environment variables:
     DONORBOX_API_KEY    — DonorBox API key; required to run the DonorBox downloader
     PAYPAL_CLIENT_ID    — required to run the PayPal downloader
     PAYPAL_SECRET_KEY   — PayPal OAuth2 secret; required to run the PayPal downloader
+    QBO_CLIENT_ID       — required to run the QBO downloader
+    QBO_CLIENT_SECRET   — QBO OAuth2 client secret; required to run the QBO downloader
 """
 from __future__ import annotations
 
@@ -48,6 +50,23 @@ def run_paypal(client_id: str, secret_key: str, output_dir: Path, year: int) -> 
     print(f"[paypal] wrote {path}")
 
 
+def run_qbo(
+    client_id: str, client_secret: str, tokens_dir: Path, output_dir: Path, year: int
+) -> None:
+    from qbo import QBODownloader
+
+    tokens_path = tokens_dir / "qbo_tokens.json"
+    service_dir = find_service_dir(output_dir, "QBO")
+    with QBODownloader(
+        client_id=client_id,
+        client_secret=client_secret,
+        tokens_path=tokens_path,
+        output_dir=service_dir,
+    ) as dl:
+        path = dl.download(year=year)
+    print(f"[qbo] wrote {path}")
+
+
 def run_stripe(api_key: str, output_dir: Path, year: int) -> None:
     from stripe import StripeDownloader
 
@@ -79,14 +98,21 @@ def main() -> None:
         "--services",
         nargs="+",
         metavar="SERVICE",
-        choices=["donorbox", "stripe", "paypal"],
+        choices=["donorbox", "stripe", "paypal", "qbo"],
         default=None,
         help="Services to download (default: all with credentials set). "
-             "Choices: donorbox stripe paypal",
+             "Choices: donorbox stripe paypal qbo",
+    )
+    parser.add_argument(
+        "--tokens-dir",
+        type=Path,
+        default=None,
+        help="Directory containing OAuth2 token files (e.g. qbo_tokens.json). "
+             "Required when QBO_CLIENT_ID/QBO_CLIENT_SECRET are set.",
     )
     args = parser.parse_args()
 
-    requested = set(args.services) if args.services else {"donorbox", "stripe", "paypal"}
+    requested = set(args.services) if args.services else {"donorbox", "stripe", "paypal", "qbo"}
 
     if "donorbox" in requested:
         donorbox_email = os.environ.get("DONORBOX_EMAIL")
@@ -126,6 +152,29 @@ def main() -> None:
         else:
             print(
                 "PAYPAL_CLIENT_ID / PAYPAL_SECRET_KEY not set — skipping PayPal download",
+                file=sys.stderr,
+            )
+
+    if "qbo" in requested:
+        qbo_id = os.environ.get("QBO_CLIENT_ID")
+        qbo_secret = os.environ.get("QBO_CLIENT_SECRET")
+        if qbo_id and qbo_secret:
+            if args.tokens_dir is None:
+                print(
+                    "Error: --tokens-dir is required when QBO_CLIENT_ID/QBO_CLIENT_SECRET are set",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            run_qbo(
+                client_id=qbo_id,
+                client_secret=qbo_secret,
+                tokens_dir=args.tokens_dir,
+                output_dir=args.output_dir,
+                year=args.year,
+            )
+        else:
+            print(
+                "QBO_CLIENT_ID / QBO_CLIENT_SECRET not set — skipping QBO download",
                 file=sys.stderr,
             )
 

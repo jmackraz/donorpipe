@@ -189,6 +189,34 @@ Fetches CSVs from external services (Stripe, DonorBox, etc.) into the given acco
 
 Note: all services download the same data regardless of account. The account argument determines where files land. Multi-account download support will require per-account download configuration when the time comes.
 
+### QBO token setup (one-time + renewal)
+
+QBO uses OAuth2 with a 100-day refresh token. Initial tokens are obtained from the Intuit
+OAuth2 Playground; if the refresh token expires, this procedure must be repeated.
+
+**Prerequisites:** `QBO_CLIENT_ID` and `QBO_CLIENT_SECRET` set in `.env`, and `tokens_dir`
+set in `warehouse_config.json`.
+
+**Bootstrap procedure:**
+1. Go to [Intuit OAuth2 Playground](https://developer.intuit.com/app/developer/playground)
+2. Select your app, authorize, and copy the `access_token`, `refresh_token`, and `realmId`
+3. Create `<tokens_dir>/qbo_tokens.json`:
+```json
+{
+  "realm_id": "<realmId from Playground>",
+  "access_token": "<access_token from Playground>",
+  "refresh_token": "<refresh_token from Playground>",
+  "token_expiry": "<UTC expiry as ISO 8601, e.g. 2026-03-18T12:00:00+00:00>"
+}
+```
+
+The downloader automatically refreshes the access token (valid 1 hour) using the refresh
+token and writes updated values back to the file. The refresh token itself is valid for
+100 days; the downloader rotates it on every use.
+
+**If a refresh fails** (e.g. the refresh token has expired), the download will fail with
+a clear error message. Repeat the bootstrap procedure to get fresh tokens.
+
 ### Rebuild and sync changed graphs
 
 ```bash

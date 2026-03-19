@@ -104,6 +104,25 @@ Config is read from `config.json` by default. Override with `DONORPIPE_CONFIG=/p
 |---|---|---|---|
 | `VITE_API_BASE_URL` | No | `""` (same origin) | Base URL for API requests. Leave unset when the frontend is served by the same server. Set to e.g. `http://localhost:8000` for local frontend-only dev against a separate API process. |
 
+### Warehouse Downloaders (`warehouse/downloads/`)
+
+These variables enable the automated download services. Set in `.env`. Services without
+credentials are skipped silently. `tokens_dir` in `warehouse_config.json` must also be set
+for QBO.
+
+| Variable | Required for | Description |
+|---|---|---|
+| `STRIPE_API_KEY` | Stripe | Stripe secret API key |
+| `DONORBOX_EMAIL` | DonorBox | Org login email |
+| `DONORBOX_API_KEY` | DonorBox | DonorBox API key |
+| `PAYPAL_CLIENT_ID` | PayPal | PayPal app client ID |
+| `PAYPAL_SECRET_KEY` | PayPal | PayPal OAuth2 client secret |
+| `QBO_CLIENT_ID` | QBO | Intuit app client ID |
+| `QBO_CLIENT_SECRET` | QBO | Intuit app client secret |
+
+QBO also requires `tokens_dir` set in `warehouse_config.json` pointing to a directory
+containing `qbo_tokens.json` (see `docs/OPERATIONS.md` for bootstrap procedure).
+
 ### Scripts (`scripts/*.sh`)
 
 These variables control which host the deployment/ops scripts target. All have sensible defaults.

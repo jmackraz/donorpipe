@@ -1,0 +1,79 @@
+{
+  "QueryResponse": {
+    "SalesReceipt": [
+      {
+        "Id": "100",
+        "DocNumber": "5001",
+        "TxnDate": "2025-06-01",
+        "MetaData": {
+          "CreateTime": "2025-06-01T10:00:00-07:00",
+          "LastUpdatedTime": "2025-06-01T10:00:00-07:00"
+        },
+        "CustomerRef": {"value": "1", "name": "Alice Donor"},
+        "PaymentRefNum": "REF001",
+        "TotalAmt": 250.00,
+        "Line": [
+          {
+            "Id": "1",
+            "Amount": 250.00,
+            "DetailType": "SalesItemLineDetail",
+            "SalesItemLineDetail": {
+              "ItemRef": {"value": "6", "name": "Annual Fund"},
+              "ClassRef": {"value": "1", "name": "30-Program:Kenya:Women's Work Center"},
+              "UnitPrice": 250.00,
+              "Qty": 1
+            }
+          },
+          {
+            "Amount": 250.00,
+            "DetailType": "SubTotalLineDetail",
+            "SubTotalLineDetail": {}
+          }
+        ]
+      },
+      {
+        "Id": "101",
+        "DocNumber": "5002",
+        "TxnDate": "2025-03-15",
+        "MetaData": {
+          "CreateTime": "2025-03-15T14:30:00-07:00",
+          "LastUpdatedTime": "2025-03-15T14:30:00-07:00"
+        },
+        "CustomerRef": {"value": "2", "name": "Bob Donor"},
+        "PaymentRefNum": "REF002",
+        "TotalAmt": 175.00,
+        "Line": [
+          {
+            "Id": "1",
+            "Amount": 100.00,
+            "DetailType": "SalesItemLineDetail",
+            "SalesItemLineDetail": {
+              "ItemRef": {"value": "7", "name": "Clean Water Project"},
+              "ClassRef": {"value": "2", "name": "30-Program:Kenya:Clean Water"},
+              "UnitPrice": 100.00,
+              "Qty": 1
+            }
+          },
+          {
+            "Id": "2",
+            "Amount": 75.00,
+            "DetailType": "SalesItemLineDetail",
+            "SalesItemLineDetail": {
+              "ItemRef": {"value": "8", "name": "General Operations"},
+              "UnitPrice": 75.00,
+              "Qty": 1
+            }
+          },
+          {
+            "Amount": 175.00,
+            "DetailType": "SubTotalLineDetail",
+            "SubTotalLineDetail": {}
+          }
+        ]
+      }
+    ],
+    "startPosition": 1,
+    "maxResults": 2
+  },
+  "time": "2026-03-18T12:00:00.000-07:00"
+}

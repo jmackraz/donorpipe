@@ -73,8 +73,9 @@ data_base = os.path.expanduser(all_accounts[account_id]["data_base"])
 print(f"[{account_id}] → {data_base}")
 
 runner = os.path.join(root, "warehouse", "downloads", "runner.py")
-subprocess.run(
-    ["uv", "run", runner, "--output-dir", data_base, "--year", year],
-    env=os.environ.copy(), check=True, cwd=root,
-)
+cmd = ["uv", "run", runner, "--output-dir", data_base, "--year", year]
+tokens_dir = config.get("tokens_dir")
+if tokens_dir:
+    cmd += ["--tokens-dir", os.path.expanduser(tokens_dir)]
+subprocess.run(cmd, env=os.environ.copy(), check=True, cwd=root)
 PYEOF
