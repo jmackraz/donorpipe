@@ -1,5 +1,27 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 20 / 20b — Triggered Refresh (Bookkeeper UI + Warehouse Polling)
+
+**Goal**: Let any authenticated user request a data refresh from within the app and see
+when it has completed, without needing access to the warehouse server.
+
+**What was built**:
+- `POST /accounts/{id}/refresh` — writes `refresh_state.json` with `requested_at` timestamp
+- `GET /accounts/{id}/refresh` — returns `{pending, requested_at, last_updated}`; `pending`
+  derived by comparing timestamps (no explicit confirm step)
+- `warehouse/poll_refresh.sh` — long-running service polls the API every 30s; triggers
+  `update.sh ondemand` when pending, then warehouse delivers new graph and timestamps resolve it
+- `warehouse/systemd/donorpipe-ondemand.service` — systemd unit for the poller
+- Frontend `↻` button in StatsBar; "Refreshing…" pending state; clears on reload
+- `useRefresh.ts` hook; pending state held in React (no additional server polling)
+- `docker-compose.yml` data volume changed from `:ro` to `:rw` (API needs to write state file)
+- Service account (`warehouse` user) added to configs for poller authentication
+- systemd `PATH` fix: `~/.local/bin` added so `uv` is found by service units
+
+Status: COMPLETE.
+
+---
+
 ## Milestone 19b - Automated Downloads
 
 Automated download of export files from donation/payment processors on a schedule or on demand.
