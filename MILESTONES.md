@@ -46,11 +46,13 @@ This is mostly an operator set of tasks.
 6. Test dev.
 
 **Staging**
-1. Fresh deployment of staging, clean out data directory
-2. Deploy graph manually
-3. Use refresh.sh to deploy graph, test update detection
-4. Test staging **NEXT TO DO**
-5. Automate updates to staging (mac job scheduling different than staging & prod?)
+* Fresh deployment of staging, clean out data directory
+* Deploy graph manually
+* Use refresh.sh to deploy graph, test update detection
+* Test staging **NEXT TO DO**
+* Automate updates to staging (mac job scheduling different than staging & prod?)
+    * demand refresh: qbo download and rclone sync for benevity
+    * scheduled refresh: all downloads and rclone sync
 
 **Production**
 1. Repeat staging steps
@@ -96,6 +98,14 @@ confirm completion. The app returns to green.
    the app derives freshness from timestamps alone.
 5. **Warehouse polling service**: long-running service unit polls `GET /admin/refresh-status`
    every 30–60 seconds; triggers full refresh when `pending` is true.
+
+**Note**:
+The refresh that will be done in the warehouse when new data is requested will be:
+1. Fresh download from QBO
+2. Fresh rclone sync from gdrive Benevities
+3. No fresh download of other services (donorbox, stripe, paypal)
+
+We may want to be able to request a "full refresh" sometime, but it's not a high-priority.
 
 Status: Not started.
 
