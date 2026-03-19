@@ -45,12 +45,11 @@ This app presents the information from those CSV reports in a way that's ready t
 Donations are flagged as "missing" if they do not have a matching receipt in QBO.
 
 1. Switch to the **Donations** tab.
-2. Enable the "Missing" filter.
-3. Select each donation in turn and use the information in the detail panel to enter it into QBO.
+2. Enable the "Missing" filter, to see only donations that are missing a receipt. (But first, see Note below.)
+3. Select each donation in turn and use the information in the detail panel to create a Sales Receipt QBO.
 
 **Note:** It is a good practice to first fix any receipts that are missing their donation link (see below). 
-If that link is not made, it is easy to create a duplicate receipt.
-
+If that link is not made, it is easy to accidentally create a duplicate receipt for a donation.
 ---
 
 ## Viewing and Fixing Errors in Receipts
