@@ -16,6 +16,8 @@ function formatUpdated(isoString: string): { label: string; stale: boolean } {
 
 interface Props {
   store: TransactionStore
+  newDataAvailable?: boolean
+  onReload?: () => void
 }
 
 interface ServiceStats {
@@ -24,7 +26,7 @@ interface ServiceStats {
   newest: string
 }
 
-export default function StatsBar({ store }: Props) {
+export default function StatsBar({ store, newDataAvailable, onReload }: Props) {
   const [open, setOpen] = useState(false)
 
   const stats = useMemo(() => {
@@ -66,11 +68,20 @@ export default function StatsBar({ store }: Props) {
           {totals.donations} donations · {totals.payouts} payouts ·{" "}
           {totals.receipts} receipts
         </span>
-        {updated && (
+        {newDataAvailable ? (
+          <span
+            className="ml-auto text-amber-600 hover:text-amber-800 cursor-pointer underline"
+            onClick={(e) => { e.stopPropagation(); onReload?.() }}
+            role="button"
+            tabIndex={0}
+          >
+            New data — Reload ↺
+          </span>
+        ) : updated ? (
           <span className={`ml-auto ${updated.stale ? "text-amber-600" : "text-gray-400"}`}>
             Updated {updated.label}
           </span>
-        )}
+        ) : null}
       </button>
 
       {open && (

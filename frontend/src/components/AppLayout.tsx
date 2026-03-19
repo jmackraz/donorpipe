@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useState, useCallback } from "react"
 import { useSearchParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { useGraph } from "../hooks/useGraph"
+import { useGraph, useGraphMeta } from "../hooks/useGraph"
 import { useFilters } from "../hooks/useFilters"
 import type { EntityType } from "../hooks/useFilters"
 import { filterDonations, filterCharges, filterPayouts, filterReceipts } from "../lib/filters"
@@ -45,6 +45,7 @@ export default function AppLayout() {
   }, [accounts]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: store, isLoading, error, refetch } = useGraph(account)
+  const { newDataAvailable } = useGraphMeta(account, store?.meta?.generated_at)
   const { filters, setFilter, clearFilters } = useFilters()
 
   // Tab keyboard shortcuts 1–4 and "/" to focus filter text
@@ -198,7 +199,7 @@ export default function AppLayout() {
       </header>
 
       {/* Stats bar */}
-      {store && <StatsBar store={store} />}
+      {store && <StatsBar store={store} newDataAvailable={newDataAvailable} onReload={refetch} />}
 
       {/* Error */}
       {error && <ErrorBanner error={error as Error} onRetry={() => refetch()} />}

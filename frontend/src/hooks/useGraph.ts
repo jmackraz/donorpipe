@@ -36,3 +36,33 @@ export function useGraph(accountId: string) {
     retry: 1,
   })
 }
+
+export function useGraphMeta(accountId: string, loadedGeneratedAt?: string) {
+  const { getToken, logout } = useAuth()
+  const query = useQuery({
+    queryKey: ["graph-meta", accountId],
+    queryFn: async () => {
+      const token = getToken()!
+      const res = await fetch(`${API_BASE}/accounts/${accountId}/graph`, {
+        method: "HEAD",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.status === 401) { logout(); return null }
+      return res.headers.get("Last-Modified")
+    },
+    enabled: !!accountId && !!loadedGeneratedAt,
+    staleTime: 0,
+    refetchInterval: (query) => {
+      const serverLastModified = query.state.data
+      if (loadedGeneratedAt && serverLastModified && new Date(serverLastModified) > new Date(loadedGeneratedAt)) {
+        return false  // new data already detected — stop polling until user reloads
+      }
+      return 10_000
+    },
+  })
+  const newDataAvailable =
+    !!loadedGeneratedAt &&
+    !!query.data &&
+    new Date(query.data) > new Date(loadedGeneratedAt)
+  return { newDataAvailable }
+}
