@@ -1,0 +1,14 @@
+[Unit]
+Description=DonorPipe nightly data update
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<pi-user>
+WorkingDirectory=/home/<pi-user>/donorpipe_warehouse/donorpipe
+EnvironmentFile=/home/<pi-user>/donorpipe_warehouse/donorpipe/.env
+ExecStart=/home/<pi-user>/donorpipe_warehouse/donorpipe/warehouse/update.sh \
+  --config warehouse/warehouse_pi_config.json nightly
+StandardOutput=journal
+StandardError=journal

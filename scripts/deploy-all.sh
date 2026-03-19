@@ -20,3 +20,6 @@ echo "==> Pushing help..."
 
 echo "==> Syncing data..."
 "$PROJECT_DIR/warehouse/sync-graphs.sh" oliveseed test_org
+
+echo "==> Updating warehouse code on Pi..."
+"$SCRIPT_DIR/update-warehouse-pi.sh"

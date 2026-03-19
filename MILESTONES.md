@@ -57,7 +57,11 @@ This is mostly an operator set of tasks.
 
 **Production**
 1. Repeat staging steps: clean out data dir, deploy all, test.
-2. Add Clone**
+
+##### Milestone 19a.b - Set up warehouse operations
+This is mostly a developer set of tasks.
+
+**Add Rclone**
 1. Get it set up
 2. Clone new stuff from gdrive (not stripe, donorbox) to primary
 3. Update stripe, donorbox in gdrive from primary
@@ -66,7 +70,7 @@ This is mostly an operator set of tasks.
 1. Deploy code to Pi
 2. Copy primary to pi
 3. Set up rclone
-4. Set up automation
+4. Set up automation with systemd
 
 ### Milestone 20 - Update from manual downloads
 

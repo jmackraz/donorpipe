@@ -13,7 +13,7 @@ This document covers running, deploying, and managing DonorPipe across environme
 `warehouse/update.sh` combines download + rebuild + sync in one command:
 
 ```bash
-warehouse/update.sh nightly    # Download all services, rebuild, sync to staging
+warehouse/update.sh nightly    # Download all services, rebuild, sync to staging + prod
 warehouse/update.sh ondemand   # Download QBO only (for bookkeeper changes), rebuild, sync
 ```
 
@@ -149,14 +149,16 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 
 | Script | Purpose | Key args / env vars |
 |--------|---------|---------------------|
-| `warehouse/update.sh` | Hardwired download + rebuild + sync for oliveseed | `nightly` or `ondemand` (required) |
+| `warehouse/update.sh` | Hardwired download + rebuild + sync for oliveseed | `[--config <path>]`, `nightly` or `ondemand` (required) |
 | `warehouse/download.sh` | Download CSVs from services (Stripe, DonorBox, PayPal, QBO) | `<account>` (required), `--year`, `--config`; `--services <svc> ...` must follow account |
 | `warehouse/refresh.sh` | Detect changes → rebuild graphs → sync to server | `[accounts]`, `--sync-only`, `PROD=1` |
 | `warehouse/sync-graphs.sh` | Sync pre-built graph.json files to server | `<account> [account ...]`, `PROD=1` |
 | `warehouse/sanitize.sh` | Regenerate sanitized test data | reads `sanitize[]` from `warehouse_config.json` |
 | `scripts/build_graphs.sh` | Build graph.json from CSVs | `--config <path>`, `[account_id ...]` |
 | `scripts/deploy.sh` | Build Docker images and deploy to host | `PROD=1`, `DPIPE_HOST`, `DPIPE_USER`, `DPIPE_DIR` |
-| `scripts/deploy-all.sh` | Full deploy: images + config + help + graphs | `PROD=1` |
+| `scripts/deploy-all.sh` | Full deploy: images + config + help + graphs + warehouse update | `PROD=1` |
+| `scripts/update-warehouse-pi.sh` | Update warehouse code on Pi (git pull + uv sync) | `DPIPE_HOST`, `WAREHOUSE_DIR` |
+| `scripts/provision-pi-warehouse.sh` | Install systemd timer units on Pi (one-time) | `DPIPE_HOST`, `PI_USER` |
 | `scripts/push-config.sh` | Copy config to host and restart api | `PROD=1`, `DPIPE_HOST`, `DPIPE_DIR` |
 | `scripts/push-help.sh` | Copy docs/help.md to host | `PROD=1`, `DPIPE_HOST`, `DPIPE_DIR` |
 | `scripts/logs.sh` | View container logs | `[service]`, `PROD=1` |
@@ -172,6 +174,13 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 | `scripts/fetch_graph.py` | Fetch graph summary from running API | `--account`, `--json`, `--base-url` |
 | `scripts/generate_graph_json.py` | Build graph.json for one account | called by `build_graphs.sh` |
 
+### Config files
+
+| File | Used by | Notes |
+|------|---------|-------|
+| `warehouse/warehouse_config.json` | Dev machine | Full config including `users` and dev-machine paths |
+| `warehouse/warehouse_pi_config.json` | Pi warehouse | Pi-local paths, no `users` (auth is the API's concern) |
+
 ### warehouse_config.json keys
 
 | Key | Purpose |
@@ -184,19 +193,97 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 
 ---
 
+## Pi Warehouse
+
+The Pi runs both the Docker API/nginx and an autonomous warehouse that downloads fresh data
+nightly, rebuilds graphs locally, and pushes them to the Docker data dir (staging) and to
+Lightsail prod.
+
+### Directory layout on Pi
+
+```
+~/donorpipe/                               ← Docker runtime (managed by deploy.sh)
+  data/oliveseed/graph.json                ← updated here by loopback rsync
+
+~/donorpipe_warehouse/
+  donorpipe/                               ← git clone; warehouse scripts run here
+  primary_repository/oliveseed/            ← CSV data + graph.json (built by warehouse)
+  download_tokens/                         ← qbo_tokens.json
+  logs/
+```
+
+### Update warehouse code
+
+After a deploy that changes warehouse scripts or Python dependencies:
+
+```bash
+./scripts/update-warehouse-pi.sh           # git pull + uv sync on Pi
+```
+
+`deploy-all.sh` runs this automatically.
+
+### Run warehouse manually (on Pi)
+
+```bash
+ssh punkinpi.local
+cd ~/donorpipe_warehouse/donorpipe
+warehouse/update.sh --config warehouse/warehouse_pi_config.json nightly
+```
+
+### Systemd timer
+
+The nightly timer runs `update.sh nightly` at 03:00 (±5 min) each day.
+
+```bash
+systemctl list-timers donorpipe-nightly.timer     # Check next run
+journalctl -u donorpipe-nightly.service -f        # Follow logs
+journalctl -u donorpipe-nightly.service -n 100    # Last 100 lines
+```
+
+---
+
 ## First-Time / One-Time Setup
 
 ### Staging Pi setup
 
+**Docker runtime** (required before `deploy.sh`):
+
 ```bash
 # On the Pi:
 mkdir -p ~/donorpipe/data
-# Copy staging_config.json to ~/donorpipe/config.json (set data_base to "/data")
+# Copy staging_config.json to ~/donorpipe/config.json
 # Create ~/donorpipe/.env with:
 #   DONORPIPE_JWT_SECRET=<generate: python3 -c "import secrets; print(secrets.token_hex(32))">
 ```
 
 Then run `./scripts/deploy.sh` from your dev machine to ship the images.
+
+**Warehouse** (one-time, after Docker is running):
+
+```bash
+# On the Pi:
+mkdir -p ~/donorpipe_warehouse/{primary_repository/oliveseed,download_tokens,logs}
+cd ~/donorpipe_warehouse
+git clone <repo-url> donorpipe
+cd donorpipe
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+
+# Copy .env with all API keys (STRIPE_API_KEY, DONORBOX_*, PAYPAL_*, QBO_*):
+# scp .env punkinpi.local:~/donorpipe_warehouse/donorpipe/.env
+
+# Copy QBO tokens:
+# scp <tokens-dir>/qbo_tokens.json punkinpi.local:~/donorpipe_warehouse/download_tokens/
+
+# Seed initial CSV data (operator step — live data):
+# rsync -av <local-data>/ punkinpi.local:~/donorpipe_warehouse/primary_repository/
+
+# Ensure Pi can SSH to itself (needed for loopback rsync to ~/donorpipe/data):
+ssh-keyscan punkinpi.local >> ~/.ssh/known_hosts
+
+# From dev machine, install and enable the systemd timer:
+./scripts/provision-pi-warehouse.sh
+```
 
 ### Production Lightsail provisioning
 

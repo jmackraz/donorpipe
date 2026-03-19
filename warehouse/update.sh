@@ -10,12 +10,14 @@
 # Google Drive before the rebuild.
 #
 # Sync targets:
-#   Staging only: warehouse/refresh.sh  (active)
-#   Staging + prod: chained with && PROD=1 --sync-only  (commented out below;
-#     comment out the staging-only line when prod is active)
+#   After a successful rebuild this script syncs to staging, then to prod
+#   if the staging sync succeeded (gated by the exit code from refresh.sh).
 #
 # Usage:
-#   ./warehouse/update.sh nightly|ondemand
+#   ./warehouse/update.sh [--config <config.json>] nightly|ondemand
+#
+# On the Pi, pass the Pi config:
+#   ./warehouse/update.sh --config warehouse/warehouse_pi_config.json nightly
 
 set -euo pipefail
 
@@ -23,8 +25,24 @@ SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPTS/.." && pwd)"
 CONFIG="$SCRIPTS/warehouse_config.json"
 ACCOUNT="oliveseed"
+MODE=""
 
-MODE="${1:-}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --config) CONFIG="$2"; shift 2 ;;
+    nightly|ondemand) MODE="$1"; shift ;;
+    *) echo "Usage: $0 [--config <config>] nightly|ondemand" >&2; exit 1 ;;
+  esac
+done
+
+if [[ -z "$MODE" ]]; then
+  echo "Usage: $0 [--config <config>] nightly|ondemand" >&2
+  exit 1
+fi
+
+if [[ "$CONFIG" != /* ]]; then
+  CONFIG="$(pwd)/$CONFIG"
+fi
 
 case "$MODE" in
   nightly)
@@ -46,15 +64,8 @@ case "$MODE" in
 
     "$SCRIPTS/download.sh" --config "$CONFIG" "$ACCOUNT" --services qbo
     ;;
-
-  *)
-    echo "Usage: $0 nightly|ondemand" >&2
-    exit 1
-    ;;
 esac
 
-# Rebuild changed graphs and sync to staging only.
-"$ROOT/warehouse/refresh.sh" --config "$CONFIG" "$ACCOUNT"
-
-# When prod is active, replace the line above with this to sync both:
-# "$ROOT/warehouse/refresh.sh" --config "$CONFIG" "$ACCOUNT" && PROD=1 "$ROOT/warehouse/refresh.sh" --sync-only --config "$CONFIG" "$ACCOUNT"
+# Rebuild changed graphs, sync to staging, then sync to prod if staging succeeded.
+"$ROOT/warehouse/refresh.sh" --config "$CONFIG" "$ACCOUNT" && \
+  PROD=1 "$ROOT/warehouse/refresh.sh" --sync-only --config "$CONFIG" "$ACCOUNT"
