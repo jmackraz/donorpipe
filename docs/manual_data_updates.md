@@ -5,7 +5,7 @@ the user will want to see updated quickly in the app.
 ## General Operations
 * We collect CSV files in an offline data warehouse
 * From the files that warehouse, we create a data graph json file
-* From the warehouse, we use warehouse/sync-data.sh to push the graph out to the staging or production servers.
+* From the warehouse, we push the generated graph to staging or production servers.
 
 ## Updates
 * We can update the csv files from Stripe and DonorBox automatically on a schedule, and then update the graph and sync.
