@@ -21,6 +21,21 @@ function copyToClipboard(text: string) {
   navigator.clipboard.writeText(text).catch(() => {})
 }
 
+function CopyButton({ text }: { text: string }) {
+  return (
+    <button
+      onClick={() => copyToClipboard(text)}
+      className="ml-1 text-gray-300 hover:text-gray-600 flex-shrink-0"
+      title={`Copy`}
+    >
+      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+    </button>
+  )
+}
+
 function toFlatJson(type: EntityType, entity: AnyEntity): Record<string, unknown> {
   const base = {
     id: entity.id,
@@ -75,36 +90,42 @@ function DonationDetail({ d, onSelectEntity }: { d: Donation; onSelectEntity?: O
           Provenance
         </h3>
         <dl className="text-sm space-y-0.5">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <dt className="text-gray-500 w-28 shrink-0">Service</dt>
             <dd className="font-mono">{d.service}</dd>
+            <CopyButton text={d.service} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <dt className="text-gray-500 w-28 shrink-0">TX ID</dt>
             <dd className="font-mono">{d.tx_id}</dd>
+            <CopyButton text={d.tx_id} />
           </div>
           {d.payment_service && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <dt className="text-gray-500 w-28 shrink-0">Payment</dt>
               <dd className="font-mono">{d.payment_service}</dd>
+              <CopyButton text={d.payment_service} />
             </div>
           )}
           {d.email && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <dt className="text-gray-500 w-28 shrink-0">Email</dt>
               <dd>{d.email}</dd>
+              <CopyButton text={d.email} />
             </div>
           )}
           {d.designation && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <dt className="text-gray-500 w-28 shrink-0">Designation</dt>
               <dd>{d.designation}</dd>
+              <CopyButton text={d.designation} />
             </div>
           )}
           {d.comment && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <dt className="text-gray-500 w-28 shrink-0">Comment</dt>
               <dd>{d.comment}</dd>
+              <CopyButton text={d.comment} />
             </div>
           )}
         </dl>
@@ -246,6 +267,7 @@ export default function DetailPanel({ type, entity, onClose, donations }: Props)
 
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey) return
       if (e.key === "Escape") {
         if (poppedEntity !== null) setPoppedEntity(null)
         else if (guessedDonation !== null) setGuessedDonation(null)
@@ -361,23 +383,26 @@ export default function DetailPanel({ type, entity, onClose, donations }: Props)
                   Donation (suggested)
                 </span>
                 <span className="text-xs text-gray-500">{d.date}</span>
+                <CopyButton text={d.date} />
               </div>
               {d.name && (
-                <div className="text-base font-medium text-gray-800 truncate">{d.name}</div>
+                <div className="flex items-center gap-1 min-w-0">
+                  <div className="text-base font-medium text-gray-800 truncate">{d.name}</div>
+                  <CopyButton text={d.name} />
+                </div>
               )}
-              <div className="text-lg font-semibold text-gray-900">
-                {fmtAmt(d.net, d.currency)}
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-semibold text-gray-900">
+                  {fmtAmt(d.net, d.currency)}
+                </span>
+                <CopyButton text={fmtAmt(d.net, d.currency)} />
               </div>
-              <div className="font-mono text-xs text-gray-400 truncate mt-0.5">{d.id}</div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="font-mono text-xs text-gray-400 truncate">{d.id}</span>
+                <CopyButton text={d.id} />
+              </div>
             </div>
             <div className="flex items-center gap-2 ml-2 shrink-0">
-              <button
-                onClick={() => copyToClipboard(d.tx_id)}
-                className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded px-2 py-1"
-                title="Copy transaction ID to paste into QBO"
-              >
-                Copy TX ID
-              </button>
               <button
                 onClick={onClose}
                 aria-label="Close detail panel"
@@ -445,26 +470,38 @@ export default function DetailPanel({ type, entity, onClose, donations }: Props)
               {TYPE_LABELS[type]}
             </span>
             <span className="text-xs text-gray-500">{entity.date}</span>
+            {type === "donations" && <CopyButton text={entity.date} />}
           </div>
           {(type === "donations" || type === "receipts") &&
             (entity as Donation | Receipt).name && (
-              <div className="text-base font-medium text-gray-800 truncate">
-                {(entity as Donation | Receipt).name}
+              <div className="flex items-center gap-1 min-w-0">
+                <div className="text-base font-medium text-gray-800 truncate">
+                  {(entity as Donation | Receipt).name}
+                </div>
+                {type === "donations" && <CopyButton text={(entity as Donation).name!} />}
               </div>
             )}
-          <div className="text-lg font-semibold text-gray-900">
-            {fmtAmt(entity.net, entity.currency)}
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-semibold text-gray-900">
+              {fmtAmt(entity.net, entity.currency)}
+            </span>
+            {type === "donations" && <CopyButton text={fmtAmt(entity.net, entity.currency)} />}
           </div>
-          <div className="font-mono text-xs text-gray-400 truncate mt-0.5">{entity.id}</div>
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="font-mono text-xs text-gray-400 truncate">{entity.id}</span>
+            {type === "donations" && <CopyButton text={entity.id} />}
+          </div>
         </div>
         <div className="flex items-center gap-2 ml-2 shrink-0">
-          <button
-            onClick={() => copyToClipboard(entity.id)}
-            className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded px-2 py-1"
-            title="Copy ID"
-          >
-            Copy ID
-          </button>
+          {type !== "donations" && (
+            <button
+              onClick={() => copyToClipboard(entity.id)}
+              className="text-xs text-gray-500 hover:text-gray-900 border border-gray-200 rounded px-2 py-1"
+              title="Copy ID"
+            >
+              Copy ID
+            </button>
+          )}
           <button
             onClick={onClose}
             aria-label="Close detail panel"

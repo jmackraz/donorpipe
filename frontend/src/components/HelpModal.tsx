@@ -18,6 +18,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      if (e.metaKey || e.ctrlKey) return
       if (e.key === "Escape") onClose()
     }
     window.addEventListener("keydown", handleKey)

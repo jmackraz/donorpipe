@@ -71,7 +71,7 @@ export function useFilters() {
     setParams(
       (prev) => {
         const next = new URLSearchParams()
-        for (const key of ["account", "type"] as const) {
+        for (const key of ["account", "type", "selected"] as const) {
           const v = prev.get(key)
           if (v) next.set(key, v)
         }

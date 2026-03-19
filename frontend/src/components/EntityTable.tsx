@@ -121,6 +121,7 @@ export default function EntityTable({ type, entities, selectedId, onSelect }: Pr
     function handleKey(e: KeyboardEvent) {
       const target = e.target as Element
       if (target.tagName === "INPUT" || target.tagName === "SELECT") return
+      if (e.metaKey || e.ctrlKey) return
 
       if (e.key === "ArrowDown") {
         e.preventDefault()

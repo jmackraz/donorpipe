@@ -53,6 +53,7 @@ export default function AppLayout() {
     function handleKey(e: KeyboardEvent) {
       const target = e.target as Element
       if (target.tagName === "INPUT" || target.tagName === "SELECT") return
+      if (e.metaKey || e.ctrlKey) return
       if (/^[1-3]$/.test(e.key)) {
         const t = types[parseInt(e.key) - 1]
         if (t) setFilter("type", t)
