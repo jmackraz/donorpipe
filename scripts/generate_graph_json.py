@@ -54,10 +54,11 @@ def main() -> None:
     tx_store = loader.load()
 
     graph = tx_store.to_graph()
-    graph["_meta"] = {
+    meta = {
         "generated_at": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(),
         "files": [_file_entry(f) for f in loader.files],
     }
+    graph = {"_meta": meta, **graph}
 
     output_path = os.path.abspath(args.output if args.output is not None else DEFAULT_OUTPUT_PATH)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
