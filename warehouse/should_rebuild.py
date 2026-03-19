@@ -95,8 +95,6 @@ def main() -> None:
                   f"(mtime changed) → rebuild needed")
             sys.exit(REBUILD_NEEDED)
 
-        print(f"[should_rebuild] unchanged: {os.path.basename(path)}")
-
     # ── Check for new CSV files not in the manifest ───────────────────────────
     if args.dirs:
         current_csvs = find_csvs(args.dirs)
