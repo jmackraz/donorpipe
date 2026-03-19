@@ -45,6 +45,37 @@ fresh data automatically, with a clear indication of when data was last updated.
    displays a "Last updated: [timestamp]" indicator. Shows a visual stale warning if
    data is older than a threshold.
 
+## Milestone 19a.a - Set up repository operations
+
+Bootstrapped the primary warehouse repository and validated the full pipeline:
+1. Set up primary repository directory and config file
+2. Initialized Stripe and DonorBox by downloading years since 2023
+3. Initialized other sources with copies of manual downloads
+4. Sanitized data to create test org
+5. Built graph for 'oliveseed'
+6. Tested dev
+
+Staging steps also complete:
+- Fresh deployment of staging, clean data directory
+- Graph deployed manually and via `refresh.sh`
+- Update detection tested on staging
+
+Status: COMPLETE.
+
+---
+
+## Milestone 19a.b - Set up warehouse operations
+
+Moved warehouse to Pi:
+1. Deployed code to Pi
+2. Copied primary warehouse to Pi
+3. Set up rclone
+4. Set up automation with systemd
+
+Status: COMPLETE.
+
+---
+
 ## Milestone 19a - Pre-built graph serving
 
 `build_graphs.sh` writes `graph.json` per account from local CSVs; `graph_route.py` serves the pre-built file directly (503 if not present — no CSV fallback in the API). Decouples data processing from request handling; no CSV files needed on the server.

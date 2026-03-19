@@ -33,44 +33,15 @@ We may want to work on a feature branch for this.
 
 #### Sub-milestones
 
-##### Milestone 19a.a - Set up repository operations
-This is mostly an operator set of tasks.
-
-**Repository** COMPLETE
-1. Set up primary repository directory
-2. Create a config file for it
-3. Initialize Stripe and DonorBox by downloading years since 2023
-4. Initialize other with copies of manual downloads
-6. Sanitize to create test_org/
-5. Build graph for 'oliveseed'
-6. Test dev.
-
-**Staging**
-* Fresh deployment of staging, clean out data directory
-* Deploy graph manually
-* Use refresh.sh to deploy graph, test update detection
-* Test staging **NEXT TO DO**
-* Write nightly and on-demand refresh scripts
-    * demand refresh: qbo download and rclone sync for benevity, then refresh
-    * nightly refresh: all downloads and rclone sync, then refresh
-* Automate nightly to staging (mac job scheduling different than staging & prod?)
-
-**Production**
-1. Repeat staging steps: clean out data dir, deploy all, test.
-
-##### Milestone 19a.b - Set up warehouse operations
+##### Milestone 19a.c - Sync Benefity reports from google drive
 This is mostly a developer set of tasks.
 
 **Add Rclone**
 1. Get it set up
 2. Clone new stuff from gdrive (not stripe, donorbox) to primary
 3. Update stripe, donorbox in gdrive from primary
+4. Add this step to update script
 
-**Move Warehouse to Pi**
-1. Deploy code to Pi
-2. Copy primary to pi
-3. Set up rclone
-4. Set up automation with systemd
 
 ### Milestone 20 - Update from manual downloads
 
@@ -102,31 +73,16 @@ confirm completion. The app returns to green.
    every 30–60 seconds; triggers full refresh when `pending` is true.
 
 **Note**:
-The refresh that will be done in the warehouse when new data is requested will be:
-1. Fresh download from QBO
-2. Fresh rclone sync from gdrive Benevities
-3. No fresh download of other services (donorbox, stripe, paypal)
+The refresh that will be done in the warehouse when new data is requested will be: "update.sh ondemand"
 
-We may want to be able to request a "full refresh" sometime, but it's not a high-priority.
+We may want the user to be able to request a "full refresh" ('nightly') sometime, but it's not a high priority.
 
 Status: Not started.
 
 
 ## Backlog
-**Production Checklist:**
-* Logging, alarms
-
-**Architecture:**
-* Merge in trickybit.csvstore (not anytime soon)
-
 
 **UI:**
 * Add notice about proprietary data
-* Keyboard shortcuts — navigation, focus and selection (M14 phase 3)
-* Keyboard shortcuts — complete filter shortcut set requiring FilterBar focus (M14 phase 3)
-* tune keyboard shortcuts, document
 * add "transaction id" filter, works with "copy ID" for emailing, etc.
 * "What's New" message pops up if unseen, can reach through help or something
-
-**Demo:**
-* Realistic fake data (BIG. DONE!)
