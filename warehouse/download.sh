@@ -10,7 +10,11 @@
 # will be needed.
 #
 # Usage:
-#   ./warehouse/download.sh [--config <config.json>] [--year <year>] [--services <svc> ...] <account_id>
+#   ./warehouse/download.sh [--config <config.json>] [--year <year>] <account_id> [--services <svc> ...]
+#
+# NOTE: --services must come after <account_id>. The --services parser consumes
+# all following words until the next --flag, so placing it before a bare account
+# name will swallow the account as a service name.
 set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,7 +48,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$ACCOUNT" ]]; then
-  echo "Usage: ./warehouse/download.sh [--config <config>] [--year <year>] [--services <svc> ...] <account_id>" >&2
+  echo "Usage: ./warehouse/download.sh [--config <config>] [--year <year>] <account_id> [--services <svc> ...]" >&2
   exit 1
 fi
 
