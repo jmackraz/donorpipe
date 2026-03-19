@@ -38,8 +38,8 @@ API_BASE="${DPIPE_API_BASE:?DPIPE_API_BASE is required}"
 SERVICE_USER="${DPIPE_SERVICE_USER:?DPIPE_SERVICE_USER is required}"
 SERVICE_PASS="${DPIPE_SERVICE_PASS:?DPIPE_SERVICE_PASS is required}"
 
-# Read account list from config
-ACCOUNTS=$(uv run python3 -c "
+# Read account list from config (stdlib only — no uv needed)
+ACCOUNTS=$(python3 -c "
 import json, sys
 c = json.load(open('$CONFIG'))
 print(' '.join(c['accounts']))
