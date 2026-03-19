@@ -24,7 +24,7 @@
     },
     "warehouse": {
       "hashed_password": "$2b$12$/cTgLPoodjGrpJ1F9S7Y3OOvrSW4ru7NwvmAaslkiur2AuErWHmNq",
-      "accounts": ["oliveseed"]
+      "accounts": ["oliveseed", "test_org"]
     },
     "demo": {
       "hashed_password": "$2b$12$/GvsbyUVqCTX0kwR76AP7Oq8x.sD1RV1u19Cik/U563aEFpT5HGuO",

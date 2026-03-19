@@ -21,6 +21,10 @@
     "jim": {
       "hashed_password": "$2b$12$XHWqkAAE/mQ33puoPWXWLuh.cKCt1bquorca5UeHwCKQsy9cV13Fe",
       "accounts": ["oliveseed", "test_org"]
+    },
+    "warehouse": {
+      "hashed_password": "$2b$12$/cTgLPoodjGrpJ1F9S7Y3OOvrSW4ru7NwvmAaslkiur2AuErWHmNq",
+      "accounts": ["oliveseed","test_org"]
     }
   },
   "hosts": {
