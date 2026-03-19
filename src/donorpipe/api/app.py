@@ -13,6 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from donorpipe.api.auth import create_access_token, verify_password
 from donorpipe.api.config import load_config
 from donorpipe.api.graph_route import router
+from donorpipe.api.refresh_route import router as refresh_router
 
 
 logging.basicConfig(
@@ -38,6 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(router)
+app.include_router(refresh_router)
 
 
 @app.get("/health")

@@ -18,6 +18,8 @@ interface Props {
   store: TransactionStore
   newDataAvailable?: boolean
   onReload?: () => void
+  refreshPending?: boolean
+  onRequestRefresh?: () => void
 }
 
 interface ServiceStats {
@@ -26,7 +28,7 @@ interface ServiceStats {
   newest: string
 }
 
-export default function StatsBar({ store, newDataAvailable, onReload }: Props) {
+export default function StatsBar({ store, newDataAvailable, onReload, refreshPending, onRequestRefresh }: Props) {
   const [open, setOpen] = useState(false)
 
   const stats = useMemo(() => {
@@ -77,9 +79,23 @@ export default function StatsBar({ store, newDataAvailable, onReload }: Props) {
           >
             New data — Reload ↺
           </span>
+        ) : refreshPending ? (
+          <span className="ml-auto text-amber-600">
+            Refreshing…
+          </span>
         ) : updated ? (
-          <span className={`ml-auto ${updated.stale ? "text-amber-600" : "text-gray-400"}`}>
-            Updated {updated.label}
+          <span className={`ml-auto flex items-center gap-2 ${updated.stale ? "text-amber-600" : "text-gray-400"}`}>
+            <span>Updated {updated.label}</span>
+            <span
+              className="cursor-pointer hover:text-gray-600"
+              onClick={(e) => { e.stopPropagation(); onRequestRefresh?.() }}
+              role="button"
+              tabIndex={0}
+              title="Request data refresh"
+              aria-label="Request data refresh"
+            >
+              ↻
+            </span>
           </span>
         ) : null}
       </button>

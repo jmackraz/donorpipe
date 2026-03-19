@@ -14,7 +14,7 @@ from donorpipe.api.config import UserConfig
 logger = logging.getLogger(__name__)
 
 
-def _read_meta(path: Path) -> dict:
+def read_meta(path: Path) -> dict:
     """Read only the _meta object from the start of graph.json without loading the whole file."""
     chunk_size = 4096
     buffer = ""
@@ -90,7 +90,7 @@ def head_graph(
     if not graph_path.exists():
         raise HTTPException(status_code=503, detail=f"Graph not built for account '{account_id}'")
 
-    meta = _read_meta(graph_path)
+    meta = read_meta(graph_path)
     generated_at = meta.get("generated_at")
     if generated_at:
         dt = datetime.fromisoformat(generated_at)

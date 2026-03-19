@@ -150,6 +150,7 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 | Script | Purpose | Key args / env vars |
 |--------|---------|---------------------|
 | `warehouse/update.sh` | Hardwired download + rebuild + sync for oliveseed | `[--config <path>]`, `nightly` or `ondemand` (required) |
+| `warehouse/poll_refresh.sh` | Long-running poller: triggers `update.sh ondemand` when bookkeeper requests refresh | `[--config <path>]`; needs `DPIPE_SERVICE_USER`, `DPIPE_SERVICE_PASS`, `DPIPE_API_BASE` in `.env` |
 | `warehouse/download.sh` | Download CSVs from services (Stripe, DonorBox, PayPal, QBO) | `<account>` (required), `--year`, `--config`; `--services <svc> ...` must follow account |
 | `warehouse/refresh.sh` | Detect changes → rebuild graphs → sync to server | `[accounts]`, `--sync-only`, `PROD=1` |
 | `warehouse/sync-graphs.sh` | Sync pre-built graph.json files to server | `<account> [account ...]`, `PROD=1` |
@@ -186,6 +187,7 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 | Key | Purpose |
 |-----|---------|
 | `tokens_dir` | Directory for QBO OAuth2 token file (`qbo_tokens.json`) |
+| `api_base` | App API base URL used by `poll_refresh.sh` (e.g. `https://donorpipe.trickybit.com`) |
 | `sanitize[]` | List of `{source, dest}` pairs used by `warehouse/sanitize.sh` |
 | `accounts` | Account definitions: `data_base` (CSV root path), `data_dirs` (service subdirs) |
 | `hosts` | Staging/prod targets: `host` and `dir` per environment |
@@ -239,6 +241,29 @@ systemctl list-timers donorpipe-nightly.timer     # Check next run
 journalctl -u donorpipe-nightly.service -f        # Follow logs
 journalctl -u donorpipe-nightly.service -n 100    # Last 100 lines
 ```
+
+### On-demand refresh poller
+
+A long-running service (`donorpipe-ondemand`) polls the API every 30 seconds for refresh
+requests. When a user clicks "↻" in the app, the poller detects it and runs `update.sh
+ondemand` (downloads QBO + rebuilds + syncs).
+
+```bash
+systemctl status donorpipe-ondemand.service        # Check poller status
+journalctl -u donorpipe-ondemand.service -f        # Follow logs
+```
+
+**Credentials required in `.env`** on the Pi:
+
+```
+DPIPE_SERVICE_USER=warehouse   # Service account username
+DPIPE_SERVICE_PASS=<password>  # Service account password
+DPIPE_API_BASE=https://donorpipe.trickybit.com  # Or staging URL
+```
+
+The service account (`warehouse` user) must exist in the server's `config.json` with access
+to the appropriate accounts. Create it via `scripts/hash_password.py` and add it as a user
+entry (see User management section).
 
 ---
 

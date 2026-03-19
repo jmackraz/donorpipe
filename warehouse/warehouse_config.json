@@ -1,5 +1,6 @@
 {
   "tokens_dir": "/Users/jim/p/donorpipe_data/download_tokens",
+  "api_base": "https://donorpipe.trickybit.com",
   "sanitize": [
     {
       "source": "/Users/jim/p/donorpipe_data/primary_repository/oliveseed",

@@ -135,6 +135,17 @@ These variables control which host the deployment/ops scripts target. All have s
 | `DPIPE_DIR` | `~/donorpipe` | Remote directory where the app is installed. |
 | `DPIPE_DEV_CONFIG` | `warehouse/warehouse_config.json` | Config file used by `scripts/dev.sh`. Override to run against a different local config (e.g. `config.json` for testdata). |
 
+### Warehouse Poller (`warehouse/poll_refresh.sh`)
+
+Required on the Pi for the on-demand refresh feature. Set in `.env`.
+
+| Variable | Required | Description |
+|---|---|---|
+| `DPIPE_SERVICE_USER` | Yes | Username for the warehouse API service account |
+| `DPIPE_SERVICE_PASS` | Yes | Password for the warehouse API service account |
+| `DPIPE_API_BASE` | Yes | App API base URL (e.g. `https://donorpipe.trickybit.com`) |
+| `DPIPE_POLL_INTERVAL` | No | Seconds between polls (default: 30) |
+
 ## Project
 Read PROJECT.md for a high-level definition of the project.
 Read MILESTONES.md for the development plan

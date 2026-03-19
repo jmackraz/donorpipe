@@ -12,6 +12,7 @@ import FilterBar from "./FilterBar"
 import EntityTable from "./EntityTable"
 import DetailPanel from "./DetailPanel"
 import StatsBar from "./StatsBar"
+import { useRequestRefresh } from "../hooks/useRefresh"
 import EmptyState from "./EmptyState"
 import ErrorBanner from "./ErrorBanner"
 import HelpModal from "./HelpModal"
@@ -46,6 +47,7 @@ export default function AppLayout() {
 
   const { data: store, isLoading, error, refetch } = useGraph(account)
   const { newDataAvailable } = useGraphMeta(account, store?.meta?.generated_at)
+  const { requestRefresh, requestedAt, clearRequest } = useRequestRefresh(account)
   const { filters, setFilter, clearFilters } = useFilters()
 
   // Tab keyboard shortcuts 1–4 and "/" to focus filter text
@@ -199,7 +201,15 @@ export default function AppLayout() {
       </header>
 
       {/* Stats bar */}
-      {store && <StatsBar store={store} newDataAvailable={newDataAvailable} onReload={refetch} />}
+      {store && (
+        <StatsBar
+          store={store}
+          newDataAvailable={newDataAvailable}
+          onReload={() => { refetch(); clearRequest() }}
+          refreshPending={!!requestedAt && !newDataAvailable}
+          onRequestRefresh={requestRefresh}
+        />
+      )}
 
       {/* Error */}
       {error && <ErrorBanner error={error as Error} onRetry={() => refetch()} />}

@@ -22,22 +22,28 @@ PI_USER="${PI_USER:-$(ssh "$DPIPE_HOST" 'echo $USER')}"
 
 echo "==> Installing systemd units on $DPIPE_HOST (user: $PI_USER)..."
 
-# Substitute <pi-user> placeholder and write to a temp file
-TMPFILE="$(mktemp /tmp/donorpipe-nightly-XXXXXX.service)"
+# Substitute <pi-user> placeholder and write to temp files
+TMPFILE_NIGHTLY="$(mktemp /tmp/donorpipe-nightly-XXXXXX.service)"
+TMPFILE_ONDEMAND="$(mktemp /tmp/donorpipe-ondemand-XXXXXX.service)"
 sed "s/<pi-user>/$PI_USER/g" \
-    "$PROJECT_DIR/warehouse/systemd/donorpipe-nightly.service" > "$TMPFILE"
+    "$PROJECT_DIR/warehouse/systemd/donorpipe-nightly.service" > "$TMPFILE_NIGHTLY"
+sed "s/<pi-user>/$PI_USER/g" \
+    "$PROJECT_DIR/warehouse/systemd/donorpipe-ondemand.service" > "$TMPFILE_ONDEMAND"
 
-scp "$TMPFILE" "$DPIPE_HOST:/tmp/donorpipe-nightly.service"
+scp "$TMPFILE_NIGHTLY"  "$DPIPE_HOST:/tmp/donorpipe-nightly.service"
+scp "$TMPFILE_ONDEMAND" "$DPIPE_HOST:/tmp/donorpipe-ondemand.service"
 scp "$PROJECT_DIR/warehouse/systemd/donorpipe-nightly.timer" \
     "$DPIPE_HOST:/tmp/donorpipe-nightly.timer"
-rm "$TMPFILE"
+rm "$TMPFILE_NIGHTLY" "$TMPFILE_ONDEMAND"
 
 ssh "$DPIPE_HOST" "
-  sudo mv /tmp/donorpipe-nightly.service /etc/systemd/system/
-  sudo mv /tmp/donorpipe-nightly.timer   /etc/systemd/system/
+  sudo mv /tmp/donorpipe-nightly.service  /etc/systemd/system/
+  sudo mv /tmp/donorpipe-nightly.timer    /etc/systemd/system/
+  sudo mv /tmp/donorpipe-ondemand.service /etc/systemd/system/
   sudo systemctl daemon-reload
   sudo systemctl enable --now donorpipe-nightly.timer
+  sudo systemctl enable --now donorpipe-ondemand.service
   systemctl list-timers donorpipe-nightly.timer
 "
 
-echo "==> Done. Timer installed and enabled on $DPIPE_HOST."
+echo "==> Done. Timer and on-demand poller installed and enabled on $DPIPE_HOST."
