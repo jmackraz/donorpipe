@@ -2,16 +2,28 @@
 # Sync pre-built graph.json files to staging or production.
 #
 # Usage:
-#   ./warehouse/sync-graphs.sh <account> [account ...]
-#   PROD=1 ./warehouse/sync-graphs.sh <account> [account ...]
+#   ./warehouse/sync-graphs.sh [--config <config.json>] <account> [account ...]
+#   PROD=1 ./warehouse/sync-graphs.sh [--config <config.json>] <account> [account ...]
 set -euo pipefail
 
 WAREHOUSE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG="$WAREHOUSE/warehouse_config.json"
+ACCOUNTS=()
 
-if [[ $# -eq 0 ]]; then
-  echo "Usage: sync-graphs.sh <account> [account ...]"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --config) CONFIG="$2"; shift 2 ;;
+    *) ACCOUNTS+=("$1"); shift ;;
+  esac
+done
+
+if [[ ${#ACCOUNTS[@]} -eq 0 ]]; then
+  echo "Usage: sync-graphs.sh [--config <config>] <account> [account ...]"
   exit 1
+fi
+
+if [[ "$CONFIG" != /* ]]; then
+  CONFIG="$(pwd)/$CONFIG"
 fi
 
 TARGET=$([[ "${PROD:-0}" == "1" ]] && echo "prod" || echo "staging")
@@ -35,4 +47,4 @@ requested = sys.argv[1:]
 for account, acct in c['accounts'].items():
     if account in requested:
         print(account + '|' + os.path.expanduser(acct['data_base']))
-" -- "$@")
+" -- "${ACCOUNTS[@]}")

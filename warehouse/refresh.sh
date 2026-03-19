@@ -129,4 +129,4 @@ fi
 # ── Sync to server ────────────────────────────────────────────────────────────
 echo ""
 echo "=== Sync ==="
-"$ROOT/warehouse/sync-graphs.sh" "${REBUILD_ACCOUNTS[@]}"
+"$ROOT/warehouse/sync-graphs.sh" --config "$CONFIG" "${REBUILD_ACCOUNTS[@]}"

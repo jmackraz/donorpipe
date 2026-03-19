@@ -19,7 +19,7 @@ echo "==> Pushing help..."
 "$SCRIPT_DIR/push-help.sh"
 
 echo "==> Syncing data..."
-"$PROJECT_DIR/warehouse/sync-graphs.sh" oliveseed test_org
+"$PROJECT_DIR/warehouse/sync-graphs.sh" --config "$PROJECT_DIR/warehouse/warehouse_config.json" oliveseed test_org
 
 echo "==> Updating warehouse code on Pi..."
 "$SCRIPT_DIR/update-warehouse-pi.sh"
