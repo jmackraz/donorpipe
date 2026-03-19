@@ -13,7 +13,8 @@ The main data update workflow: download fresh CSVs from services, then rebuild a
 ```bash
 # 1. Download fresh data from external services (Stripe, DonorBox, PayPal, QBO)
 warehouse/download.sh oliveseed
-warehouse/download.sh --year 2025 oliveseed    # specific year
+warehouse/download.sh --year 2025 oliveseed                          # specific year
+warehouse/download.sh --year 2025 --services stripe qbo oliveseed   # selected services
 
 # 2. Rebuild changed graphs and sync to staging
 warehouse/refresh.sh
@@ -139,7 +140,7 @@ bun scripts/fetch_graph.ts --account my_org --base-url http://localhost:8000
 
 | Script | Purpose | Key args / env vars |
 |--------|---------|---------------------|
-| `warehouse/download.sh` | Download CSVs from services (Stripe, DonorBox, PayPal, QBO) | `<account>` (required), `--year`, `--config`; credentials from `.env` |
+| `warehouse/download.sh` | Download CSVs from services (Stripe, DonorBox, PayPal, QBO) | `<account>` (required), `--year`, `--config`, `--services <svc> ...`; credentials from `.env` |
 | `warehouse/refresh.sh` | Detect changes → rebuild graphs → sync to server | `[accounts]`, `--sync-only`, `PROD=1` |
 | `warehouse/sync-graphs.sh` | Sync pre-built graph.json files to server | `<account> [account ...]`, `PROD=1` |
 | `warehouse/sanitize.sh` | Regenerate sanitized test data | reads `sanitize[]` from `warehouse_config.json` |

@@ -10,7 +10,7 @@
 # will be needed.
 #
 # Usage:
-#   ./warehouse/download.sh [--config <config.json>] [--year <year>] <account_id>
+#   ./warehouse/download.sh [--config <config.json>] [--year <year>] [--services <svc> ...] <account_id>
 set -euo pipefail
 
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,11 +24,17 @@ fi
 CONFIG="$SCRIPTS/warehouse_config.json"
 YEAR=$(date +%Y)
 ACCOUNT=""
+SERVICES=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
     --year)   YEAR="$2";   shift 2 ;;
+    --services)
+      shift
+      while [[ $# -gt 0 && "$1" != --* ]]; do
+        SERVICES+=("$1"); shift
+      done ;;
     *)
       if [[ -n "$ACCOUNT" ]]; then
         echo "Error: download.sh takes exactly one account argument" >&2; exit 1
@@ -38,7 +44,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$ACCOUNT" ]]; then
-  echo "Usage: ./warehouse/download.sh [--config <config>] [--year <year>] <account_id>" >&2
+  echo "Usage: ./warehouse/download.sh [--config <config>] [--year <year>] [--services <svc> ...] <account_id>" >&2
   exit 1
 fi
 
@@ -53,13 +59,14 @@ fi
 
 echo "Account: $ACCOUNT"
 echo "=== Download ==="
-python3 - "$ROOT" "$CONFIG" "$YEAR" "$ACCOUNT" <<'PYEOF'
+python3 - "$ROOT" "$CONFIG" "$YEAR" "$ACCOUNT" "${SERVICES[@]+"${SERVICES[@]}"}" <<'PYEOF'
 import json, os, subprocess, sys
 
 root        = sys.argv[1]
 config_path = sys.argv[2]
 year        = sys.argv[3]
 account_id  = sys.argv[4]
+services    = sys.argv[5:]
 
 with open(config_path) as f:
     config = json.load(f)
@@ -74,6 +81,8 @@ print(f"[{account_id}] → {data_base}")
 
 runner = os.path.join(root, "warehouse", "downloads", "runner.py")
 cmd = ["uv", "run", runner, "--output-dir", data_base, "--year", year]
+if services:
+    cmd += ["--services"] + services
 tokens_dir = config.get("tokens_dir")
 if tokens_dir:
     cmd += ["--tokens-dir", os.path.expanduser(tokens_dir)]
