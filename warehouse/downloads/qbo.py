@@ -177,7 +177,7 @@ class QBODownloader:
             "Transaction date": datetime.strptime(txn["TxnDate"], "%Y-%m-%d").strftime(
                 "%m/%d/%Y"
             ),
-            "Num": txn["DocNumber"],
+            "Num": txn.get("DocNumber", ""),
             "Product/Service full name": detail["ItemRef"]["name"],
             "Amount": f"{line['Amount']:.2f}",
             "REF #": txn.get("PaymentRefNum", ""),
@@ -202,10 +202,23 @@ class QBODownloader:
         receipts = self._fetch_receipts(realm_id, access_token, year)
 
         rows: list[dict[str, str]] = []
+        skipped = 0
         for txn in receipts:
             for line in txn.get("Line", []):
                 if line.get("DetailType") == "SalesItemLineDetail":
-                    rows.append(self._map_row(txn, line))
+                    try:
+                        rows.append(self._map_row(txn, line))
+                    except KeyError as exc:
+                        import json, sys
+                        skipped += 1
+                        print(
+                            f"WARNING: skipping malformed SalesReceipt line "
+                            f"(missing key {exc}). Transaction payload:",
+                            file=sys.stderr,
+                        )
+                        print(json.dumps(txn, indent=2), file=sys.stderr)
+        if skipped:
+            print(f"WARNING: {skipped} line(s) skipped due to missing fields.", file=sys.stderr)
 
         rows.sort(key=lambda r: datetime.strptime(r["Transaction date"], "%m/%d/%Y"))
 
