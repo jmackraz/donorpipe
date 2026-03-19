@@ -23,7 +23,9 @@
       "Read(//tmp/**)",
       "Skill(keybindings-help)",
       "Bash(ls:*)",
-      "Bash(env OSF_EXPORTS=testdata:*)"
+      "Bash(env OSF_EXPORTS=testdata:*)",
+      "WebFetch(domain:developer.intuit.com)",
+      "WebFetch(domain:help.developer.intuit.com)"
     ]
   }
 }
