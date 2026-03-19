@@ -5,7 +5,8 @@
 # Env vars (set in .env on the Pi):
 #   DPIPE_SERVICE_USER    Username for the warehouse API service account
 #   DPIPE_SERVICE_PASS    Password for the warehouse API service account
-#   DPIPE_API_BASE        API base URL (e.g. https://donorpipe.trickybit.com)
+#   DPIPE_API_BASE        Space-separated API base URLs to poll
+#                         (e.g. "https://staging.example.com https://prod.example.com")
 #   DPIPE_POLL_INTERVAL   Seconds between polls (default: 30)
 #
 # Usage (normally run via systemd):
@@ -34,7 +35,7 @@ if [[ -f "$ROOT/.env" ]]; then
 fi
 
 POLL_INTERVAL="${DPIPE_POLL_INTERVAL:-30}"
-API_BASE="${DPIPE_API_BASE:?DPIPE_API_BASE is required}"
+API_BASES="${DPIPE_API_BASE:?DPIPE_API_BASE is required}"
 SERVICE_USER="${DPIPE_SERVICE_USER:?DPIPE_SERVICE_USER is required}"
 SERVICE_PASS="${DPIPE_SERVICE_PASS:?DPIPE_SERVICE_PASS is required}"
 
@@ -45,40 +46,56 @@ c = json.load(open('$CONFIG'))
 print(' '.join(c['accounts']))
 ")
 
-# Authenticate and get a JWT token
+# Per-server token state
+declare -A TOKENS
+declare -A TOKEN_OBTAINED_AT
+TOKEN_LIFETIME=25200  # 7 hours (tokens expire after 8h)
+
+# Authenticate and get a JWT token for a given base URL
 get_token() {
-  curl -sf -X POST "$API_BASE/token" \
+  local base="$1"
+  curl -sf -X POST "$base/token" \
     -d "username=$SERVICE_USER&password=$SERVICE_PASS" \
     | python3 -c "import json,sys; print(json.load(sys.stdin)['access_token'])"
 }
 
-TOKEN=$(get_token)
-TOKEN_OBTAINED=$(date +%s)
-TOKEN_LIFETIME=25200  # 7 hours (tokens expire after 8h)
+for BASE in $API_BASES; do
+  TOKENS["$BASE"]=$(get_token "$BASE")
+  TOKEN_OBTAINED_AT["$BASE"]=$(date +%s)
+done
 
-echo "$(date): poll_refresh.sh started (accounts: $ACCOUNTS, interval: ${POLL_INTERVAL}s)"
+echo "$(date): poll_refresh.sh started (servers: $API_BASES, accounts: $ACCOUNTS, interval: ${POLL_INTERVAL}s)"
 
 while true; do
-  # Re-authenticate if token is approaching expiry
   NOW=$(date +%s)
-  if (( NOW - TOKEN_OBTAINED > TOKEN_LIFETIME )); then
-    echo "$(date): Refreshing API token..."
-    TOKEN=$(get_token)
-    TOKEN_OBTAINED=$(date +%s)
-  fi
+  ANY_PENDING=false
 
-  for ACCT in $ACCOUNTS; do
-    STATUS=$(curl -sf -H "Authorization: Bearer $TOKEN" \
-      "$API_BASE/accounts/$ACCT/refresh" || echo '{"pending":false}')
-
-    PENDING=$(echo "$STATUS" | python3 -c "import json,sys; print(json.load(sys.stdin).get('pending', False))")
-
-    if [[ "$PENDING" == "True" ]]; then
-      echo "$(date): Refresh requested for $ACCT — running update.sh ondemand"
-      "$SCRIPTS/update.sh" --config "$CONFIG" ondemand || \
-        echo "$(date): update.sh ondemand exited with error $?"
+  for BASE in $API_BASES; do
+    # Re-authenticate if token is approaching expiry
+    if (( NOW - TOKEN_OBTAINED_AT["$BASE"] > TOKEN_LIFETIME )); then
+      echo "$(date): Refreshing API token for $BASE..."
+      TOKENS["$BASE"]=$(get_token "$BASE")
+      TOKEN_OBTAINED_AT["$BASE"]=$(date +%s)
     fi
+
+    for ACCT in $ACCOUNTS; do
+      STATUS=$(curl -sf -H "Authorization: Bearer ${TOKENS[$BASE]}" \
+        "$BASE/accounts/$ACCT/refresh" || echo '{"pending":false}')
+
+      PENDING=$(echo "$STATUS" | python3 -c "import json,sys; print(json.load(sys.stdin).get('pending', False))")
+
+      if [[ "$PENDING" == "True" ]]; then
+        echo "$(date): Refresh requested for $ACCT on $BASE"
+        ANY_PENDING=true
+      fi
+    done
   done
+
+  if [[ "$ANY_PENDING" == "true" ]]; then
+    echo "$(date): Running update.sh ondemand"
+    "$SCRIPTS/update.sh" --config "$CONFIG" ondemand || \
+      echo "$(date): update.sh ondemand exited with error $?"
+  fi
 
   sleep "$POLL_INTERVAL"
 done

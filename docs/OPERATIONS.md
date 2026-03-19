@@ -258,7 +258,7 @@ journalctl -u donorpipe-ondemand.service -f        # Follow logs
 ```
 DPIPE_SERVICE_USER=warehouse   # Service account username
 DPIPE_SERVICE_PASS=<password>  # Service account password
-DPIPE_API_BASE=https://donorpipe.trickybit.com  # Or staging URL
+DPIPE_API_BASE="https://staging.url https://donorpipe.trickybit.com"  # Space-separated; single URL also works
 ```
 
 The service account (`warehouse` user) must exist in the server's `config.json` with access

@@ -143,7 +143,7 @@ Required on the Pi for the on-demand refresh feature. Set in `.env`.
 |---|---|---|
 | `DPIPE_SERVICE_USER` | Yes | Username for the warehouse API service account |
 | `DPIPE_SERVICE_PASS` | Yes | Password for the warehouse API service account |
-| `DPIPE_API_BASE` | Yes | App API base URL (e.g. `https://donorpipe.trickybit.com`) |
+| `DPIPE_API_BASE` | Yes | Space-separated API base URLs to poll (e.g. `"https://staging.url https://donorpipe.trickybit.com"`). Single URL also works. |
 | `DPIPE_POLL_INTERVAL` | No | Seconds between polls (default: 30) |
 
 ## Project
