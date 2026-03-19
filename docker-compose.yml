@@ -9,7 +9,7 @@ services:
       - DONORPIPE_CONFIG=/app/config.json
     volumes:
       - ./config.json:/app/config.json:ro
-      - ${DONORPIPE_DATA:-./data}:/data:ro
+      - ${DONORPIPE_DATA:-./data}:/data:rw
       - ./docs:/app/docs:ro
     restart: unless-stopped
 
