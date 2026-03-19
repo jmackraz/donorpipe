@@ -1,6 +1,12 @@
 {
   "tokens_dir": "~/donorpipe_warehouse/download_tokens",
   "api_base": "https://donorpipe.trickybit.com",
+  "sanitize": [
+    {
+      "source": "~/donorpipe_warehouse/primary_repository/oliveseed",
+      "dest": "~/donorpipe_warehouse/primary_repository/test_org"
+    }
+  ],
   "accounts": {
     "oliveseed": {
       "data_base": "~/donorpipe_warehouse/primary_repository/oliveseed",

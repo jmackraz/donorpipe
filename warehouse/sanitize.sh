@@ -2,7 +2,7 @@
 set -euo pipefail
 WAREHOUSE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$WAREHOUSE")"
-CONFIG="$WAREHOUSE/warehouse_config.json"
+CONFIG="${1:-$WAREHOUSE/warehouse_config.json}"
 
 COUNT=$(python3 -c "import json; c=json.load(open('$CONFIG')); print(len(c['sanitize']))")
 
