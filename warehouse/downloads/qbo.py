@@ -1,6 +1,6 @@
 """QuickBooks Online (QBO) OAuth2 downloader.
 
-Downloads Sales Receipts for a given year and writes QBO_from_{year}.csv matching
+Downloads Sales Receipts from 2023-01-01 to the present and writes QBO_from_2023.csv matching
 the format expected by load_qbo_transactions() in transaction_store.py.
 
 Auth: OAuth2 authorization code flow with long-lived refresh tokens.
@@ -127,10 +127,8 @@ class QBODownloader:
     # API fetch
     # ------------------------------------------------------------------
 
-    def _fetch_receipts(self, realm_id: str, token: str, year: int) -> list[dict]:  # type: ignore[type-arg]
-        """Paginate SalesReceipt query for the full year. Returns all receipt dicts."""
-        start = f"{year}-01-01"
-        end = f"{year}-12-31"
+    def _fetch_receipts(self, realm_id: str, token: str, start: str, end: str) -> list[dict]:  # type: ignore[type-arg]
+        """Paginate SalesReceipt query for the given date range. Returns all receipt dicts."""
         all_receipts: list[dict] = []  # type: ignore[type-arg]
         position = 1
         while True:
@@ -190,8 +188,8 @@ class QBODownloader:
     # Download
     # ------------------------------------------------------------------
 
-    def download(self, year: int) -> Path:
-        """Download QBO Sales Receipts for *year* and write QBO_from_{year}.csv.
+    def download(self) -> Path:
+        """Download QBO Sales Receipts from 2023-01-01 to today and write QBO_from_2023.csv.
 
         Returns the path to the written file.
         """
@@ -199,7 +197,10 @@ class QBODownloader:
         access_token = self._ensure_valid_token(tokens)
         realm_id = tokens["realm_id"]
 
-        receipts = self._fetch_receipts(realm_id, access_token, year)
+        today = datetime.now(tz=UTC).date()
+        start = "2023-01-01"
+        end = today.strftime("%Y-%m-%d")
+        receipts = self._fetch_receipts(realm_id, access_token, start, end)
 
         rows: list[dict[str, str]] = []
         skipped = 0
@@ -222,13 +223,13 @@ class QBODownloader:
 
         rows.sort(key=lambda r: datetime.strptime(r["Transaction date"], "%m/%d/%Y"))
 
-        output_path = self.output_dir / f"QBO_from_{year}.csv"
+        output_path = self.output_dir / "QBO_from_2023.csv"
         self.output_dir.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", newline="", encoding="utf-8") as f:
             raw_writer = csv.writer(f)
             raw_writer.writerow(["[CURRENT] Sales Transaction Export"] + [""] * 8)
             raw_writer.writerow([""] * 9)  # org name (not available via API)
-            raw_writer.writerow([f"January, {year}-December, {year}"] + [""] * 8)
+            raw_writer.writerow([f"January, 2023-{today.strftime('%B, %Y')}"] + [""] * 8)
             raw_writer.writerow([""] * 9)  # blank row (row 4 of header block)
             dict_writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
             dict_writer.writeheader()

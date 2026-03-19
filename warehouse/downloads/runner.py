@@ -51,7 +51,7 @@ def run_paypal(client_id: str, secret_key: str, output_dir: Path, year: int) -> 
 
 
 def run_qbo(
-    client_id: str, client_secret: str, tokens_dir: Path, output_dir: Path, year: int
+    client_id: str, client_secret: str, tokens_dir: Path, output_dir: Path
 ) -> None:
     from qbo import QBODownloader
 
@@ -63,7 +63,7 @@ def run_qbo(
         tokens_path=tokens_path,
         output_dir=service_dir,
     ) as dl:
-        path = dl.download(year=year)
+        path = dl.download()
     print(f"[qbo] wrote {path}")
 
 
@@ -170,7 +170,6 @@ def main() -> None:
                 client_secret=qbo_secret,
                 tokens_dir=args.tokens_dir,
                 output_dir=args.output_dir,
-                year=args.year,
             )
         else:
             print(

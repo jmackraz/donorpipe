@@ -63,8 +63,8 @@ def _make_download_downloader(tmp_path: Path) -> QBODownloader:
 
     dl = _make_downloader(tokens_path, tmp_path)
 
-    def mock_fetch(realm_id: str, token: str, year: int) -> list[dict]:  # type: ignore[type-arg]
-        return receipts if year == 2025 else []
+    def mock_fetch(realm_id: str, token: str, start: str, end: str) -> list[dict]:  # type: ignore[type-arg]
+        return receipts
 
     dl._fetch_receipts = mock_fetch  # type: ignore[method-assign]
     return dl
@@ -235,19 +235,19 @@ class TestEnsureValidToken:
 
 class TestQBODownloaderUnit:
     def test_writes_csv(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         assert path.exists()
-        assert path.name == "QBO_from_2025.csv"
+        assert path.name == "QBO_from_2023.csv"
 
     def test_row_count(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         # Receipt 1: 1 SalesItemLineDetail line. Receipt 2: 2. Total: 3 data rows.
         # (csv_rows does not stop at TOTAL — exclude it manually here)
         rows = [r for r in csv_rows(str(path), skip=4) if "TOTAL" not in ",".join(r.values())]
         assert len(rows) == 3
 
     def test_single_line_receipt_fields(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         rows = {r["Num"]: r for r in csv_rows(str(path), skip=4)}
 
         r = rows["5001"]
@@ -259,46 +259,46 @@ class TestQBODownloaderUnit:
         assert r["Line created date"] == "06/01/2025 10:00:00 AM"
 
     def test_item_class_leaf_extracted(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         rows = {r["Num"]: r for r in csv_rows(str(path), skip=4)}
         # "30-Program:Kenya:Women's Work Center" → "Women's Work Center"
         assert rows["5001"]["Item class"] == "Women's Work Center"
 
     def test_multi_line_receipt_produces_two_rows(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         all_rows = list(csv_rows(str(path), skip=4))
         rows_5002 = [r for r in all_rows if r["Num"] == "5002"]
         assert len(rows_5002) == 2
 
     def test_subtotal_lines_skipped(self, tmp_path: Path) -> None:
         """SubTotalLineDetail rows must not appear in output."""
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         rows = list(csv_rows(str(path), skip=4))
         assert all(r["Donor"] != "" for r in rows)
 
     def test_missing_class_ref_defaults_to_empty(self, tmp_path: Path) -> None:
         """Line without ClassRef → empty Item class."""
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         all_rows = list(csv_rows(str(path), skip=4))
         # Receipt 5002 line 2 ("General Operations") has no ClassRef
         ops_row = next(r for r in all_rows if r["Product/Service full name"] == "General Operations")
         assert ops_row["Item class"] == ""
 
     def test_rows_sorted_by_date(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         rows = [r for r in csv_rows(str(path), skip=4) if r["Transaction date"]]
         dates = [datetime.strptime(r["Transaction date"], "%m/%d/%Y") for r in rows]
         assert dates == sorted(dates)
 
     def test_csv_four_line_header(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         lines = path.read_text().splitlines()
         assert "[CURRENT] Sales Transaction Export" in lines[0]
         # Row 5 (index 4) should be the column header row
         assert lines[4].startswith("Donor,")
 
     def test_total_footer(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         last_line = path.read_text().rstrip("\n").splitlines()[-1]
         assert last_line.startswith("TOTAL")
 
@@ -309,7 +309,7 @@ class TestQBODownloaderUnit:
 
 class TestQBOCSVRoundTrip:
     def test_receipts_created(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         store = TransactionStore([str(path)])
         store.load()
         # 2 unique DocNumbers (5001, 5002); both lines of 5002 share the same Num so
@@ -317,7 +317,7 @@ class TestQBOCSVRoundTrip:
         assert len(store.receipts) == 2
 
     def test_receipt_fields(self, tmp_path: Path) -> None:
-        path = _make_download_downloader(tmp_path).download(year=2025)
+        path = _make_download_downloader(tmp_path).download()
         store = TransactionStore([str(path)])
         store.load()
 
