@@ -50,16 +50,14 @@ This is mostly an operator set of tasks.
 * Deploy graph manually
 * Use refresh.sh to deploy graph, test update detection
 * Test staging **NEXT TO DO**
-* Automate updates to staging (mac job scheduling different than staging & prod?)
-    * demand refresh: qbo download and rclone sync for benevity
-    * scheduled refresh: all downloads and rclone sync
+* Write nightly and on-demand refresh scripts
+    * demand refresh: qbo download and rclone sync for benevity, then refresh
+    * nightly refresh: all downloads and rclone sync, then refresh
+* Automate nightly to staging (mac job scheduling different than staging & prod?)
 
 **Production**
-1. Repeat staging steps
-2. Add prod to refresh config.
-3. Announce.
-
-**RClone**
+1. Repeat staging steps: clean out data dir, deploy all, test.
+2. Add Clone**
 1. Get it set up
 2. Clone new stuff from gdrive (not stripe, donorbox) to primary
 3. Update stripe, donorbox in gdrive from primary
