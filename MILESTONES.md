@@ -1,7 +1,7 @@
 # Milestone Plan for DonorPipe
 
 ## Overview
-Completed milestones (1–19a) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
+Completed milestones (1–19c) have been moved to [docs/COMPLETED_MILESTONES.md](docs/COMPLETED_MILESTONES.md).
 
 ## Active Milestones
 ### Milestone 19 - Content management
@@ -67,27 +67,6 @@ This is mostly an operator set of tasks.
 2. Copy primary to pi
 3. Set up rclone
 4. Set up automation
-
-##### Milestone 19b - Automated downloads
-Automated download of export files from donation/payment processors on a schedule or on demand.
-* **Stripe** — **COMPLETE** API-based, straightforward
-* **DonorBox** — **COMPLETE** API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
-* **PayPal** — **COMPLETE** API-based; see `docs/paypal_downloading.md`
-* **Benevity** — No automated options, other than browser automation
-Status: Stripe, DonorBox, and PayPal complete.  Benevity excluded.
-
-**DonorBox Platform Fees** - empirically determined to be:
-* 1.75% until 4/1/2025
-* 2.0% after 4/1/2025 
-
-
-##### Milestone 19c - QBO OAuth2 download
-Automated download of QBO "Sales Transaction Export" report.
-* QBO has a "run report" API in addition to entity queries (either works)
-* OAuth2 is the main complexity — 100-day refresh token lifecycle
-* Report format is a fixed custom export
-
-Status: Not started.
 
 ### Milestone 20 - Update from manual downloads
 

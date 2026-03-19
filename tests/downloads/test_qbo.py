@@ -191,6 +191,27 @@ class TestEnsureValidToken:
         with pytest.raises(RuntimeError, match="Playground"):
             dl._ensure_valid_token(tokens)
 
+    def test_missing_expiry_triggers_refresh(self, tmp_path: Path) -> None:
+        """qbo_tokens.json with no token_expiry field → refresh on first use."""
+        tokens_path = tmp_path / "qbo_tokens.json"
+        _write_tokens(tokens_path)
+        # Remove token_expiry to simulate a freshly bootstrapped file
+        tokens = json.loads(tokens_path.read_text())
+        del tokens["token_expiry"]
+        tokens_path.write_text(json.dumps(tokens))
+
+        refresh_response = _MockResponse(200, {
+            "access_token": "bootstrapped_token",
+            "refresh_token": "new_refresh_token",
+            "expires_in": "3600",
+        })
+        dl = _make_downloader(tokens_path, tmp_path, _client=_MockClient(refresh_response))
+        tokens = dl._load_tokens()
+        result = dl._ensure_valid_token(tokens)
+        assert result == "bootstrapped_token"
+        on_disk = json.loads(tokens_path.read_text())
+        assert "token_expiry" in on_disk  # expiry written after first refresh
+
     def test_refresh_writes_atomic_tmp_then_replace(self, tmp_path: Path) -> None:
         tokens_path = tmp_path / "qbo_tokens.json"
         _write_tokens(tokens_path, token_expiry=_past_expiry())

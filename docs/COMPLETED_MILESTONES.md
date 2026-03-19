@@ -1,5 +1,31 @@
 # Completed Milestones for DonorPipe
 
+## Milestone 19b - Automated Downloads
+
+Automated download of export files from donation/payment processors on a schedule or on demand.
+* **Stripe** — API-based, straightforward
+* **DonorBox** — API-based; platform fee computed from amount × rate (1.75% pre-4/1/2025, 2.0% after)
+* **PayPal** — API-based; see `docs/paypal_downloading.md`
+* **Benevity** — No automated options, excluded
+
+**DonorBox Platform Fees** — empirically determined:
+* 1.75% until 4/1/2025
+* 2.0% after 4/1/2025
+
+Status: COMPLETE (Stripe, DonorBox, PayPal). Benevity excluded.
+
+## Milestone 19c - QBO OAuth2 Download
+
+Automated download of QBO "Sales Transaction Export" report via entity query API.
+* OAuth2 authorization code flow with 100-day refresh tokens stored in `qbo_tokens.json`
+* `client_id`/`client_secret` passed via env vars (`QBO_CLIENT_ID`, `QBO_CLIENT_SECRET`)
+* Tokens directory configured via `tokens_dir` in `warehouse_config.json` and `--tokens-dir` in `runner.py`
+* One CSV row per `SalesItemLineDetail` line; matches format expected by `load_qbo_transactions()`
+* Token refresh uses `client_secret_post` (credentials in POST body); rotates refresh token on use
+* Output: `QBO_from_{year}.csv` with 4-line header + TOTAL footer
+
+Status: COMPLETE.
+
 ## Milestone 20a - Manifest, Change Detection, Scheduled Refresh, Data Freshness
 
 **Goal**: Detect when CSV files in the warehouse have changed and keep the app showing

@@ -1,5 +1,5 @@
 {
-  "tokens_dir": "",
+  "tokens_dir": "/Users/jim/p/donorpipe_data/download_tokens",
   "sanitize": [
     {
       "source": "/Users/jim/p/donorpipe_data/primary_repository/oliveseed",

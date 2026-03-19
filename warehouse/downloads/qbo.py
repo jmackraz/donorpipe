@@ -78,9 +78,13 @@ class QBODownloader:
         If the access token expires within 5 minutes, a refresh is performed and the
         updated tokens are written back to disk. Raises RuntimeError on refresh failure.
         """
-        expiry_str = tokens["token_expiry"].replace("Z", "+00:00")
-        expiry = datetime.fromisoformat(expiry_str)
-        if datetime.now(tz=UTC) >= expiry - timedelta(minutes=5):
+        expiry_str = tokens.get("token_expiry", "")
+        if expiry_str:
+            expiry = datetime.fromisoformat(expiry_str.replace("Z", "+00:00"))
+            needs_refresh = datetime.now(tz=UTC) >= expiry - timedelta(minutes=5)
+        else:
+            needs_refresh = True  # no expiry recorded — refresh to get a valid token
+        if needs_refresh:
             new_tokens = self._refresh_token(tokens)
             self._save_tokens(new_tokens)
             return new_tokens["access_token"]  # type: ignore[no-any-return]
@@ -93,15 +97,20 @@ class QBODownloader:
         """
         r = self._client.post(
             self._TOKEN_URL,
-            auth=(self._client_id, self._client_secret),
             data={
                 "grant_type": "refresh_token",
                 "refresh_token": tokens["refresh_token"],
+                "client_id": self._client_id,
+                "client_secret": self._client_secret,
             },
         )
         if not r.is_success:
+            try:
+                detail = r.json()
+            except Exception:
+                detail = r.text
             raise RuntimeError(
-                f"QBO token refresh failed (HTTP {r.status_code}). "
+                f"QBO token refresh failed (HTTP {r.status_code}): {detail}\n"
                 "Use the Intuit OAuth2 Playground to obtain new tokens and update "
                 f"{self._tokens_path}."
             )
