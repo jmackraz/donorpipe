@@ -1,9 +1,15 @@
 # DonorPipe Help
 
-DonorPipe reconciles donation data from multiple online giving platforms (Stripe, DonorBox, PayPal)
-against QuickBooks Online receipts, helping you find missing donations, data discrepancies, and
-duplicate receipts.
+DonorPipe interconnects donation data reported from multiple online giving platforms (DonorBox, Benevity, Stripe, PayPal)
+and compares them against QuickBooks Online sales receipts, helping you to:
+* Enter new online donations correctly into QBO
+* Reconcile bank deposits with QBO payouts
+* Identify and fix errors in QBO receipts
 
+You no longer have to:
+* Manually download CSV reports from each platform
+* Pick through large CSVs to create sales receipts for online donations.
+* Struggle to reconcile bank deposits against the several online donations that can be batched in a single payout.
 ---
 
 ## Getting Started
@@ -31,7 +37,7 @@ a deposit in QBO, we need to match it up with the donation or donations that it 
 
 1. Switch to the **Payouts** tab.
 2. Filter (e.g., by date) to find the payout item matching your bank deposit.
-3. Click the item to open the detail panel, which shows the donations included in
+3. Click the item to open the detail panel, the _Relationships_ section shows the donations included in
    that payout.
 4. Use that list to match the bank deposit to donations in QBO.
 
@@ -48,8 +54,10 @@ Donations are flagged as "missing" if they do not have a matching receipt in QBO
 2. Enable the "Missing" filter, to see only donations that are missing a receipt. (But first, see Note below.)
 3. Select each donation in turn and use the information in the detail panel to create a Sales Receipt QBO.
 
-**Note:** It is a good practice to first fix any receipts that are missing their donation link (see below). 
+**NOTE**:
+It is a good practice to first fix any receipts that are missing their donation link (see below). 
 If that link is not made, it is easy to accidentally create a duplicate receipt for a donation.
+
 ---
 
 ## Viewing and Fixing Errors in Receipts
@@ -93,3 +101,10 @@ Duplicate receipts may have been accidentally created for a single donation.
 4. You can click on each receipt shown to see its details.
 5. In QBO, decide which receipt to delete. One of them may have been reconciled to a banking deposit.
 
+### Viewing your QBO Additions and Corrections
+Much of the data work is done by adding receipts in QBO for donations that need them, and correcting any data omissions, 
+discrepancies, and duplications.  It's nice to see your changes updated in the app.  To do so:
+1. Click the Refresh icon (circular arrow) at the right of the header near the latest-updated date.
+2. In a minute or two, the system will notice, do a fresh download from QBO, and update the web app.
+3. In your browser, you'll see in the same header area that new data has arrived. Click
+to refresh your browser view and see your changes.
