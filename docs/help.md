@@ -2,15 +2,17 @@
 
 DonorPipe interconnects donation data reported from multiple online giving platforms (DonorBox, Benevity, Stripe, PayPal)
 and compares them against QuickBooks Online sales receipts, helping you to:
-* Enter new online donations correctly into QBO
-* Reconcile bank deposits with QBO payouts
-* Identify and fix errors in QBO receipts
+* Create sales receipts for new online donations correctly into QBO
+* Reconcile bank deposits with QBO sales receipts
+* Identify and fix data-entry errors and duplicates in QBO receipts
 
-You no longer have to:
+We no longer have to:
 * Manually download CSV reports from each platform
 * Pick through large CSVs to create sales receipts for online donations.
 * Struggle to reconcile bank deposits against the several online donations that can be batched in a single payout.
 ---
+
+![DonorPipe donation pipeline diagram](/donation_pipeline.svg)
 
 ## Getting Started
 
