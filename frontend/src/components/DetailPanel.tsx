@@ -191,6 +191,7 @@ function ReceiptDetail({ r, onFindDonation, onSelectEntity }: { r: Receipt; onFi
           <div className="flex gap-2">
             <dt className="text-gray-500 w-28 shrink-0">TX ID</dt>
             <dd className="font-mono">{r.tx_id}</dd>
+            <CopyButton text={r.tx_id} />
           </div>
           {r.ref_id && (
             <div className="flex gap-2">
