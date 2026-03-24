@@ -10,17 +10,24 @@ We no longer have to:
 * Manually download CSV reports from each platform
 * Pick through large CSVs to create sales receipts for online donations.
 * Struggle to reconcile bank deposits against the several online donations that can be batched in a single payout.
----
+## Online Donations Transactions
+A typical scenario for online donations:
+1. A donor makes an online **_donation_** in DonorBox, and pays with their credit card.
+2. DonorBox creates a **_charge_** in Stripe
+3. We create a **_sales receipt_** in QBO for the online donation (from their exported report)
+4. This all happens a second time, after which Stripe makes a **_payout_** for __both__ donations, in the form of a **_deposit_** to our bank account.
+5. When we reconcile the bank deposit, we have to identify the two (or sometimes more) online donations 
+that are included in that payout.
 
 ![DonorPipe donation pipeline diagram](/donation_pipeline.svg)
 
+---
 ## Getting Started
-
-After logging in, select your account from the header. DonorPipe will load all donation, payout,
-and receipt data for that account.
-
 Use the **tabs** (Donations / Receipts / Payouts) to switch between entity types, and the
 **filter bar** to narrow results by date range, amount, service, or donor name.
+
+Click on a listed item to see its details in the detail panel. All related transactions are shown in the _Relationships_
+section of the detail panel. 
 
 **Keyboard shortcuts:**
 - `1` — Donations tab, `2` — Receipts tab, `3` — Payouts tab
