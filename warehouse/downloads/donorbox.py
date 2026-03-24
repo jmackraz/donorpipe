@@ -142,14 +142,21 @@ class DonorBoxDownloader:
         """
         output_path = self.output_dir / f"donorbox_{year}.csv"
 
+        # date_to is exclusive at midnight UTC, so widen the window past the year
+        # boundary and filter in Python. Late-evening US donations on Dec 31 are
+        # stored as Jan 1 UTC and would otherwise be silently omitted.
         donations = self._paginate(
             "/api/v1/donations",
             {
                 "date_from": f"{year}-01-01",
-                "date_to": f"{year}-12-31",
+                "date_to": f"{year + 1}-01-03",
                 "order": "asc",
             },
         )
+        donations = [
+            d for d in donations
+            if str(d.get("donation_date", "")).startswith(str(year))
+        ]
 
         rows: list[dict[str, str]] = []
         for d in donations:
