@@ -67,8 +67,8 @@ export default function StatsBar({ store, newDataAvailable, onReload, refreshPen
       >
         <span>{open ? "▲" : "▼"}</span>
         <span>
-          {totals.donations} donations · {totals.payouts} payouts ·{" "}
-          {totals.receipts} receipts
+          {totals.donations} donations · {totals.receipts} receipts ·{" "}
+          {totals.payouts} payouts
         </span>
         {newDataAvailable ? (
           <span
