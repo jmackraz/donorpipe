@@ -111,7 +111,7 @@ function DonationNode({
   const clickable = onSelectEntity && donation.id !== selectedId
   return (
     <div
-      className={`text-sm ml-4 ${donation.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
+      className={`text-sm ml-1 ${donation.id === selectedId ? SELECTED_CLS : ""} ${clickable ? CLICKABLE_CLS : ""}`}
       onClick={clickable ? () => onSelectEntity(donation) : undefined}
     >
       <span className="text-xs text-blue-700 mr-2">Donation</span>
@@ -165,7 +165,7 @@ function ReceiptSection({
   }
   if (receipts.length === 1) {
     return (
-      <div className="ml-8">
+      <div className="ml-4">
         <ReceiptNode receipt={receipts[0]!} selectedId={selectedId} onSelectEntity={onSelectEntity} />
       </div>
     )
@@ -195,13 +195,13 @@ export default function RelationshipGraph({ entity, onSelectEntity }: Props) {
         Relationships
       </h3>
       <div className="space-y-2">
-        <PayoutNode payout={form.payout} selectedId={selectedId} onSelectEntity={onSelectEntity} />
         {form.entries.map((entry, i) => (
           <div key={entry.donation?.id ?? `placeholder-${i}`} className="space-y-1">
             <DonationNode donation={entry.donation} selectedId={selectedId} onSelectEntity={onSelectEntity} />
             <ReceiptSection receipts={entry.receipts} selectedId={selectedId} onSelectEntity={onSelectEntity} />
           </div>
         ))}
+        <PayoutNode payout={form.payout} selectedId={selectedId} onSelectEntity={onSelectEntity} />
       </div>
     </section>
   )
