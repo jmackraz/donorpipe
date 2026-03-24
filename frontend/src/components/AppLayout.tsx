@@ -109,6 +109,16 @@ export default function AppLayout() {
     }
   }, [store, filters])
 
+  const filteredCounts = useMemo(() => {
+    if (!store) return { donations: 0, charges: 0, payouts: 0, receipts: 0 }
+    return {
+      donations: filterDonations(store.donations, filters).length,
+      charges: filterCharges(store.charges, filters).length,
+      payouts: filterPayouts(store.payouts, filters).length,
+      receipts: filterReceipts(store.receipts, filters).length,
+    }
+  }, [store, filters])
+
   const selectedEntity = useMemo((): AnyEntity | null => {
     if (!store || !filters.selected) return null
     return (
@@ -226,7 +236,7 @@ export default function AppLayout() {
         <>
           <TypeTabs
             activeType={filters.type}
-            store={store}
+            filteredCounts={filteredCounts}
             onSelect={(t) => {
               setSearchParams(
                 (prev) => {

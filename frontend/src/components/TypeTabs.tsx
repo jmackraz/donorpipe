@@ -1,9 +1,8 @@
 import type { EntityType } from "../hooks/useFilters"
-import type { TransactionStore } from "../lib/graph"
 
 interface Props {
   activeType: EntityType
-  store: TransactionStore
+  filteredCounts: Record<EntityType, number>
   onSelect: (type: EntityType) => void
 }
 
@@ -13,11 +12,11 @@ const TABS: { type: EntityType; label: string }[] = [
   { type: "payouts", label: "Payouts" },
 ]
 
-export default function TypeTabs({ activeType, store, onSelect }: Props) {
+export default function TypeTabs({ activeType, filteredCounts, onSelect }: Props) {
   return (
     <div role="tablist" className="flex border-b border-gray-200 bg-white px-4">
       {TABS.map(({ type, label }, i) => {
-        const count = store[type].size
+        const count = filteredCounts[type]
         const active = type === activeType
         return (
           <button
