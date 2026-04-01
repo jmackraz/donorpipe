@@ -219,6 +219,7 @@ Lightsail prod.
 After a deploy that changes warehouse scripts or Python dependencies:
 
 ```bash
+# first, push changes to github
 ./scripts/update-warehouse-pi.sh           # git pull + uv sync on Pi
 ```
 

@@ -25,7 +25,8 @@
       "Bash(ls:*)",
       "Bash(env OSF_EXPORTS=testdata:*)",
       "WebFetch(domain:developer.intuit.com)",
-      "WebFetch(domain:help.developer.intuit.com)"
+      "WebFetch(domain:help.developer.intuit.com)",
+      "Bash(python3:*)"
     ]
   }
 }
