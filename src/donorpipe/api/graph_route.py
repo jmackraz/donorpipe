@@ -66,6 +66,8 @@ def get_graph(
     with open(graph_path) as f:
         graph = json.load(f)
 
+    response.headers["Cache-Control"] = "no-cache"
+
     generated_at = graph.get("_meta", {}).get("generated_at")
     if generated_at:
         dt = datetime.fromisoformat(generated_at)
@@ -89,6 +91,8 @@ def head_graph(
     graph_path = Path(account.data_base).resolve() / "graph.json"
     if not graph_path.exists():
         raise HTTPException(status_code=503, detail=f"Graph not built for account '{account_id}'")
+
+    response.headers["Cache-Control"] = "no-cache"
 
     meta = read_meta(graph_path)
     generated_at = meta.get("generated_at")
