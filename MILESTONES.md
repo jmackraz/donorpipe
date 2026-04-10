@@ -45,13 +45,8 @@ This is mostly a developer set of tasks.
 ## Backlog
 
 **UI:**
-* Add notice about proprietary data
-* add "transaction id" filter, works with "copy ID" for emailing, etc.
-* "What's New" message pops up if unseen, can reach through help or something
-* payout json includes charges when expanded (?)
-* apply 'missing filter' to payouts
-* don't show 'find donation' if cash (maybe)
-* add CSV filename/line number to json (needed? isn't 'service' enough?)
+* [done] figure out how I can run downloads on my dev machine (see oauth section of OPERATIONS.md)
+* [already works] add "transaction id" filter, works with "copy ID" for emailing, etc.
 * [fixed] changing tabs fails when item selected (keep donation/receipt/payout selections separate?)
-* **need address/contact info in the details for donations**
-* **The net from donorbox is incorrect**
+* **[fixed] need address/contact info in the details for donations**
+* [ignore] The net from donorbox is incorrect (old ones, not critical)
