@@ -238,6 +238,7 @@ class TransactionStore:
 
                 #print(f"net: {net}, name: {name}, date: {date} transaction_id: {donation_id}")
 
+                # TODO: Benevity address/phone field names TBD — confirm from CSV report headers
                 self.add_donation( Donation(r, filename, "benevity", tx_id=donation_id, date=date, net=net,
                                     name=name,
                                     payment_service="benevity",
@@ -245,7 +246,9 @@ class TransactionStore:
                                     designation=r['Project'],
                                     comment=r['Comment'],
                                     email=r['Email'],
-                                    currency=currency))       # our choice, we synthesize the charge to suit
+                                    currency=currency,
+                                    phone="",
+                                    address=""))       # our choice, we synthesize the charge to suit
 
                 # sythesized charge, ID is same as donation_id
                 self.add_charge( Charge(r, filename=filename,service="benevity",
@@ -313,6 +316,22 @@ class TransactionStore:
                 self.add_charge(charge)
                 charges_needing_payout.append(charge)
 
+                pp_parts: list[str] = []
+                pp_line1 = r.get('Address Line 1', '')
+                pp_line2 = r.get('Address Line 2/District/Neighborhood', '')
+                pp_street = f"{pp_line1} {pp_line2}".strip() if pp_line2 else pp_line1
+                if pp_street:
+                    pp_parts.append(pp_street)
+                pp_city = r.get('Town/City', '')
+                pp_state = r.get('State/Province/Region/County/Territory/Prefecture/Republic', '')
+                pp_postal = r.get('Zip/Postal Code', '')
+                pp_city_line = f"{pp_city}, {pp_state}  {pp_postal}".strip().strip(',').strip()
+                if pp_city_line:
+                    pp_parts.append(pp_city_line)
+                if r.get('Country'):
+                    pp_parts.append(r.get('Country', ''))
+                pp_address = "\n".join(pp_parts)
+
                 self.add_donation( Donation(r, filename=filename, service="paypal",
                                     tx_id=r['Transaction ID'], date=date, net=net,
                                     name=name,
@@ -320,7 +339,9 @@ class TransactionStore:
                                     charge_tx_id=charge.tx_id,
                                     designation = r['Subject'],
                                     comment = r['Note'],
-                                    email=r['From Email Address'])
+                                    email=r['From Email Address'],
+                                    phone="",
+                                    address=pp_address)
                 )
 
         for r in partner_fees:
@@ -378,6 +399,21 @@ class TransactionStore:
                 print("UNKNOWN DONATION TYPE:", r['Donation Type'])
                 continue
 
+            phone = r.get('Phone', '')
+            parts: list[str] = []
+            street = f"{r.get('Address', '')} {r.get('Address 2', '')}".strip()
+            if street:
+                parts.append(street)
+            city = r.get('City', '')
+            state = r.get('State / Province', '')
+            postal = r.get('Postal Code', '')
+            city_line = f"{city}, {state}  {postal}".strip().strip(',').strip()
+            if city_line:
+                parts.append(city_line)
+            if r.get('Country'):
+                parts.append(r.get('Country', ''))
+            address = "\n".join(parts)
+
             self.add_donation(Donation(r, filename=filename, service="donorbox",
                                 tx_id=r['Receipt Id'], date=r['Donated At'], net=r['Net Amount'],
                                 name=r['Name'],
@@ -386,6 +422,8 @@ class TransactionStore:
                                 designation=f"{r['Campaign']}/{r['Designation']}",
                                 comment=r['Donor Comment'],
                                 email=r['Donor Email'],
+                                phone=phone,
+                                address=address,
                                        ))
 
 

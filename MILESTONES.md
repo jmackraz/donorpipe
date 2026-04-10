@@ -42,11 +42,16 @@ This is mostly a developer set of tasks.
 3. Update stripe, donorbox in gdrive from primary
 4. Add this step to update script
 
-
-
 ## Backlog
 
 **UI:**
 * Add notice about proprietary data
 * add "transaction id" filter, works with "copy ID" for emailing, etc.
 * "What's New" message pops up if unseen, can reach through help or something
+* payout json includes charges when expanded (?)
+* apply 'missing filter' to payouts
+* don't show 'find donation' if cash (maybe)
+* add CSV filename/line number to json (needed? isn't 'service' enough?)
+* [fixed] changing tabs fails when item selected (keep donation/receipt/payout selections separate?)
+* **need address/contact info in the details for donations**
+* **The net from donorbox is incorrect**

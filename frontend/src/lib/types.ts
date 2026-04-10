@@ -13,6 +13,8 @@ export interface RawDonation extends Transaction {
   designation: string
   comment: string
   payment_service: string
+  phone?: string
+  address?: string
   charge_id: string | null
   payout_id: string | null
   receipt_ids: string[]

@@ -54,6 +54,8 @@ function toFlatJson(type: EntityType, entity: AnyEntity): Record<string, unknown
       designation: d.designation,
       comment: d.comment,
       payment_service: d.payment_service,
+      phone: d.phone,
+      address: d.address,
       charge_id: d.charge?.id ?? null,
       payout_id: d.payout?.id ?? null,
       receipt_ids: d.receipts.map((r) => r.id),
@@ -130,6 +132,30 @@ function DonationDetail({ d, onSelectEntity }: { d: Donation; onSelectEntity?: O
           )}
         </dl>
       </section>
+
+      {(d.phone || d.address) && (
+        <section className="mb-4">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+            Contact
+          </h3>
+          <dl className="text-sm space-y-0.5">
+            {d.phone && (
+              <div className="flex gap-2 items-center">
+                <dt className="text-gray-500 w-28 shrink-0">Phone</dt>
+                <dd>{d.phone}</dd>
+                <CopyButton text={d.phone} />
+              </div>
+            )}
+            {d.address && (
+              <div className="flex gap-2 items-start">
+                <dt className="text-gray-500 w-28 shrink-0 mt-0.5">Address</dt>
+                <dd className="whitespace-pre-wrap select-text flex-1">{d.address}</dd>
+                <CopyButton text={d.address} />
+              </div>
+            )}
+          </dl>
+        </section>
+      )}
 
       <RelationshipGraph entity={d} onSelectEntity={onSelectEntity} />
     </>

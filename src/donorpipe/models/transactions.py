@@ -40,7 +40,8 @@ class Donation(Transaction):
     def __init__(self, record: dict[str, Any], filename: str, service: str, tx_id: str,
                  date: str, net: str | float, name: str, payment_service: str,
                  charge_tx_id: str | None, designation: str, comment: str,
-                 email: str, currency: str = "USD") -> None:
+                 email: str, currency: str = "USD",
+                 phone: str = "", address: str = "") -> None:
         super().__init__(record, filename, service, tx_id, date, net, currency )
         self.name = name
         self.payment_service = payment_service
@@ -48,6 +49,8 @@ class Donation(Transaction):
         self.designation = designation
         self.comment = comment
         self.email = email
+        self.phone = phone
+        self.address = address
 
         # linkage — populated by association passes in transaction_loader
         self.receipts: list[Receipt] = []
@@ -90,6 +93,8 @@ class Donation(Transaction):
             "designation": self.designation,
             "comment": self.comment,
             "email": self.email,
+            "phone": self.phone,
+            "address": self.address,
             "charge_id": self.charge.id if self.charge else None,
             "payout_id": self.payout.id if self.payout else None,
             "receipt_ids": [r.id for r in self.receipts],
@@ -111,6 +116,8 @@ class Donation(Transaction):
             comment=data["comment"],
             email=data["email"],
             currency=data.get("currency", "USD"),
+            phone=data.get("phone", ""),
+            address=data.get("address", ""),
         )
 
 
