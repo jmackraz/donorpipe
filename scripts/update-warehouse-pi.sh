@@ -18,5 +18,5 @@ DPIPE_HOST="${DPIPE_HOST:-punkinpi.local}"
 WAREHOUSE_DIR="${WAREHOUSE_DIR:-~/donorpipe_warehouse/donorpipe}"
 
 echo "==> Updating warehouse on $DPIPE_HOST..."
-ssh "$DPIPE_HOST" "cd $WAREHOUSE_DIR && git pull && uv sync"
+ssh "$DPIPE_HOST" "cd $WAREHOUSE_DIR && git pull && /home/jim/.local/bin/uv sync"
 echo "==> Done."
