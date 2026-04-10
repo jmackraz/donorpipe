@@ -33,8 +33,9 @@ export function useFilters() {
   const filters: Filters = useMemo(() => {
     const rawType = params.get("type")
     const rawInterval = params.get("dateInterval")
+    const type: EntityType = isEntityType(rawType) ? rawType : "donations"
     return {
-      type: isEntityType(rawType) ? rawType : "donations",
+      type,
       donor: params.get("donor") ?? "",
       missing: params.get("missing") === "1",
       discrepancies: params.get("discrepancies") === "1",
@@ -44,7 +45,7 @@ export function useFilters() {
       dateInterval: isDateInterval(rawInterval) ? rawInterval : "month",
       amountMin: params.get("amountMin") ? Number(params.get("amountMin")) : null,
       amountMax: params.get("amountMax") ? Number(params.get("amountMax")) : null,
-      selected: params.get("selected"),
+      selected: params.get(`sel_${type}`),
       sortAsc: params.get("sortAsc") === "1",
     }
   }, [params])
@@ -69,11 +70,28 @@ export function useFilters() {
     [setParams],
   )
 
+  const setSelected = useCallback(
+    (id: string | null) => {
+      const type = params.get("type") ?? "donations"
+      const selKey = `sel_${type}`
+      setParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (id) next.set(selKey, id)
+          else next.delete(selKey)
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [params, setParams],
+  )
+
   const clearFilters = useCallback(() => {
     setParams(
       (prev) => {
         const next = new URLSearchParams()
-        for (const key of ["account", "type", "selected"] as const) {
+        for (const key of ["account", "type", "sel_donations", "sel_receipts", "sel_payouts"] as const) {
           const v = prev.get(key)
           if (v) next.set(key, v)
         }
@@ -83,5 +101,5 @@ export function useFilters() {
     )
   }, [setParams])
 
-  return { filters, setFilter, clearFilters }
+  return { filters, setFilter, setSelected, clearFilters }
 }

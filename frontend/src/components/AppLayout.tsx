@@ -48,7 +48,7 @@ export default function AppLayout() {
   const { data: store, isLoading, error, refetch } = useGraph(account)
   const { newDataAvailable } = useGraphMeta(account, store?.meta?.generated_at)
   const { requestRefresh, requestedAt, clearRequest } = useRequestRefresh(account)
-  const { filters, setFilter, clearFilters } = useFilters()
+  const { filters, setFilter, setSelected, clearFilters } = useFilters()
 
   // Tab keyboard shortcuts 1–4 and "/" to focus filter text
   useEffect(() => {
@@ -137,7 +137,9 @@ export default function AppLayout() {
         const next = new URLSearchParams(prev)
         if (accountInput) next.set("account", accountInput)
         else next.delete("account")
-        next.delete("selected")
+        next.delete("sel_donations")
+        next.delete("sel_receipts")
+        next.delete("sel_payouts")
         return next
       },
       { replace: true },
@@ -152,7 +154,9 @@ export default function AppLayout() {
         const next = new URLSearchParams(prev)
         if (val) next.set("account", val)
         else next.delete("account")
-        next.delete("selected")
+        next.delete("sel_donations")
+        next.delete("sel_receipts")
+        next.delete("sel_payouts")
         return next
       },
       { replace: true },
@@ -242,7 +246,6 @@ export default function AppLayout() {
                 (prev) => {
                   const next = new URLSearchParams(prev)
                   next.set("type", t)
-                  next.delete("selected")
                   return next
                 },
                 { replace: true },
@@ -274,7 +277,7 @@ export default function AppLayout() {
                   type={filters.type}
                   entities={filteredEntities}
                   selectedId={filters.selected}
-                  onSelect={(id) => setFilter("selected", id)}
+                  onSelect={(id) => setSelected(id)}
                 />
               )}
             </div>
@@ -284,7 +287,7 @@ export default function AppLayout() {
               <DetailPanel
                 type={filters.type}
                 entity={selectedEntity}
-                onClose={() => setFilter("selected", null)}
+                onClose={() => setSelected(null)}
                 donations={store.donations}
               />
             )}
