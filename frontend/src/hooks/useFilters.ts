@@ -16,6 +16,7 @@ export interface Filters {
   amountMin: number | null
   amountMax: number | null
   selected: string | null
+  sortAsc: boolean
 }
 
 function isEntityType(v: string | null): v is EntityType {
@@ -44,6 +45,7 @@ export function useFilters() {
       amountMin: params.get("amountMin") ? Number(params.get("amountMin")) : null,
       amountMax: params.get("amountMax") ? Number(params.get("amountMax")) : null,
       selected: params.get("selected"),
+      sortAsc: params.get("sortAsc") === "1",
     }
   }, [params])
 

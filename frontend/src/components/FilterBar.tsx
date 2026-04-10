@@ -193,6 +193,12 @@ export default function FilterBar({ filters, setFilter, clearFilters, services, 
             {/* Toggle buttons */}
             <div className="flex items-center gap-1">
               <ToggleButton
+                active={filters.sortAsc}
+                onClick={() => setFilter("sortAsc", !filters.sortAsc)}
+              >
+                Oldest first
+              </ToggleButton>
+              <ToggleButton
                 active={filters.missing}
                 onClick={() => setFilter("missing", !filters.missing)}
               >

@@ -35,7 +35,7 @@ export function filterDonations(donations: Map<string, Donation>, f: Filters): D
     results.push(d)
   }
 
-  return results.sort((a, b) => b.date.localeCompare(a.date))
+  return results.sort((a, b) => f.sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date))
 }
 
 export function filterCharges(charges: Map<string, Charge>, f: Filters): Charge[] {
@@ -47,7 +47,7 @@ export function filterCharges(charges: Map<string, Charge>, f: Filters): Charge[
     results.push(c)
   }
 
-  return results.sort((a, b) => b.date.localeCompare(a.date))
+  return results.sort((a, b) => f.sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date))
 }
 
 export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[] {
@@ -60,7 +60,7 @@ export function filterPayouts(payouts: Map<string, Payout>, f: Filters): Payout[
     results.push(p)
   }
 
-  return results.sort((a, b) => b.date.localeCompare(a.date))
+  return results.sort((a, b) => f.sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date))
 }
 
 export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Receipt[] {
@@ -82,5 +82,5 @@ export function filterReceipts(receipts: Map<string, Receipt>, f: Filters): Rece
     results.push(r)
   }
 
-  return results.sort((a, b) => b.date.localeCompare(a.date))
+  return results.sort((a, b) => f.sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date))
 }
