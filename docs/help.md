@@ -34,6 +34,8 @@ section of the detail panel.
 - `f` — Toggle the filter panel open/closed
 - `/` — Focus the donor search field (opens filter panel if collapsed)
 - `n` / `p` — Step forward / backward by one date period
+- `m` — Toggle "Missing" filter
+- `o` — Toggle "Oldest first" sort order
 - `c` — Clear all filters
 - `Escape` — Collapse the filter panel
 - `?` — Open this help panel

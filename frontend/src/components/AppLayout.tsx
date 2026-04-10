@@ -74,6 +74,10 @@ export default function AppLayout() {
         if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, 1))
       } else if (e.key === "p") {
         if (filters.dateStart) setFilter("dateStart", advanceDate(filters.dateStart, filters.dateInterval, -1))
+      } else if (e.key === "m") {
+        setFilter("missing", !filters.missing)
+      } else if (e.key === "o") {
+        setFilter("sortAsc", !filters.sortAsc)
       } else if (e.key === "?") {
         setHelpOpen(true)
       }
