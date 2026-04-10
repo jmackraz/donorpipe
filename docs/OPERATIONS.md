@@ -1,35 +1,54 @@
 # DonorPipe Operations
-
 This document covers running, deploying, and managing DonorPipe across environments.
 
+---
+## Environments
+### Production
+- https://donorpipe.trickybit.com
+- ubuntu@ip-172-26-8-101
+- /home/ubuntu/donorpipe
+
+### Staging
+- http://punkinpi.local
+- /home/jim/donorpipe
+
+### Data warehouse
+- root: /home/jim/donorpipe_warehouse
+- data: /home/jim/donorpipe_warehouse/primary_repository/{oliveseed,test_org}
+- code: /home/jim/donorpipe_warehouse/donorpipe
+
+### Development
+- http://localhost:5173
 ---
 
 ## Day-to-Day Operations
 
 ### Update graphs
 
+**Note: these scripts are run in the data warehouse environment, not the development box.
+
 #### Hardwired update (normal use)
 
 `warehouse/update.sh` combines download + rebuild + sync in one command:
 
 ```bash
-warehouse/update.sh nightly    # Download all services, rebuild, sync to staging + prod
-warehouse/update.sh ondemand   # Download QBO only (for bookkeeper changes), rebuild, sync
+warehouse/update.sh --config warehouse/warehouse_pi_config.json nightly    # Download all services, rebuild, sync to staging + prod
+warehouse/update.sh --config warehouse/warehouse_pi_config.json ondemand   # Download QBO only (for bookkeeper changes), rebuild, sync
 ```
 
 #### Manual / ad-hoc update
 
 ```bash
 # 1. Download fresh data from external services (Stripe, DonorBox, PayPal, QBO)
-warehouse/download.sh oliveseed
-warehouse/download.sh --year 2025 oliveseed                          # specific year
-warehouse/download.sh oliveseed --services stripe qbo               # selected services (--services must follow account)
+warehouse/download.sh --config warehouse/warehouse_pi_config.json oliveseed
+warehouse/download.sh --config warehouse/warehouse_pi_config.json --year 2025 oliveseed                          # specific year
+warehouse/download.sh --config warehouse/warehouse_pi_config.json oliveseed --services stripe qbo               # selected services (--services must follow account)
 
 # 2. Rebuild changed graphs and sync to staging
-warehouse/refresh.sh
+warehouse/refresh.sh --config warehouse/warehouse_pi_config.json
 
 # 2b. Rebuild and sync to staging, then prod if staging changed
-warehouse/refresh.sh && PROD=1 warehouse/refresh.sh --sync-only
+warehouse/refresh.sh --config warehouse/warehouse_pi_config.json && PROD=1 warehouse/refresh.sh --config warehouse/warehouse_pi_config.json --sync-only
 ```
 
 `refresh.sh` detects changes since the last build, rebuilds only what changed, and syncs to the target server. It exits 1 (no-op) when nothing changed — the `&&` pattern uses this to gate the prod sync.
@@ -340,9 +359,20 @@ QBO uses OAuth2 with a 100-day refresh token. Initial tokens are obtained from t
 
 **Prerequisites:** `QBO_CLIENT_ID` and `QBO_CLIENT_SECRET` in `.env`, and `tokens_dir` set in `warehouse_config.json`.
 
-1. Go to [Intuit OAuth2 Playground](https://developer.intuit.com/app/developer/playground)
-2. Select your app, authorize, copy `access_token`, `refresh_token`, and `realmId`
-3. Create `<tokens_dir>/qbo_tokens.json`:
+1. Go to _Intuit OAuth2 Playground_ ( https://developer.intuit.com/app/developer/playground )
+2. Select:
+- workspace: "Jim Mackraz"
+- app: Tricky1 (Production)
+- keys should fill in automatically
+- oauth settings: com.intuit.quickbooks.accounting
+- Get Authorization Code
+- Confirm realm ID
+- Get Tokens
+3. Update `<tokens_dir>/qbo_tokens.json`:
+- Copy refresh token (expires 101 days) and Access Token (expires 1 hour)
+- Save them into `<tokens_dir>/qbo_tokens.json`
+- Don't worry about the token_expiry timestamp
+- Test, within 1 hour.
 
 ```json
 {
@@ -351,6 +381,12 @@ QBO uses OAuth2 with a 100-day refresh token. Initial tokens are obtained from t
   "refresh_token": "<refresh_token from Playground>",
   "token_expiry": "<UTC expiry as ISO 8601, e.g. 2026-03-18T12:00:00+00:00>"
 }
+```
+
+Test with:
+```bash
+warehouse/download.sh --config warehouse/warehouse_pi_config.json oliveseed --services qbo
+warehouse/download.sh --config warehouse/warehouse_config.json oliveseed --services qbo # on dev machine
 ```
 
 The downloader automatically refreshes the access token (valid 1 hour) and rotates the refresh token on every use. If a refresh fails (token expired), re-run this bootstrap.

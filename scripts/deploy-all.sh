@@ -18,8 +18,11 @@ echo "==> Pushing config..."
 echo "==> Pushing help..."
 "$SCRIPT_DIR/push-help.sh"
 
-echo "==> Syncing data..."
-"$PROJECT_DIR/warehouse/sync-graphs.sh" --config "$PROJECT_DIR/warehouse/warehouse_config.json" oliveseed test_org
+# don't do this: data is sync'd from the warehouse, not my development machine
+#echo "==> Syncing data..."
+#"$PROJECT_DIR/warehouse/sync-graphs.sh" --config "$PROJECT_DIR/warehouse/warehouse_config.json" oliveseed test_org
+
+echo "NOTE: Remember to update graphs from data warehouse if needed."
 
 echo "==> Updating warehouse code on Pi..."
 "$SCRIPT_DIR/update-warehouse-pi.sh"
